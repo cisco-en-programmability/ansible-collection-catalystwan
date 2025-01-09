@@ -1,4 +1,4 @@
 ---
 
 validator_port: "12346"
-certificate_signing: cisco
+controller_certificate_auth: cisco

@@ -58,6 +58,10 @@ options:
         type: str
         choices: [ "valid", "invalid" ]
         required: True
+  install_certificate:
+    description:
+      - Install locally signed certificate.
+    type: str
   device_ip:
     description:
       - Target device IP address.
@@ -140,6 +144,7 @@ def run_module():
                 validity=dict(type=str, choices=[Validity.VALID, Validity.INVALID], required=True),
             ),
         ),
+        install_certificate=dict(type=str),
         device_ip=dict(type=str, aliases=["target_ip"]),
         uuid=dict(type=str),
         wait_for_completed=dict(type="bool", default=True),
@@ -152,9 +157,17 @@ def run_module():
             ("invalidate", "send_to_controllers"),
             ("invalidate", "send_to_vbond"),
             ("invalidate", "change_vedge_list_validity"),
+            ("invalidate", "install_certificate"),
         ],
         required_one_of=[
-            ("invalidate", "generate_csr", "send_to_controllers", "send_to_vbond", "change_vedge_list_validity")
+            (
+                "invalidate",
+                "generate_csr",
+                "send_to_controllers",
+                "send_to_vbond",
+                "change_vedge_list_validity",
+                "install_certificate",
+            )
         ],
     )
     result = ModuleResult()
@@ -238,6 +251,15 @@ def run_module():
             failure_msg="Couldn't Invalidate devices, task failed or task has reached timeout.",
             payload=payload,
             wait_for_completed=module.params.get("wait_for_completed"),
+        )
+    if module.params.get("install_certificate"):
+        payload = module.params.get("install_certificate")
+        module.send_request_safely(
+            result=result,
+            action_name="Install certificate",
+            send_func=module.session.endpoints.certificate_management_device.install_signed_cert,
+            payload=payload,
+            response_key="install_signed_cert",
         )
 
     # ----------------------------------#

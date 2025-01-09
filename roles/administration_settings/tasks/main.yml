@@ -22,7 +22,9 @@
 
 - name: Generate certificates when not provided
   ansible.builtin.include_tasks: certificates.yml
-  when: certificate_signing == "enterprise" and certificate_enterprise_root_ca is not defined
+  when:
+    - controller_certificate_auth == "enterprise"
+    - enterprise_ca_cert_path is not defined
 
 - name: Set initial configuration via administration settings - loop through all vManage devices
   cisco.catalystwan.administration_settings:
@@ -31,9 +33,11 @@
       port: "{{ validator_port }}"
     organization: "{{ organization_name }}"
     certificates:
-      certificate_signing: "{{ certificate_signing }}"
+      certificate_signing: "{{ controller_certificate_auth }}"
       retrieve_interval: "2"
-    enterprise_root_ca: "{{ certificate_enterprise_root_ca if certificate_signing == 'enterprise' else omit }}"
+    enterprise_root_ca: >-
+      {{ lookup('file', enterprise_ca_cert_path | default(results_dir~'/certificates/ca.crt'))
+      if controller_certificate_auth == 'enterprise' else omit }}
     pnp_connect_sync: "on"
     smart_account_credentials:
       username: "{{ pnp_username }}"

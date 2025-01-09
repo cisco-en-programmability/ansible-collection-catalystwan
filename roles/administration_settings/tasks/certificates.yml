@@ -11,13 +11,13 @@
 
 - name: Generate private key
   community.crypto.openssl_privatekey:
-    path: "{{ results_dir }}/certificates/generated-ca.pem"
+    path: "{{ results_dir }}/certificates/ca.pem"
     mode: "0600"
 
 - name: Generate csr
   community.crypto.openssl_csr:
-    path: "{{ results_dir }}/certificates/generated-ca.csr"
-    privatekey_path: "{{ results_dir }}/certificates/generated-ca.pem"
+    path: "{{ results_dir }}/certificates/ca.csr"
+    privatekey_path: "{{ results_dir }}/certificates/ca.pem"
     common_name: "SD-WAN CA"
     basic_constraints:
       - 'CA:TRUE'
@@ -29,14 +29,9 @@
 
 - name: Generate certificate for enterprise signing
   community.crypto.x509_certificate:
-    path: "{{ results_dir }}/certificates/generated-ca.crt"
-    privatekey_path: "{{ results_dir }}/certificates/generated-ca.pem"
-    csr_path: "{{ results_dir }}/certificates/generated-ca.csr"
+    path: "{{ results_dir }}/certificates/ca.crt"
+    privatekey_path: "{{ results_dir }}/certificates/ca.pem"
+    csr_path: "{{ results_dir }}/certificates/ca.csr"
     provider: selfsigned
     mode: "0600"
     return_content: true
-  register: generated_ca_certificate
-
-- name: Read generated certificate
-  ansible.builtin.set_fact:
-    certificate_enterprise_root_ca: "{{ generated_ca_certificate['certificate'] }}"
