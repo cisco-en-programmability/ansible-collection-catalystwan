@@ -14,6 +14,7 @@ exclude_paths:
   - .dev_dir/example_dev_vars.yml
   - .dev_dir/*
   - playbooks/tests/configuration_file_dev_vars.yml
+  - .ansible
 # parseable: true
 # quiet: true
 # strict: true
