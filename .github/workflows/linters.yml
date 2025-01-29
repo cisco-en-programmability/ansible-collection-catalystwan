@@ -31,6 +31,7 @@ jobs:
       - uses: isort/isort-action@master
         with:
           requirementsFiles: "requirements.txt"
+          isortVersion: '5.12.0'
 
       - name: Install pycln
         run: pip install pycln==2.4.0
