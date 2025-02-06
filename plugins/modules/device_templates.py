@@ -8,7 +8,7 @@
 DOCUMENTATION = r"""
 ---
 module: Device_templates
-short_description: Manage Device Templates on vManage.
+short_description: Manage Device Templates on Manager.
 version_added: "0.2.0"
 description:
   - This module allows you to create, delete, attach and detach Device Templates
@@ -32,7 +32,7 @@ options:
     default: null
   device_role:
     description:
-      - The device role. Applicable to all devices except 'vManage' and 'vSmart'
+      - The device role. Applicable to all devices except 'Manager' and 'vSmart'
     required: false
     default: null
     type: str
@@ -68,7 +68,7 @@ options:
   device_specific_vars:
     description:
       - For parameters in a feature template that you configure as device-specific,
-        when you attach a device template to a device, Cisco vManage prompts you for the values to use
+        when you attach a device template to a device, Cisco Manager prompts you for the values to use
         for these parameters.
     type: raw
 author:
@@ -77,11 +77,11 @@ extends_documentation_fragment:
   - cisco.catalystwan.device_models_device_template
   - cisco.catalystwan.manager_authentication
 notes:
-  - Ensure that the provided credentials have sufficient permissions to manage templates and devices in vManage.
+  - Ensure that the provided credentials have sufficient permissions to manage templates and devices in Manager.
 """
 
 EXAMPLES = r"""
-- name: Ensure a device template is present on vManage
+- name: Ensure a device template is present on Manager
   cisco.catalystwan.device_templates:
     state: present
     template_name: "MyDeviceTemplate"
@@ -101,7 +101,7 @@ EXAMPLES = r"""
     timeout_seconds: 600
     manager_credentials: ...
 
-- name: Remove a device template from vManage
+- name: Remove a device template from Manager
   cisco.catalystwan.device_templates:
     state: absent
     template_name: "MyDeviceTemplate"
@@ -139,7 +139,7 @@ from catalystwan.session import ManagerHTTPError
 from catalystwan.typed_list import DataSequence
 
 from ..module_utils.result import ModuleResult
-from ..module_utils.vmanage_module import AnsibleCatalystwanModule
+from ..module_utils.manager_module import AnsibleCatalystwanModule
 
 State = Literal["present", "absent", "attached", "detached"]
 
@@ -215,7 +215,7 @@ def run_module():
         if target_template:
             module.logger.debug(f"Detected existing template:\n{target_template}\n")
             result.msg = (
-                f"Template with name {template_name} already present on vManage, skipping create template operation."
+                f"Template with name {template_name} already present on Manager, skipping create template operation."
             )
         else:
             general_templates = []
@@ -232,7 +232,7 @@ def run_module():
             )
 
             module.logger.debug(
-                f"Prepared template for sending to vManage, template configuration:\n{device_template}\n"
+                f"Prepared template for sending to Manager, template configuration:\n{device_template}\n"
             )
             try:
                 module.session.api.templates.create(template=device_template, debug=module.params.get("debug"))
@@ -290,9 +290,9 @@ def run_module():
             result.changed = True
             result.msg = f"Deleted template {template_name}"
         else:
-            module.logger.debug(f"Template '{target_template}' not presend in list of Device Templates on vManage.")
+            module.logger.debug(f"Template '{target_template}' not presend in list of Device Templates on Manager.")
             result.msg = (
-                f"Template {template_name} not presend in list of Device Templates on vManage. "
+                f"Template {template_name} not presend in list of Device Templates on Manager. "
                 "skipping delete template operation."
             )
 

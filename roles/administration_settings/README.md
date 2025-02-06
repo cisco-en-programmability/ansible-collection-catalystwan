@@ -29,13 +29,13 @@ Variables expected by this role:
 - `validator_port`: The port used by the validator.
 - `pnp_username`: The username for the PnP service account.
 - `pnp_password`: The password for the PnP service account.
-- `vmanage_instances`: A list of vManage instances, each containing management IP, admin username, and admin password.
+- `manager_instances`: A list of Manager instances, each containing management IP, admin username, and admin password.
 
-Example of `vmanage_instances`:
+Example of `manager_instances`:
 
 ```yaml
-vmanage_instances:
-  - hostname: 'vmanage01'
+manager_instances:
+  - hostname: 'manager01'
     system_ip: '192.0.2.10'
     mgmt_public_ip: '198.51.100.10'
     admin_username: 'admin'
@@ -57,8 +57,8 @@ Including an example of how to use your role (with variables passed in as parame
         validator_port: '12345'
         pnp_username: 'pnp_user'
         pnp_password: 'pnp_pass'
-        vmanage_instances:
-          - hostname: 'vmanage01'
+        manager_instances:
+          - hostname: 'manager01'
             system_ip: '192.0.2.10'
             mgmt_public_ip: '198.51.100.10'
             admin_username: 'admin'

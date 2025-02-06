@@ -8,7 +8,7 @@ from catalystwan.endpoints.monitoring.device_details import DeviceData
 from catalystwan.session import ManagerHTTPError
 from catalystwan.typed_list import DataSequence
 
-from ..module_utils.vmanage_module import AnsibleCatalystwanModule
+from ..module_utils.manager_module import AnsibleCatalystwanModule
 
 
 def get_target_device(

@@ -8,10 +8,10 @@
 DOCUMENTATION = r"""
 ---
 module: devices_certificates
-short_description: Manages certificates for devices within vManage
+short_description: Manages certificates for devices within Manager
 version_added: "0.1.0"
 description:
-  - This module manages the certificates for devices in vManage.
+  - This module manages the certificates for devices in Manager.
   - It can generate a Certificate Signing Request (CSR), send configuration to controllers,
     send configuration to vBond, invalidate certificates, and change the validity of the device list.
 options:
@@ -91,7 +91,7 @@ changed:
   type: bool
   sample: true
 response:
-  description: Detailed response from the vManage API if applicable.
+  description: Detailed response from the Manager API if applicable.
   returned: when API call is made
   type: dict
   sample: {"status": "success", "details": "CSR generated successfully."}
@@ -122,7 +122,7 @@ from catalystwan.endpoints.certificate_management_device import TargetDevice, Va
 
 from ..module_utils.filters import get_target_device
 from ..module_utils.result import ModuleResult
-from ..module_utils.vmanage_module import AnsibleCatalystwanModule
+from ..module_utils.manager_module import AnsibleCatalystwanModule
 
 
 def run_module():
@@ -202,7 +202,7 @@ def run_module():
         payload = TargetDevice(deviceIP=module.params.get("device_ip"))
         module.send_request_safely(
             result=result,
-            action_name="Generate CSR for vManage",
+            action_name="Generate CSR for Manager",
             send_func=module.session.endpoints.certificate_management_device.generate_csr,
             payload=payload,
             response_key="generate_csr",

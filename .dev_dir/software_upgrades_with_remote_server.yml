@@ -23,7 +23,7 @@
     remote_server_user: "{{ remote_server_user }}"
     remote_server_password: "{{ remote_server_password }}"
     remote_server_image_location_prefix: "{{ remote_server_image_location_prefix }}"
-    vmanage_remote_software_filename: "{{ vmanage_remote_software_filename }}"
+    manager_remote_software_filename: "{{ manager_remote_software_filename }}"
     viptela_remote_software_filename: "{{ viptela_remote_software_filename }}"
     cedge_remote_software_filename: "{{ cedge_remote_software_filename }}"
     controller_software_version_to_activate: "{{ controller_software_version_to_activate }}"

@@ -8,7 +8,7 @@
 DOCUMENTATION = r"""
 ---
 module: cluster_management
-short_description: Cluster configuration for vManage devices
+short_description: Cluster configuration for Manager devices
 version_added: "0.2.1"
 description: This module can be used to add or edit existing controller devices to cluster configuration.
 options:
@@ -17,9 +17,9 @@ options:
       - How much time (in seconds) to wait for the device to connect to cluster post configuration.
     type: int
     default: 0
-  vmanage_id:
+  manager_id:
     description:
-      - Optional ID of vManage to edit. Don't set when adding new vManage instances to cluster.
+      - Optional ID of Manager to edit. Don't set when adding new Manager instances to cluster.
     type: str
   system_ip:
     description:
@@ -63,12 +63,12 @@ msg:
   description: Message detailing the outcome of the operation.
   returned: always
   type: str
-  sample: "Successfully updated requested vManage configuration."
+  sample: "Successfully updated requested Manager configuration."
 response:
-  description: Detailed response from the vManage API if applicable.
+  description: Detailed response from the Manager API if applicable.
   returned: when API call is made
   type: dict
-  sample: {"edit_vmanage": "successMessage": "Edit Node operation performed. The operation may take some time and
+  sample: {"edit_manager": "successMessage": "Edit Node operation performed. The operation may take some time and
     may cause application-server to restart in between"}
 changed:
   description: Whether or not the state was changed.
@@ -78,11 +78,11 @@ changed:
 """
 
 EXAMPLES = r"""
-# Example of using the module to edit parameters of vManage added to cluster
-- name: "Edit vManage"
+# Example of using the module to edit parameters of Manager added to cluster
+- name: "Edit Manager"
   cisco.catalystwan.cluster_management:
     wait_until_configured_seconds: 300
-    vmanage_id: "0"
+    manager_id: "0"
     system_ip: "100.100.100.100"
     cluster_ip: "1.1.1.1"
     username: "username"
@@ -92,8 +92,8 @@ EXAMPLES = r"""
       sd-avc:
         server: false
 
-# Example of using the module to add a new vManage to cluster
-- name: "Add vManage to cluster"
+# Example of using the module to add a new Manager to cluster
+- name: "Add Manager to cluster"
   cisco.catalystwan.cluster_management:
     wait_until_configured_seconds: 300
     system_ip: "100.100.100.100"
@@ -114,7 +114,7 @@ from catalystwan.endpoints.cluster_management import ConnectedDevice, VManageSet
 from catalystwan.exceptions import ManagerRequestException
 
 from ..module_utils.result import ModuleResult
-from ..module_utils.vmanage_module import AnsibleCatalystwanModule
+from ..module_utils.manager_module import AnsibleCatalystwanModule
 
 
 def get_connected_devices(module, device_ip):
@@ -159,7 +159,7 @@ def wait_for_connected_device(module, system_ip, cluster_ip, timeout) -> Optiona
 def run_module():
     module_args = dict(
         wait_until_configured_seconds=dict(type="int", default=0),
-        vmanage_id=dict(type=str),
+        manager_id=dict(type=str),
         system_ip=dict(type=str, required=True),
         cluster_ip=dict(type=str, required=True),
         username=dict(type=str, required=True),
@@ -184,7 +184,7 @@ def run_module():
     module.session.request_timeout = 60
     result = ModuleResult()
 
-    vmanage_id = module.params.get("vmanage_id")
+    manager_id = module.params.get("manager_id")
     system_ip = module.params.get("system_ip")
     cluster_ip = module.params.get("cluster_ip")
 
@@ -194,7 +194,7 @@ def run_module():
         module.exit_json(**result.model_dump(mode="json"))
 
     payload = VManageSetup(
-        vmanage_id=vmanage_id,
+        vmanage_id=manager_id,
         device_ip=cluster_ip,
         username=module.params.get("username"),
         password=module.params.get("password"),
@@ -202,10 +202,10 @@ def run_module():
         services=module.params.get("services"),
     )
 
-    if vmanage_id:
+    if manager_id:
         module.send_request_safely(
             result,
-            action_name="Cluster Management: Edit vManage",
+            action_name="Cluster Management: Edit Manager",
             send_func=module.session.endpoints.cluster_management.edit_vmanage,
             payload=payload,
             response_key="edit_vmanage",
@@ -213,7 +213,7 @@ def run_module():
     else:
         module.send_request_safely(
             result,
-            action_name="Cluster Management: Add vManage",
+            action_name="Cluster Management: Add Manager",
             send_func=module.session.endpoints.cluster_management.add_vmanage,
             payload=payload,
             response_key="add_vmanage",
@@ -224,10 +224,10 @@ def run_module():
         if wait_until_configured_seconds:
             error_msg = wait_for_connected_device(module, system_ip, cluster_ip, wait_until_configured_seconds)
             if error_msg:
-                module.fail_json(msg=f"Error during vManage configuration: {error_msg}")
-        result.msg = "Successfully updated requested vManage configuration."
+                module.fail_json(msg=f"Error during Manager configuration: {error_msg}")
+        result.msg = "Successfully updated requested Manager configuration."
     else:
-        result.msg = "No changes to vManage configuration applied."
+        result.msg = "No changes to Manager configuration applied."
 
     module.exit_json(**result.model_dump(mode="json"))
 

@@ -7,10 +7,10 @@
 DOCUMENTATION = r"""
 ---
 module: devices_info
-short_description: Retrieves information about devices within vManage
+short_description: Retrieves information about devices within Manager
 version_added: "0.1.0"
 description:
-  - This module retrieves details about devices in vManage.
+  - This module retrieves details about devices in Manager.
   - It can filter the retrieved device information based on specified criteria.
   - This module supports backup of running-config from devices. Available for all or filtered devices.
 options:
@@ -62,7 +62,7 @@ devices:
   sample: |
     [
       {
-        "host-name": "vmanage",
+        "host-name": "manager",
         "device-type": "controller",
         "system-ip": "192.168.1.1",
         "uuid": "1234-5678-9abc-def0",
@@ -103,7 +103,7 @@ from pydantic import BaseModel, Field
 
 from ..module_utils.filters import get_target_device
 from ..module_utils.result import ModuleResult
-from ..module_utils.vmanage_module import AnsibleCatalystwanModule
+from ..module_utils.manager_module import AnsibleCatalystwanModule
 
 
 class BackupPathModel(BaseModel):

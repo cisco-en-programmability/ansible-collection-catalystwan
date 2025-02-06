@@ -15,9 +15,9 @@
     - configuration_file_dev_vars.yml
   vars:
     manager_authentication: &manager_authentication
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
+      url: "{{ (manager_instances | first).mgmt_public_ip }}"
+      username: "{{ (manager_instances | first).admin_username }}"
+      password: "{{ (manager_instances | first).admin_password }}"
   tasks:
     - name: 1. Get all Device Templates that are not attached to any device
       cisco.catalystwan.device_templates_info:
@@ -28,7 +28,7 @@
           <<: *manager_authentication
       register: device_templates
 
-    - name: 2. Delete selected Device Templates from vManage
+    - name: 2. Delete selected Device Templates from Manager
       cisco.catalystwan.device_templates:
         state: absent
         template_name: "{{ device_template.name }}"

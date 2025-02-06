@@ -15,7 +15,7 @@
     fail_msg: "Your SD-WAN initial config file missing required variable: {{ required_var }}"
     quiet: true
   loop:
-    - "{{ vmanage_instances }}"
+    - "{{ manager_instances }}"
     - "{{ vbond_instances }}"
     - "{{ vsmart_instances }}"
   loop_control:

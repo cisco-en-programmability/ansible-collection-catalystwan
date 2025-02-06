@@ -9,9 +9,9 @@ DOCUMENTATION = r"""
 ---
 module: administration_settings
 version_added: "0.1.0"
-short_description: Manages administration settings on a vManage instance
+short_description: Manages administration settings on a Manager instance
 description:
-  - Manages various administration settings on a vManage instance, including
+  - Manages various administration settings on a Manager instance, including
     validator (vBond), certificates, smart account credentials, PnP Connect Sync,
     and organization settings.
   - More settings can be enhanced by reusing
@@ -113,7 +113,7 @@ EXAMPLES = r"""
       domain_ip: "192.0.2.1"
       port: "12346"
     manager_credentials:
-      url: "https://vmanage.example.com"
+      url: "https://manager.example.com"
       username: "admin"
       password: "securepassword123"  # pragma: allowlist secret
       port: "8443"
@@ -217,7 +217,7 @@ from catalystwan.endpoints.configuration_settings import (
 )
 
 from ..module_utils.result import ModuleResult
-from ..module_utils.vmanage_module import AnsibleCatalystwanModule
+from ..module_utils.manager_module import AnsibleCatalystwanModule
 
 
 def run_module():

@@ -15,6 +15,6 @@
     fail_msg: "Selected role is missing following variables: {{ required_var }}"
     quiet: true
   loop:
-    - "{{ vmanage_instances }}"
+    - "{{ manager_instances }}"
   loop_control:
     loop_var: required_var

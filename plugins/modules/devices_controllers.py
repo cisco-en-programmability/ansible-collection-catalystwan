@@ -7,10 +7,10 @@
 DOCUMENTATION = r"""
 ---
 module: devices_controllers
-short_description: Manages devices within vManage
+short_description: Manages devices within Manager
 version_added: "0.1.0"
 description:
-  - This module can be used to add or invalidate controller devices in vManage.
+  - This module can be used to add or invalidate controller devices in Manager.
   - It supports the creation of a new device with a generated CSR and specifies the device personality.
   - When invalidating, it requires either the UUID or device IP to identify the device.
 options:
@@ -31,9 +31,9 @@ options:
     no_log: True
   personality:
     description:
-      - Personality of the device. Choices are 'vSmart', 'vBond', or 'vManage'.
+      - Personality of the device. Choices are 'vSmart', 'vBond', or 'Manager'.
     type: str
-    choices: ["vSmart", "vBond", "vManage"]
+    choices: ["vSmart", "vBond", "Manager"]
   generate_csr:
     description:
       - Whether to generate a CSR (Certificate Signing Request) for the device.
@@ -63,8 +63,8 @@ options:
 author:
   - Arkadiusz Cichon (acichon@cisco.com)
 notes:
-  - "Only vSmart, vBond, and vManage device personalities are currently supported."
-  - "The 'state' option 'invalidated' will delete the device configuration in vManage."
+  - "Only vSmart, vBond, and Manager device personalities are currently supported."
+  - "The 'state' option 'invalidated' will delete the device configuration in Manager."
   - "For 'present' state, 'username', 'password', 'personality', and 'device_ip' are required."
   - "For 'invalidated' state, either 'uuid' or 'device_ip' is required."
 extends_documentation_fragment:
@@ -78,7 +78,7 @@ msg:
   type: str
   sample: "Added new device: 192.168.1.1, personality: vSmart"
 response:
-  description: Detailed response from the vManage API if applicable.
+  description: Detailed response from the Manager API if applicable.
   returned: when API call is made
   type: dict
   sample: {"status": "success", "details": "Device added successfully."}
@@ -111,7 +111,7 @@ from catalystwan.utils.personality import Personality
 
 from ..module_utils.filters import get_target_device
 from ..module_utils.result import ModuleResult
-from ..module_utils.vmanage_module import AnsibleCatalystwanModule
+from ..module_utils.manager_module import AnsibleCatalystwanModule
 
 
 def run_module():

@@ -15,9 +15,9 @@
     fail_msg: "Your SD-WAN config file missing required variable: {{ required_var }}"
     quiet: true
   loop:
-    - "{{ vmanage_instances }}"
+    - "{{ manager_instances }}"
     - "{{ cedge_remote_software_filename }}"
-    - "{{ vmanage_remote_software_filename }}"
+    - "{{ manager_remote_software_filename }}"
     - "{{ viptela_remote_software_filename }}"
     - "{{ remote_server_name }}"
     - "{{ remote_server_url }}"

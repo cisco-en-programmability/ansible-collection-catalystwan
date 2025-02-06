@@ -48,9 +48,9 @@
               password: "{{ remote_server_password }}"
               image_location_prefix: "{{ remote_server_image_location_prefix }}"
             manager_authentication:
-              url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-              username: "{{ (vmanage_instances | first).admin_username }}"
-              password: "{{ (vmanage_instances | first).admin_password }}"
+              url: "{{ (manager_instances | first).mgmt_public_ip }}"
+              username: "{{ (manager_instances | first).admin_username }}"
+              password: "{{ (manager_instances | first).admin_password }}"
           failed_when: false
           changed_when: false
 
@@ -58,9 +58,9 @@
           cisco.catalystwan.software_repository_info:
             category: "remote_servers"
             manager_authentication:
-              url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-              username: "{{ (vmanage_instances | first).admin_username }}"
-              password: "{{ (vmanage_instances | first).admin_password }}"
+              url: "{{ (manager_instances | first).mgmt_public_ip }}"
+              username: "{{ (manager_instances | first).admin_username }}"
+              password: "{{ (manager_instances | first).admin_password }}"
           register: all_remote_servers
 
         - name: "Debug all_remote_servers - expect one, and verify port is == 22"
@@ -76,9 +76,9 @@
               filename: "{{ remote_software_filename }}"
               remote_server_name: "{{ remote_server_name }}"
             manager_authentication:
-              url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-              username: "{{ (vmanage_instances | first).admin_username }}"
-              password: "{{ (vmanage_instances | first).admin_password }}"
+              url: "{{ (manager_instances | first).mgmt_public_ip }}"
+              username: "{{ (manager_instances | first).admin_username }}"
+              password: "{{ (manager_instances | first).admin_password }}"
 
 
     # --- vSmart upgrade operations --- #
@@ -86,7 +86,7 @@
 
     - name: "[TEST] 1. Install software operation on vSmart"
       cisco.catalystwan.software_upgrade:
-        state: "present"  # present with reboot: true -> ACTIVATE in vManage
+        state: "present"  # present with reboot: true -> ACTIVATE in Manager
         reboot: true
         remote_server_name: "{{ remote_server_name }}"
         remote_image_filename: "{{ remote_server_image_location_prefix }}{{ remote_software_filename }}"
@@ -96,9 +96,9 @@
         filters:
           personality: "vsmart"
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"
 
     - name: "Get details of software installed on control components - filter vSmart"
       cisco.catalystwan.software_upgrade_info:
@@ -106,9 +106,9 @@
         filters:
           personality: "vsmart"
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"
       register: software_info
 
     - name: "[TEST] 2. Verify that activated version appears as current version and old version in available files"
@@ -130,9 +130,9 @@
         filters:
           personality: "vsmart"
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"
 
     - name: "Get details of software installed on control components - filter vSmart"
       cisco.catalystwan.software_upgrade_info:
@@ -140,9 +140,9 @@
         filters:
           personality: "vsmart"
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"
       register: software_info
 
     - name: "[TEST] 4. Verify that default version set correctly as version: {{ higher_software_version }}"
@@ -161,9 +161,9 @@
         filters:
           personality: "vsmart"
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"
 
     - name: "Get details of software installed on control components - filter vSmart"
       cisco.catalystwan.software_upgrade_info:
@@ -171,9 +171,9 @@
         filters:
           personality: "vsmart"
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"
       register: software_info
 
     - name: "[TEST] 6. Verify that installed version appears as current version: {{ lower_software_version }}"
@@ -190,16 +190,16 @@
 
     - name: "Prepare for cEdge - Install software operation on vSmart"
       cisco.catalystwan.software_upgrade:
-        state: "active"  # present with reboot: true -> ACTIVATE in vManage
+        state: "active"  # present with reboot: true -> ACTIVATE in Manager
         image_version: "{{ higher_software_version }}"
         wait_for_completed: true
         wait_timeout_seconds: 3600
         filters:
           personality: "vsmart"
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"
 
     - name: "Get details of software installed on control components - filter vSmart"
       cisco.catalystwan.software_upgrade_info:
@@ -207,9 +207,9 @@
         filters:
           personality: "vsmart"
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"
       register: software_info
 
     - name: "Verify that activated version appears as current version and old version in available files"

@@ -1,6 +1,6 @@
 # Ansible Role: edge_params
 
-The `edge_params` Ansible extends deployment facts for cEdge devices with additional parameters required by other roles. 
+The `edge_params` Ansible extends deployment facts for cEdge devices with additional parameters required by other roles.
 
 ## Role Description
 
@@ -23,7 +23,7 @@ There are no external role dependencies. Only `cisco.catalystwan` collection is 
 Variables expected by this role, example:
 
 ```yaml
-vmanage_instances:
+manager_instances:
   - mgmt_public_ip: '192.0.2.1'
     admin_username: 'admin'
     admin_password: 'password'
@@ -38,7 +38,7 @@ Including an example of how to use your role (for instance, with variables passe
   hosts: localhost
   gather_facts: false
   vars:
-    vmanage_instances:
+    manager_instances:
       - mgmt_public_ip: '192.0.2.1'
         admin_username: 'admin'
         admin_password: 'password'

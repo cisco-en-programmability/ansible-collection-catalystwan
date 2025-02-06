@@ -237,7 +237,7 @@ from catalystwan.typed_list import DataSequence
 from catalystwan.utils.upgrades_helper import SoftwarePackageUploadPayload
 
 from ..module_utils.result import ModuleResult
-from ..module_utils.vmanage_module import AnsibleCatalystwanModule
+from ..module_utils.manager_module import AnsibleCatalystwanModule
 
 
 class State(str, Enum):

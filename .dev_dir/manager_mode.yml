@@ -3,9 +3,9 @@
 
 ---
 
-- name: Set vManage mode for all controller devices and for all Edge devices
+- name: Set Manager mode for all controller devices and for all Edge devices
   hosts: localhost
   vars_files:
     - dev_vars.yml
   roles:
-    - cisco.catalystwan.vmanage_mode
+    - cisco.catalystwan.manager_mode

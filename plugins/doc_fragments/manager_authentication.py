@@ -13,30 +13,30 @@ class ModuleDocFragment(object):
 options:
   manager_credentials:
     description:
-      - Credentials to authenticate with the vManage instance.
+      - Credentials to authenticate with the Manager instance.
     required: true
     type: dict
     aliases: [ manager_authentication ]
     suboptions:
       url:
         description:
-          - URL of the vManage instance.
+          - URL of the Manager instance.
         required: true
         type: str
       username:
         description:
-          - Username for authentication with vManage.
+          - Username for authentication with Manager.
         required: true
         type: str
       password:
         description:
-          - Password for authentication with vManage.
+          - Password for authentication with Manager.
         required: true
         type: str
         no_log: true
       port:
         description:
-          - Port number to use for connecting to vManage.
+          - Port number to use for connecting to Manager.
         required: false
         type: str
 notes:

@@ -6,7 +6,7 @@
 - name: Verify required variables for selected role
   ansible.builtin.include_tasks: variables_assertion.yml
 
-- name: Generate CSR for vManages
+- name: Generate CSR for Managers
   cisco.catalystwan.devices_certificates:
     generate_csr: true
     device_ip: "{{ device_item.system_ip }}"
@@ -14,7 +14,7 @@
       url: "{{ device_item.mgmt_public_ip }}"
       username: "{{ device_item.admin_username }}"
       password: "{{ device_item.admin_password }}"
-  loop: "{{ vmanage_instances }}"
+  loop: "{{ manager_instances }}"
   loop_control:
     loop_var: device_item
     label: "hostname: {{ device_item.hostname }}, device_ip: {{ device_item.system_ip }}"
@@ -28,9 +28,9 @@
     personality: "vsmart"
     state: present
     manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
+      url: "{{ (manager_instances | first).mgmt_public_ip }}"
+      username: "{{ (manager_instances | first).admin_username }}"
+      password: "{{ (manager_instances | first).admin_password }}"
   loop: "{{ vsmart_instances }}"
   loop_control:
     loop_var: device_item
@@ -46,11 +46,11 @@
     personality: "vbond"
     state: present  # state present means that device was added and certificated was installed
     # Consider using loop to check certificates check
-    # Currently we cannot implement wait because of the mixed ips in vmanage itself
+    # Currently we cannot implement wait because of the mixed ips in manager itself
     manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
+      url: "{{ (manager_instances | first).mgmt_public_ip }}"
+      username: "{{ (manager_instances | first).admin_username }}"
+      password: "{{ (manager_instances | first).admin_password }}"
   loop: "{{ vbond_instances }}"
   loop_control:
     loop_var: device_item
@@ -63,11 +63,11 @@
     filters:
       device_ip: "{{ device_item.system_ip }}"
     manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
+      url: "{{ (manager_instances | first).mgmt_public_ip }}"
+      username: "{{ (manager_instances | first).admin_username }}"
+      password: "{{ (manager_instances | first).admin_password }}"
   register: device_details_info
-  loop: "{{ vsmart_instances + vbond_instances + [(vmanage_instances | first)] }}"
+  loop: "{{ vsmart_instances + vbond_instances + [(manager_instances | first)] }}"
   loop_control:
     loop_var: device_item
     label: "hostname: {{ device_item.hostname }}, device_ip: {{ device_item.system_ip }}"
@@ -81,11 +81,11 @@
     filters:
       device_ip: "{{ device_item.system_ip }}"
     manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
+      url: "{{ (manager_instances | first).mgmt_public_ip }}"
+      username: "{{ (manager_instances | first).admin_username }}"
+      password: "{{ (manager_instances | first).admin_password }}"
   register: device_details_info
-  loop: "{{ vsmart_instances + vbond_instances + [(vmanage_instances | first)] }}"
+  loop: "{{ vsmart_instances + vbond_instances + [(manager_instances | first)] }}"
   loop_control:
     loop_var: device_item
     label: "hostname: {{ device_item.hostname }}, device_ip: {{ device_item.system_ip }}"

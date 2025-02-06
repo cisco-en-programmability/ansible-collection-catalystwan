@@ -8,10 +8,10 @@
 DOCUMENTATION = r"""
 ---
 module: devices_wan_edges
-short_description: Manages WAN Edge devices within vManage
+short_description: Manages WAN Edge devices within Manager
 version_added: "0.1.0"
 description:
-  - This module manages the WAN Edge devices in vManage.
+  - This module manages the WAN Edge devices in Manager.
   - It can sync devices from a smart account, upload a WAN Edge list, generate bootstrap configuration,
     or delete WAN Edge devices.
 options:
@@ -75,7 +75,7 @@ changed:
   type: bool
   sample: true
 response:
-  description: Detailed response from the vManage API if applicable.
+  description: Detailed response from the Manager API if applicable.
   returned: when API call is made
   type: dict
   sample: {"status": "success", "details": "Device added successfully."}
@@ -133,7 +133,7 @@ from pydantic import Field
 
 from ..module_utils.filters import get_target_device
 from ..module_utils.result import ModuleResult
-from ..module_utils.vmanage_module import AnsibleCatalystwanModule
+from ..module_utils.manager_module import AnsibleCatalystwanModule
 
 
 class State(str, Enum):

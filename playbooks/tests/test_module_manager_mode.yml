@@ -6,24 +6,24 @@
 # Helper playbooks to test modules and flows while developing them
 
 # Tested operations:
-# 1. Set vManage mode for all controller devices
+# 1. Set Manager mode for all controller devices
 
 
-- name: Testing playbook to verify cisco.catalystwan.vmanage_mode module operations
+- name: Testing playbook to verify cisco.catalystwan.manager_mode module operations
   hosts: localhost
   gather_facts: false
   vars_files:
     - configuration_file_dev_vars.yml
   tasks:
-    - name: 1. Set vManage mode for all controller devices
-      cisco.catalystwan.vmanage_mode:
+    - name: 1. Set Manager mode for all controller devices
+      cisco.catalystwan.manager_mode:
         hostnames:
           - "{{ instance_item.hostname }}"
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
-      loop: "{{ vsmart_instances + vbond_instances + vmanage_instances }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"
+      loop: "{{ vsmart_instances + vbond_instances + manager_instances }}"
       loop_control:
         loop_var: instance_item
         label: "hostname: {{ instance_item.hostname }}"

@@ -10,7 +10,7 @@ module: software_repository_info
 short_description: Get information about Software Repository
 version_added: "0.1.0"
 description:
-  - This module fetches information about software repositories managed by vManage.
+  - This module fetches information about software repositories managed by Manager.
   - It can retrieve details about remote servers or software images from the repository.
 options:
   category:
@@ -35,7 +35,7 @@ remote_servers:
   description: The list of remote server information if the category is 'remote_servers'.
   returned: when 'remote_servers' is selected
   type: list
-  sample: [{"name": "Server1", "address": "192.168.1.10", "type": "vManage"}]
+  sample: [{"name": "Server1", "address": "192.168.1.10", "type": "Manager"}]
 software_images:
   description: The list of software image details if the category is 'software_images'.
   returned: when 'software_images' is selected
@@ -64,7 +64,7 @@ from catalystwan.typed_list import DataSequence
 from pydantic import Field
 
 from ..module_utils.result import ModuleResult
-from ..module_utils.vmanage_module import AnsibleCatalystwanModule
+from ..module_utils.manager_module import AnsibleCatalystwanModule
 
 
 class ExtendedModuleResult(ModuleResult):

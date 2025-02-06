@@ -522,9 +522,9 @@ options:
                 default: null
                 type: list
                 elements: int
-            vmanage_connection_preference:
+            manager_connection_preference:
                 description:
-                - Preference value for establishing vManage connections.
+                - Preference value for establishing Manager connections.
                 required: false
                 default: null
                 type: int

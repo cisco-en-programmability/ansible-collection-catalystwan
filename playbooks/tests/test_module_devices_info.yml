@@ -18,9 +18,9 @@
     - configuration_file_dev_vars.yml
   vars:
     manager_authentication: &manager_authentication
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
+      url: "{{ (manager_instances | first).mgmt_public_ip }}"
+      username: "{{ (manager_instances | first).admin_username }}"
+      password: "{{ (manager_instances | first).admin_password }}"
   tasks:
     - name: 1. Get list of Edge devices
       cisco.catalystwan.devices_info:
@@ -29,13 +29,13 @@
           <<: *manager_authentication
       register: edge_devices
 
-    - name: 2. Backup running-config from vManage with default backup dir (in CWD)
+    - name: 2. Backup running-config from Manager with default backup dir (in CWD)
       cisco.catalystwan.devices_info:
         backup: true
         manager_credentials:
           <<: *manager_authentication
 
-    - name: 3. Backup running-config from vManage to specified directory
+    - name: 3. Backup running-config from Manager to specified directory
       cisco.catalystwan.devices_info:
         backup: true
         backup_dir_path: "/tmp/backups"
@@ -48,11 +48,11 @@
         filters:
           device_ip: "{{ device_item.system_ip }}"
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"
       register: device_details_info
-      loop: "{{ vsmart_instances + vbond_instances + vmanage_instances }}"
+      loop: "{{ vsmart_instances + vbond_instances + manager_instances }}"
       loop_control:
         loop_var: device_item
         label: "hostname: {{ device_item.hostname }}, device_ip: {{ device_item.system_ip }}"

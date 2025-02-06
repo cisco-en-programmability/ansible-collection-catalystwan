@@ -6,11 +6,11 @@
 
 DOCUMENTATION = r"""
 ---
-module: vmanage_feature_template
-short_description: Manage feature templates for Cisco vManage SD-WAN
+module: manager_feature_template
+short_description: Manage feature templates for Cisco Manager SD-WAN
 version_added: "0.2.0"
 description:
-  - This module can be used to create, modify, and delete feature templates in Cisco vManage SD-WAN.
+  - This module can be used to create, modify, and delete feature templates in Cisco Manager SD-WAN.
   - The feature template configuration is defined via Python Pydantic models.
 options:
   state:
@@ -37,7 +37,7 @@ options:
     required: false
   debug:
     description:
-      - If to write payload of created template and response from vmanage as json to file.
+      - If to write payload of created template and response from manager as json to file.
       - Files will be written to C(CWD) as I("payload_{template.type}.json") and I("response_{template.type}.json").
     type: bool
     default: false
@@ -97,7 +97,7 @@ from ..module_utils.feature_templates.system_vsmart import system_vsmart_definit
 from ..module_utils.feature_templates.vpn_vsmart import vpn_vsmart_definition
 from ..module_utils.feature_templates.vpn_vsmart_interface import vpn_vsmart_interface_definition
 from ..module_utils.result import ModuleResult
-from ..module_utils.vmanage_module import AnsibleCatalystwanModule
+from ..module_utils.manager_module import AnsibleCatalystwanModule
 
 ALLOW: Final[str] = "allow"
 
@@ -191,7 +191,7 @@ def run_module():
         if target_template:
             module.logger.debug(f"Detected existing template:\n{target_template}\n")
             result.msg = (
-                f"Template with name {template_name} already present on vManage, skipping create template operation."
+                f"Template with name {template_name} already present on Manager, skipping create template operation."
             )
         else:
             for model_name, model_module in available_models.items():
@@ -221,7 +221,7 @@ def run_module():
                         )
 
                         module.logger.debug(
-                            f"Prepared template for sending to vManage, template configuration:\n{template}\n"
+                            f"Prepared template for sending to Manager, template configuration:\n{template}\n"
                         )
                         try:
                             module.session.api.templates.create(template=template, debug=module.params.get("debug"))
@@ -244,9 +244,9 @@ def run_module():
             result.changed = True
             result.msg = f"Deleted template {template_name}"
         else:
-            module.logger.debug(f"Template '{target_template}' not presend in list of Feature Templates on vManage.")
+            module.logger.debug(f"Template '{target_template}' not presend in list of Feature Templates on Manager.")
             result.msg = (
-                f"Template {template_name} not presend in list of Feature Templates on vManage, "
+                f"Template {template_name} not presend in list of Feature Templates on Manager, "
                 "skipping delete template operation."
             )
 

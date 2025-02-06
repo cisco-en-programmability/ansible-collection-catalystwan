@@ -10,7 +10,7 @@
 # Tested operations:
 
 # 1. Get all Device Templates that are not attached to any device
-# 2. Delete selected Device Templates from vManage
+# 2. Delete selected Device Templates from Manager
 # 3. Backup running-config from devices, store in default backup dir (in CWD)
 # 4. Using backup files, create CLI templates for each device available
 # 5. Get all Non-Default Feature Templates available
@@ -32,9 +32,9 @@
     - configuration_file_dev_vars.yml
   vars:
     manager_authentication: &manager_authentication
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
+      url: "{{ (manager_instances | first).mgmt_public_ip }}"
+      username: "{{ (manager_instances | first).admin_username }}"
+      password: "{{ (manager_instances | first).admin_password }}"
   tasks:
     - name: 1. Get all Device Templates that are not attached to any device
       cisco.catalystwan.device_templates_info:
@@ -45,7 +45,7 @@
           <<: *manager_authentication
       register: device_templates
 
-    - name: 2. Delete selected Device Templates from vManage
+    - name: 2. Delete selected Device Templates from Manager
       cisco.catalystwan.device_templates:
         state: absent
         template_name: "{{ device_template.name }}"
@@ -70,7 +70,7 @@
         template_description: "Template for {{ device_item.hostname }} created from backup file."
         config_file: "{{ device_item.backup_path }}"
         device_model: "{% if 'cedge' in device_item.hostname %}vedge-C8000V\
-                       {% elif 'vSmart' in device_item.hostname %}vsmart{% elif 'vManage' in device_item.hostname %}vmanage\
+                       {% elif 'vSmart' in device_item.hostname %}vsmart{% elif 'Manager' in device_item.hostname %}vmanage\
                        {% elif 'vBond' in device_item.hostname %}vedge-cloud{% endif %}"
         manager_credentials:
           <<: *manager_authentication
@@ -233,7 +233,7 @@
               - "Factory_Default_Logging_Template_V01"
           - name: "AAA_for_vSmart"
           - name: "Factory_Default_vSmart_OMP_Template"
-          - name: "Factory_Default_vSmart_vManage_Security_Template"
+          - name: "Factory_Default_vSmart_Manager_Security_Template"
           - name: "VPN_0_for_vSmart"
             subtemplates:
               - "VPN_0_Interface_for_vSmart"

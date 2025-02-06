@@ -7,23 +7,23 @@
 
 DOCUMENTATION = r"""
 ---
-module: vmanage_mode
-short_description: Manage vManage modes on Cisco devices.
+module: manager_mode
+short_description: Manage Manager modes on Cisco devices.
 version_added: "0.1.0"
 description:
-  - This module allows you to set vManage modes on Cisco devices.
+  - This module allows you to set Manager modes on Cisco devices.
   - Currently, it supports setting devices to 'present' state only.
   - The module will attach a CLI template to the device(s) based on its hostname.
 options:
   state:
     description:
-      - The state of vManage mode to enforce on the specified devices.
+      - The state of Manager mode to enforce on the specified devices.
     type: str
     choices: ["present"]
     default: "present"
   hostnames:
     description:
-      - A list of hostnames of devices to which the vManage mode will be applied.
+      - A list of hostnames of devices to which the Manager mode will be applied.
     type: list
     elements: str
     required: true
@@ -32,14 +32,14 @@ author:
 extends_documentation_fragment:
   - cisco.catalystwan.manager_authentication
 notes:
-  - Ensure that the provided credentials have sufficient permissions to manage templates and devices in vManage.
+  - Ensure that the provided credentials have sufficient permissions to manage templates and devices in Manager.
   - The module does not support idempotence. If a template with the specified name exists, it will be reattached.
   - This module is in development and may not support all possible configurations and scenarios.
 """
 
 EXAMPLES = r"""
 - name: Attach default CLI template to the specified devices
-  cisco.catalystwan.vmanage_mode:
+  cisco.catalystwan.manager_mode:
     state: present
     hostnames:
       - device1
@@ -77,7 +77,7 @@ from catalystwan.utils.personality import Personality
 from pydantic import Field
 
 from ..module_utils.result import ModuleResult
-from ..module_utils.vmanage_module import AnsibleCatalystwanModule
+from ..module_utils.manager_module import AnsibleCatalystwanModule
 
 State = Literal["present"]
 
@@ -118,7 +118,7 @@ def run_module():
 
             cli_template = CLITemplate(
                 template_name=template_name,
-                template_description="Created for setting vManage mode.",
+                template_description="Created for setting Manager mode.",
                 device_model=device_model,
             )
 
@@ -139,7 +139,7 @@ def run_module():
 
         except ManagerHTTPError as ex:
             module.fail_json(
-                msg=f"{result.msg} Could not change vManage mode: {str(ex.info)}", exception=traceback.format_exc()
+                msg=f"{result.msg} Could not change Manager mode: {str(ex.info)}", exception=traceback.format_exc()
             )
 
     module.exit_json(**result.model_dump(mode="json"))

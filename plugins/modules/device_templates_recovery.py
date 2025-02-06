@@ -126,7 +126,7 @@ author:
 extends_documentation_fragment:
   - cisco.catalystwan.manager_authentication
 notes:
-  - Ensure that the provided credentials have sufficient permissions to manage templates and devices in vManage.
+  - Ensure that the provided credentials have sufficient permissions to manage templates and devices in Manager.
 """
 
 EXAMPLES = r"""
@@ -141,7 +141,7 @@ from catalystwan.session import ManagerHTTPError
 from catalystwan.workflows import backup_restore_device_templates
 
 from ..module_utils.result import ModuleResult
-from ..module_utils.vmanage_module import AnsibleCatalystwanModule
+from ..module_utils.manager_module import AnsibleCatalystwanModule
 
 
 def run_module():

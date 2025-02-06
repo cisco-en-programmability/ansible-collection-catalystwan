@@ -43,11 +43,11 @@ extends_documentation_fragment:
   - cisco.catalystwan.device_models_device_template
   - cisco.catalystwan.manager_authentication
 notes:
-  - Ensure that the provided credentials have sufficient permissions to manage templates and devices in vManage.
+  - Ensure that the provided credentials have sufficient permissions to manage templates and devices in Manager.
 """
 
 EXAMPLES = r"""
-- name: Using configuration from file, ensure a CLI template is present on vManage
+- name: Using configuration from file, ensure a CLI template is present on Manager
   cisco.catalystwan.cli_templates:
     state: present
     template_name: "MyTemplate"
@@ -56,7 +56,7 @@ EXAMPLES = r"""
     config_file: "/path/to/config_file.txt"
     manager_credentials: ...
 
-- name: Remove a CLI template from vManage
+- name: Remove a CLI template from Manager
   cisco.catalystwan.cli_templates:
     state: absent
     template_name: "MyTemplate"
@@ -90,7 +90,7 @@ from catalystwan.session import ManagerHTTPError
 from catalystwan.typed_list import DataSequence
 
 from ..module_utils.result import ModuleResult
-from ..module_utils.vmanage_module import AnsibleCatalystwanModule
+from ..module_utils.manager_module import AnsibleCatalystwanModule
 
 State = Literal["present", "absent"]
 
@@ -141,7 +141,7 @@ def run_module():
         if target_template:
             module.logger.debug(f"Detected existing template:\n{target_template}\n")
             result.msg = (
-                f"Template with name {template_name} already present on vManage, skipping create template operation."
+                f"Template with name {template_name} already present on Manager, skipping create template operation."
             )
         else:
             cli_template = CLITemplate(
@@ -151,7 +151,7 @@ def run_module():
             )
             cli_template.load_from_file(file=module.params.get("config_file"))
 
-            module.logger.debug(f"Prepared template for sending to vManage, template configuration:\n{cli_template}\n")
+            module.logger.debug(f"Prepared template for sending to Manager, template configuration:\n{cli_template}\n")
             try:
                 template_id: str = module.session.api.templates.create(
                     template=cli_template, debug=module.params.get("debug")
@@ -175,9 +175,9 @@ def run_module():
             result.changed = True
             result.msg = f"Deleted template {template_name}"
         else:
-            module.logger.debug(f"Template '{target_template}' not presend in list of Templates on vManage.")
+            module.logger.debug(f"Template '{target_template}' not presend in list of Templates on Manager.")
             result.msg = (
-                f"Template {template_name} not presend in list of CLI Templates on vManage. "
+                f"Template {template_name} not presend in list of CLI Templates on Manager. "
                 "skipping delete template operation."
             )
 

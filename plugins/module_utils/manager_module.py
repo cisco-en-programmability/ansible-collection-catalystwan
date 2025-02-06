@@ -74,7 +74,7 @@ class AnsibleCatalystwanModule:
         self.argument_spec.update(self.common_args)
         self.module = AnsibleModule(argument_spec=self.argument_spec, supports_check_mode=supports_check_mode, **kwargs)
         self.logger = configure_logger(name="ansible_catalystwan_module", loglevel=logging.DEBUG)
-        self._vmanage_logger = configure_logger(name="ansible_catalystwan", loglevel=logging.DEBUG)
+        self._manager_logger = configure_logger(name="ansible_catalystwan", loglevel=logging.DEBUG)
 
         if not HAS_LIB:
             self.module.fail_json(msg=missing_required_lib("catalystwan"), exception=LIB_IMP_ERR)
@@ -124,7 +124,7 @@ class AnsibleCatalystwanModule:
                         username=self.module.params["manager_credentials"]["username"],
                         password=self.module.params["manager_credentials"]["password"],
                         port=self.module.params["manager_credentials"]["port"],
-                        logger=self._vmanage_logger,
+                        logger=self._manager_logger,
                     )
                     break
                 # Avoid catchall exceptions, they are not very useful unless the underlying API

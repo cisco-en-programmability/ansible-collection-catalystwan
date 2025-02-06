@@ -7,10 +7,10 @@
 DOCUMENTATION = r"""
 ---
 module: health_checks
-short_description: Performs health checks on network devices managed by vManage
+short_description: Performs health checks on network devices managed by Manager
 version_added: "0.1.0"
 description:
-  - This module performs various health checks on devices managed by vManage.
+  - This module performs various health checks on devices managed by Manager.
   - Available health chesk are choosen by C(check_type)
 options:
   check_type:
@@ -88,7 +88,7 @@ from pydantic import Field
 
 from ..module_utils.filters import get_devices_details
 from ..module_utils.result import ModuleResult
-from ..module_utils.vmanage_module import AnsibleCatalystwanModule
+from ..module_utils.manager_module import AnsibleCatalystwanModule
 
 
 class ExtendedModuleResult(ModuleResult):

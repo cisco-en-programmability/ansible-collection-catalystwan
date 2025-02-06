@@ -22,9 +22,9 @@
     wan_edge_list: "{{ wan_edge_list_path }}"
     state: present
     manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
+      url: "{{ (manager_instances | first).mgmt_public_ip }}"
+      username: "{{ (manager_instances | first).admin_username }}"
+      password: "{{ (manager_instances | first).admin_password }}"
   when: wan_edge_list_path is defined
 
 - name: Sync devices with Smart Account only if user didn't provide WAN Edge list path
@@ -34,18 +34,18 @@
     username: "{{ pnp_username }}"
     password: "{{ pnp_password }}"
     manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
+      url: "{{ (manager_instances | first).mgmt_public_ip }}"
+      username: "{{ (manager_instances | first).admin_username }}"
+      password: "{{ (manager_instances | first).admin_password }}"
   when: wan_edge_list_path is not defined
 
 - name: Generate bootstrap configuration for all devices
   cisco.catalystwan.devices_wan_edges:
     generate_bootstrap_configuration: true
     manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
+      url: "{{ (manager_instances | first).mgmt_public_ip }}"
+      username: "{{ (manager_instances | first).admin_username }}"
+      password: "{{ (manager_instances | first).admin_password }}"
   register: all_bootstrap_cfg
 
 - name: Initialize empty dictionary for generated_data_edge_instances

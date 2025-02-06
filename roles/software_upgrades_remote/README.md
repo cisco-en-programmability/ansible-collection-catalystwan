@@ -1,6 +1,6 @@
 # Ansible Role: software_upgrades_remote
 
-This Ansible role is designed to perform software upgrades on Cisco SD-WAN devices using a remote server. It covers the entire workflow for upgrading vManage, vBond, vSmar devices using software images stored on a remote server configured with SCP.
+This Ansible role is designed to perform software upgrades on Cisco SD-WAN devices using a remote server. It covers the entire workflow for upgrading Manager, vBond, vSmar devices using software images stored on a remote server configured with SCP.
 
 ## Role Description
 
@@ -8,11 +8,11 @@ The `software_upgrades_remote` role performs the following tasks:
 
 1. Verifies that required variables for the role are present.
 2. Informs the user to ensure the FTP server is correctly configured for remote server upgrades.
-3. Configures the remote server within Cisco vManage.
+3. Configures the remote server within Cisco Manager.
 4. Retrieves and validates the list of remote server repositories.
-5. Uploads software images from the remote server to the Cisco vManage software repository.
-6. Filters and asserts the presence of required software images in the vManage software repository.
-7. Executes software upgrade operations on vManage, vBond, and vSmart controllers.
+5. Uploads software images from the remote server to the Cisco Manager software repository.
+6. Filters and asserts the presence of required software images in the Manager software repository.
+7. Executes software upgrade operations on Manager, vBond, and vSmart controllers.
 8. Sets the default software version on the controllers.
 9. Cleans up available software images from the controllers if desired.
 10. Verifies that the activated version is set as the current and default version.
@@ -30,13 +30,13 @@ There are no external role dependencies. Only `cisco.catalystwan` collection is 
 
 Variables expected by this role:
 
-- `vmanage_instances`: List of vManage instances containing management IP, admin username, and admin password.
+- `manager_instances`: List of Manager instances containing management IP, admin username, and admin password.
 - `remote_server_name`: Name of the remote server to be used.
 - `remote_server_url`: URL of the remote server.
 - `remote_server_user`: Username for the remote server.
 - `remote_server_password`: Password for the remote server.
 - `remote_server_image_location_prefix`: Prefix for the image location on the remote server.
-- `vmanage_remote_software_filename`: Software image filename for vManage.
+- `manager_remote_software_filename`: Software image filename for Manager.
 - `viptela_remote_software_filename`: Software image filename for vBond and vSmart.
 - `cedge_remote_software_filename`: Software image filename for cEdge.
 - `controller_software_version_to_activate`: Version of the software to activate on controllers.
@@ -55,7 +55,7 @@ Including an example of how to use your role (with variables passed in as parame
       import_role:
         name: software_upgrades_remote
       vars:
-        vmanage_instances:
+        manager_instances:
           - mgmt_public_ip: '192.0.2.1'
             admin_username: 'admin'
             admin_password: 'password'
@@ -64,7 +64,7 @@ Including an example of how to use your role (with variables passed in as parame
         remote_server_user: 'remote_user'
         remote_server_password: 'remote_password'
         remote_server_image_location_prefix: '/images'
-        vmanage_remote_software_filename: 'viptela-vmanage-genericx86-64.zip'
+        manager_remote_software_filename: 'viptela-vmanage-genericx86-64.zip'
         viptela_remote_software_filename: 'viptela-edge-genericx86-64.zip'
         cedge_remote_software_filename: 'c8000v-universalk9.17.XX.XX.X.XXX_V17_XX_X.SSA.bin'
         controller_software_version_to_activate: '20.3.1'

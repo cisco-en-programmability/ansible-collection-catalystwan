@@ -20,7 +20,7 @@
 - name: Verify required variables for selected role
   ansible.builtin.include_tasks: variables_assertion.yml
 
-- name: Set initial configuration via administration settings - loop through all vManage devices
+- name: Set initial configuration via administration settings - loop through all Manager devices
   cisco.catalystwan.administration_settings:
     validator:
       domain_ip: "{{ vbond_transport_public_ip }}"
@@ -36,7 +36,7 @@
       url: "{{ device_item.mgmt_public_ip }}"
       username: "{{ device_item.admin_username }}"
       password: "{{ device_item.admin_password }}"
-  loop: "{{ vmanage_instances }}"
+  loop: "{{ manager_instances }}"
   loop_control:
     loop_var: device_item
     label: "hostname: {{ device_item.hostname }}, device_ip: {{ device_item.system_ip }}"

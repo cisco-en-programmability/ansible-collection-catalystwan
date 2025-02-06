@@ -8,42 +8,42 @@
   vars_files:
     - configuration_file_dev_vars.yml
   tasks:
-    - name: "Edit cluster IP address for vManage {{ (vmanage_instances | first).hostname }}"
+    - name: "Edit cluster IP address for Manager {{ (manager_instances | first).hostname }}"
       cisco.catalystwan.cluster_management:
         wait_until_configured_seconds: 300
-        vmanage_id: "0"
-        system_ip: "{{ (vmanage_instances | first).system_ip }}"
-        cluster_ip: "{{ (vmanage_instances | first).cluster_private_ip }}"
-        username: "{{ (vmanage_instances | first).admin_username }}"
-        password: "{{ (vmanage_instances | first).admin_password }}"
-        persona: "{{ (vmanage_instances | first).persona }}"
+        manager_id: "0"
+        system_ip: "{{ (manager_instances | first).system_ip }}"
+        cluster_ip: "{{ (manager_instances | first).cluster_private_ip }}"
+        username: "{{ (manager_instances | first).admin_username }}"
+        password: "{{ (manager_instances | first).admin_password }}"
+        persona: "{{ (manager_instances | first).persona }}"
         services:
           sd-avc:
             server: false
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"
 
     - name: Add remaining instances to cluster
       cisco.catalystwan.cluster_management:
         wait_until_configured_seconds: 1800
-        system_ip: "{{ vmanage.system_ip }}"
-        cluster_ip: "{{ vmanage.cluster_private_ip }}"
-        username: "{{ vmanage.admin_username }}"
-        password: "{{ vmanage.admin_password }}"
+        system_ip: "{{ manager.system_ip }}"
+        cluster_ip: "{{ manager.cluster_private_ip }}"
+        username: "{{ manager.admin_username }}"
+        password: "{{ manager.admin_password }}"
         gen_csr: false
-        persona: "{{ vmanage.persona }}"
+        persona: "{{ manager.persona }}"
         services:
           sd-avc:
             server: false
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
-      loop: "{{ vmanage_instances[1:] }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"
+      loop: "{{ manager_instances[1:] }}"
       loop_control:
-        loop_var: vmanage
-      when: vmanage.cluster_private_ip is defined
+        loop_var: manager
+      when: manager.cluster_private_ip is defined
       retries: 180
       delay: 10

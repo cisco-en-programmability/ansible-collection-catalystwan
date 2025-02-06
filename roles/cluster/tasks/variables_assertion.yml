@@ -15,7 +15,7 @@
     fail_msg: "Your SD-WAN initial config file missing required variable: {{ required_var }}"
     quiet: true
   loop:
-    - "{{ vmanage_instances }}"
-    - "{{ (vmanage_instances | first).cluster_private_ip }}"
+    - "{{ manager_instances }}"
+    - "{{ (manager_instances | first).cluster_private_ip }}"
   loop_control:
     loop_var: required_var

@@ -15,10 +15,10 @@
 # Upload vmanage-20.13.1-x86_64.tar.gz
 
 
-# --- vManage upgrade operations --- #
+# --- Manager upgrade operations --- #
 # 1. Install vmanage-20.13.1 - without restart
 # 2. Verify that installed version appears in Available Versions
-# 3. Delete installed software on vManage
+# 3. Delete installed software on Manager
 # 4. Verify that deleted version not available on device
 # 5. Activate 20.13.1
 # 6. Verify that activated version appears as current version
@@ -59,9 +59,9 @@
               password: "{{ remote_server_password }}"
               image_location_prefix: "{{ remote_server_image_location_prefix }}"
             manager_authentication:
-              url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-              username: "{{ (vmanage_instances | first).admin_username }}"
-              password: "{{ (vmanage_instances | first).admin_password }}"
+              url: "{{ (manager_instances | first).mgmt_public_ip }}"
+              username: "{{ (manager_instances | first).admin_username }}"
+              password: "{{ (manager_instances | first).admin_password }}"
           failed_when: false
           changed_when: false
 
@@ -69,9 +69,9 @@
           cisco.catalystwan.software_repository_info:
             category: "remote_servers"
             manager_authentication:
-              url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-              username: "{{ (vmanage_instances | first).admin_username }}"
-              password: "{{ (vmanage_instances | first).admin_password }}"
+              url: "{{ (manager_instances | first).mgmt_public_ip }}"
+              username: "{{ (manager_instances | first).admin_username }}"
+              password: "{{ (manager_instances | first).admin_password }}"
           register: all_remote_servers
 
         - name: "Debug all_remote_servers - expect one, and verify port is == 22"
@@ -87,15 +87,15 @@
               filename: "{{ remote_software_filename }}"
               remote_server_name: "{{ remote_server_name }}"
             manager_authentication:
-              url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-              username: "{{ (vmanage_instances | first).admin_username }}"
-              password: "{{ (vmanage_instances | first).admin_password }}"
+              url: "{{ (manager_instances | first).mgmt_public_ip }}"
+              username: "{{ (manager_instances | first).admin_username }}"
+              password: "{{ (manager_instances | first).admin_password }}"
 
 
-    # --- vManage upgrade operations --- #
+    # --- Manager upgrade operations --- #
 
 
-    - name: "[TEST] 1. Install software operation on vManage, remote_software_filename: {{ remote_software_filename }}"
+    - name: "[TEST] 1. Install software operation on Manager, remote_software_filename: {{ remote_software_filename }}"
       cisco.catalystwan.software_upgrade:
         state: "present"
         reboot: false
@@ -107,19 +107,19 @@
         filters:
           personality: "vmanage"
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"
 
-    - name: "Get details of software installed on control components - filter vManage"
+    - name: "Get details of software installed on control components - filter Manager"
       cisco.catalystwan.software_upgrade_info:
         device_type: "vmanage"
         filters:
           personality: "vmanage"
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"
       register: software_info
 
     - name: "[TEST] 2. Verify that installed version appears in Available Versions as: {{ higher_software_version }}"
@@ -132,26 +132,26 @@
         success_msg: "{{ software_info.installed_devices | first | to_nice_yaml }}"
 
 
-    - name: "[TEST] 3. Delete installed software on vManage, version: {{ higher_software_version }}"
+    - name: "[TEST] 3. Delete installed software on Manager, version: {{ higher_software_version }}"
       cisco.catalystwan.software_upgrade:
         state: "absent"
         image_version: "{{ higher_software_version }}"
         filters:
           personality: "vmanage"
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"
 
-    - name: "Get details of software info - filter vManage"
+    - name: "Get details of software info - filter Manager"
       cisco.catalystwan.software_upgrade_info:
         device_type: "vmanage"
         filters:
           personality: "vmanage"
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"
       register: software_info
 
     - name: "[TEST] 4. Verify that deleted version not available on device, version: {{ higher_software_version }}"
@@ -162,7 +162,7 @@
         success_msg: "{{ software_info.installed_devices | first | to_nice_yaml }}"
 
 
-    - name: "Prepare for next tests - Install software operation on vManage, remote_software_filename: {{ remote_software_filename }}"
+    - name: "Prepare for next tests - Install software operation on Manager, remote_software_filename: {{ remote_software_filename }}"
       cisco.catalystwan.software_upgrade:
         state: "present"
         reboot: false
@@ -174,31 +174,31 @@
         filters:
           personality: "vmanage"
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"
 
 
-    - name: "[TEST] 5. Activate software (include reboot) on vManage with version: {{ higher_software_version }}"
+    - name: "[TEST] 5. Activate software (include reboot) on Manager with version: {{ higher_software_version }}"
       cisco.catalystwan.software_upgrade:
         state: "active"
         image_version: "{{ higher_software_version }}"
         filters:
           personality: "vmanage"
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"
 
-    - name: "Get details of software installed - filter vManage"
+    - name: "Get details of software installed - filter Manager"
       cisco.catalystwan.software_upgrade_info:
         device_type: "vmanage"
         filters:
           personality: "vmanage"
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"
       register: software_info
 
     - name: "[TEST] 6. Verify that activated version appears as current version: {{ higher_software_version }}"
@@ -211,26 +211,26 @@
         success_msg: "{{ software_info.installed_devices | first | to_nice_yaml }}"
 
 
-    - name: "[TEST] 7. Set default software operation on vManage, version: {{ higher_software_version }}"
+    - name: "[TEST] 7. Set default software operation on Manager, version: {{ higher_software_version }}"
       cisco.catalystwan.software_upgrade:
         state: "default"
         image_version: "current"
         filters:
           personality: "vmanage"
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"
 
-    - name: "Get details of software info - filter vManage"
+    - name: "Get details of software info - filter Manager"
       cisco.catalystwan.software_upgrade_info:
         device_type: "vmanage"
         filters:
           personality: "vmanage"
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"
       register: software_info
 
     - name: "[TEST] 8. Verify that default version set correctly as version: {{ higher_software_version }}"
@@ -241,26 +241,26 @@
         success_msg: "{{ software_info.installed_devices | first | to_nice_yaml }}"
 
 
-    - name: "[TEST] 9. Delete old software on vManage, version: {{ lower_software_version }}"
+    - name: "[TEST] 9. Delete old software on Manager, version: {{ lower_software_version }}"
       cisco.catalystwan.software_upgrade:
         state: "absent"
         image_version: "{{ lower_software_version }}"
         filters:
           personality: "vmanage"
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"
 
-    - name: "Get details of software info - filter vManage"
+    - name: "Get details of software info - filter Manager"
       cisco.catalystwan.software_upgrade_info:
         device_type: "vmanage"
         filters:
           personality: "vmanage"
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"
       register: software_info
 
     - name: "[TEST] 10. Verify that old version not available on device, version: {{ lower_software_version }}"

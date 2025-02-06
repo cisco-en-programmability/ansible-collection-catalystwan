@@ -9,9 +9,9 @@ DOCUMENTATION = r"""
 ---
 module: alarms
 version_added: "0.1.0"
-short_description: Information about alarms in vManage
+short_description: Information about alarms in Manager
 description:
-  - This module can be used to retrieve alarm information from vManage.
+  - This module can be used to retrieve alarm information from Manager.
   - It allows filtering to retrieve only critical alarms, marking all alarms as viewed
   - Optionally supports logging the alarms to a file.
   - Can be used to mark all the alarms as viewed
@@ -110,7 +110,7 @@ from catalystwan.utils.creation_tools import asdict
 from pydantic import Field
 
 from ..module_utils.result import ModuleResult
-from ..module_utils.vmanage_module import AnsibleCatalystwanModule
+from ..module_utils.manager_module import AnsibleCatalystwanModule
 
 
 class ExtendedModuleResult(ModuleResult):

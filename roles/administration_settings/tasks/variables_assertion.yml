@@ -16,7 +16,7 @@
     fail_msg: "Selected role is missing following variables: {{ required_var }}"
     quiet: true
   loop:
-    - "{{ vmanage_instances }}"
+    - "{{ manager_instances }}"
     - "{{ vbond_instances }}"
     - "{{ organization_name }}"
     - "{{ (vbond_instances | first).transport_public_ip }}"

@@ -5,7 +5,7 @@
 
 # This role provides full workflow for upgrading devices with Remote Server.
 # It assumes that controllers are <20.13 version
-# Currently doesn't include upgrades of cEdges from Remote Server. Known bug on vManage.
+# Currently doesn't include upgrades of cEdges from Remote Server. Known bug on Manager.
 
 - name: "Verify required variables for selected role"
   ansible.builtin.include_tasks: variables_assertion.yml
@@ -36,9 +36,9 @@
       password: "{{ remote_server_password }}"
       image_location_prefix: "{{ remote_server_image_location_prefix }}"
     manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
+      url: "{{ (manager_instances | first).mgmt_public_ip }}"
+      username: "{{ (manager_instances | first).admin_username }}"
+      password: "{{ (manager_instances | first).admin_password }}"
   failed_when: false
   changed_when: false
 
@@ -48,9 +48,9 @@
     filters:
       remote_server_name: "{{ remote_server_name }}"
     manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
+      url: "{{ (manager_instances | first).mgmt_public_ip }}"
+      username: "{{ (manager_instances | first).admin_username }}"
+      password: "{{ (manager_instances | first).admin_password }}"
   register: remote_servers_info
 
 - name: "Debug all_remote_servers - expect one, and verify port is == 22"
@@ -67,7 +67,7 @@
 
 - name: |
     Upload software image to Manager from Remote Server:
-    - {{ vmanage_remote_software_filename }}
+    - {{ manager_remote_software_filename }}
     - {{ viptela_remote_software_filename }}
     - {{ cedge_remote_software_filename }}
   cisco.catalystwan.software_repository:
@@ -75,11 +75,11 @@
       filename: "{{ filename_item }}"
       remote_server_name: "{{ remote_server_name }}"
     manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
+      url: "{{ (manager_instances | first).mgmt_public_ip }}"
+      username: "{{ (manager_instances | first).admin_username }}"
+      password: "{{ (manager_instances | first).admin_password }}"
   loop:
-    - "{{ vmanage_remote_software_filename }}"
+    - "{{ manager_remote_software_filename }}"
     - "{{ viptela_remote_software_filename }}"
     - "{{ cedge_remote_software_filename }}"
   loop_control:
@@ -91,9 +91,9 @@
     filters:
       version_type: "{{ remote_server_name }}"
     manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
+      url: "{{ (manager_instances | first).mgmt_public_ip }}"
+      username: "{{ (manager_instances | first).admin_username }}"
+      password: "{{ (manager_instances | first).admin_password }}"
   register: software_images_info
 
 - name: "Assert that required images present on Manager Software Images list"
@@ -109,7 +109,7 @@
     all_available_files: "{{ software_images_info.software_images | map(attribute='available_files') | list }}"
     software_basenames: "{{ all_available_files | map('regex_replace', '^.*/([^/]+)$', '\\1') | list }}"
     software_files_names:
-      - "{{ vmanage_remote_software_filename }}"
+      - "{{ manager_remote_software_filename }}"
       - "{{ viptela_remote_software_filename }}"
       - "{{ cedge_remote_software_filename }}"
 
@@ -117,86 +117,86 @@
 # --- Upgrade operations on controllers --- #
 
 
-# --- vManage software upgrades --- #
+# --- Manager software upgrades --- #
 
-- name: "Install software on vManage, image: {{ vmanage_remote_software_filename }}"
+- name: "Install software on Manager, image: {{ manager_remote_software_filename }}"
   cisco.catalystwan.software_upgrade:
     state: "present"
     reboot: false
     remote_server_name: "{{ remote_server_name }}"
-    remote_image_filename: "{{ remote_server_image_location_prefix }}{{ vmanage_remote_software_filename }}"
+    remote_image_filename: "{{ remote_server_image_location_prefix }}{{ manager_remote_software_filename }}"
     downgrade_check: false
     wait_for_completed: true
     wait_timeout_seconds: 3600
     filters:
       personality: "vmanage"
     manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
+      url: "{{ (manager_instances | first).mgmt_public_ip }}"
+      username: "{{ (manager_instances | first).admin_username }}"
+      password: "{{ (manager_instances | first).admin_password }}"
 
 # FIXME image_path doesn't work because Remote images don't include version_name in repository
 - name: |
-    Activate software (include reboot) on vManage from software: {{ vmanage_remote_software_filename }}
+    Activate software (include reboot) on Manager from software: {{ manager_remote_software_filename }}
     Version to activate: {{ controller_software_version_to_activate }}
   cisco.catalystwan.software_upgrade:
     state: "active"
-    # image_path: "{{ remote_server_image_location_prefix }}{{ vmanage_remote_software_filename }}"
+    # image_path: "{{ remote_server_image_location_prefix }}{{ manager_remote_software_filename }}"
     image_version: "{{ controller_software_version_to_activate }}"
     wait_timeout_seconds: 3600
     filters:
       personality: "vmanage"
     manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
+      url: "{{ (manager_instances | first).mgmt_public_ip }}"
+      username: "{{ (manager_instances | first).admin_username }}"
+      password: "{{ (manager_instances | first).admin_password }}"
 
-- name: "Set default software version from current version on vManage"
+- name: "Set default software version from current version on Manager"
   cisco.catalystwan.software_upgrade:
     state: "default"
     image_version: "current"
     filters:
       personality: "vmanage"
     manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
+      url: "{{ (manager_instances | first).mgmt_public_ip }}"
+      username: "{{ (manager_instances | first).admin_username }}"
+      password: "{{ (manager_instances | first).admin_password }}"
 
-- name: "Get details of software info - filter vManage"
+- name: "Get details of software info - filter Manager"
   cisco.catalystwan.software_upgrade_info:
     device_type: "vmanage"
     filters:
       personality: "vmanage"
     manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
-  register: software_info_vmanage
+      url: "{{ (manager_instances | first).mgmt_public_ip }}"
+      username: "{{ (manager_instances | first).admin_username }}"
+      password: "{{ (manager_instances | first).admin_password }}"
+  register: software_info_manager
 
-- name: "Delete available software from vManage"
+- name: "Delete available software from Manager"
   cisco.catalystwan.software_upgrade:
     state: "absent"
     image_version: "{{ version_item }}"
     filters:
       personality: "vmanage"
     manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
-  loop: "{{ software_info_vmanage.installed_devices | map(attribute='available_versions') | first }}"
+      url: "{{ (manager_instances | first).mgmt_public_ip }}"
+      username: "{{ (manager_instances | first).admin_username }}"
+      password: "{{ (manager_instances | first).admin_password }}"
+  loop: "{{ software_info_manager.installed_devices | map(attribute='available_versions') | first }}"
   loop_control:
     loop_var: version_item
   when:
     - remove_available_software_from_device | default('false') | bool
-    - software_info_vmanage.installed_devices | map(attribute='available_versions') | length > 0
+    - software_info_manager.installed_devices | map(attribute='available_versions') | length > 0
 
 - name: "Verify that activated version appears as current version and as default version"
   ansible.builtin.assert:
     that:
-      - "controller_software_version_to_activate in (software_info_vmanage.installed_devices | first).current_partition"
-      - "controller_software_version_to_activate in (software_info_vmanage.installed_devices | first).default_version"
-    fail_msg: "{{ software_info_vmanage.installed_devices | first | to_nice_yaml }}"
-    success_msg: "{{ software_info_vmanage.installed_devices | first | to_nice_yaml }}"
+      - "controller_software_version_to_activate in (software_info_manager.installed_devices | first).current_partition"
+      - "controller_software_version_to_activate in (software_info_manager.installed_devices | first).default_version"
+    fail_msg: "{{ software_info_manager.installed_devices | first | to_nice_yaml }}"
+    success_msg: "{{ software_info_manager.installed_devices | first | to_nice_yaml }}"
 
 
 # --- vBond software upgrades --- #
@@ -204,7 +204,7 @@
 
 - name: "Install and activate software operation on vBond, image: {{ viptela_remote_software_filename }}"
   cisco.catalystwan.software_upgrade:
-    state: "present"  # present with reboot: true -> ACTIVE in vManage
+    state: "present"  # present with reboot: true -> ACTIVE in Manager
     reboot: true
     remote_server_name: "{{ remote_server_name }}"
     remote_image_filename: "{{ remote_server_image_location_prefix }}{{ viptela_remote_software_filename }}"
@@ -214,9 +214,9 @@
     filters:
       personality: "vbond"
     manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
+      url: "{{ (manager_instances | first).mgmt_public_ip }}"
+      username: "{{ (manager_instances | first).admin_username }}"
+      password: "{{ (manager_instances | first).admin_password }}"
 
 - name: "Set default software version from current version on vBond"
   cisco.catalystwan.software_upgrade:
@@ -225,9 +225,9 @@
     filters:
       personality: "vbond"
     manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
+      url: "{{ (manager_instances | first).mgmt_public_ip }}"
+      username: "{{ (manager_instances | first).admin_username }}"
+      password: "{{ (manager_instances | first).admin_password }}"
 
 - name: "Get details of software info - filter vBond"
   cisco.catalystwan.software_upgrade_info:
@@ -235,9 +235,9 @@
     filters:
       personality: "vbond"
     manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
+      url: "{{ (manager_instances | first).mgmt_public_ip }}"
+      username: "{{ (manager_instances | first).admin_username }}"
+      password: "{{ (manager_instances | first).admin_password }}"
   register: software_info_vbond
 
 - name: "Delete available software from vBond"
@@ -247,9 +247,9 @@
     filters:
       personality: "vbond"
     manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
+      url: "{{ (manager_instances | first).mgmt_public_ip }}"
+      username: "{{ (manager_instances | first).admin_username }}"
+      password: "{{ (manager_instances | first).admin_password }}"
   loop: "{{ software_info_vbond.installed_devices | map(attribute='available_versions') | first }}"
   loop_control:
     loop_var: version_item
@@ -273,7 +273,7 @@
 
 - name: "Install and activate software operation on vSmart, image: {{ viptela_remote_software_filename }}"
   cisco.catalystwan.software_upgrade:
-    state: "present"  # present with reboot: true -> ACTIVE in vManage
+    state: "present"  # present with reboot: true -> ACTIVE in Manager
     reboot: true
     remote_server_name: "{{ remote_server_name }}"
     remote_image_filename: "{{ remote_server_image_location_prefix }}{{ viptela_remote_software_filename }}"
@@ -283,9 +283,9 @@
     filters:
       personality: "vsmart"
     manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
+      url: "{{ (manager_instances | first).mgmt_public_ip }}"
+      username: "{{ (manager_instances | first).admin_username }}"
+      password: "{{ (manager_instances | first).admin_password }}"
 
 - name: "Set default software version from current version on vSmart"
   cisco.catalystwan.software_upgrade:
@@ -294,9 +294,9 @@
     filters:
       personality: "vsmart"
     manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
+      url: "{{ (manager_instances | first).mgmt_public_ip }}"
+      username: "{{ (manager_instances | first).admin_username }}"
+      password: "{{ (manager_instances | first).admin_password }}"
 
 - name: "Get details of software info - filter vSmart"
   cisco.catalystwan.software_upgrade_info:
@@ -304,9 +304,9 @@
     filters:
       personality: "vsmart"
     manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
+      url: "{{ (manager_instances | first).mgmt_public_ip }}"
+      username: "{{ (manager_instances | first).admin_username }}"
+      password: "{{ (manager_instances | first).admin_password }}"
   register: software_info_vsmart
 
 - name: "Delete available software from vSmart"
@@ -316,9 +316,9 @@
     filters:
       personality: "vsmart"
     manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
+      url: "{{ (manager_instances | first).mgmt_public_ip }}"
+      username: "{{ (manager_instances | first).admin_username }}"
+      password: "{{ (manager_instances | first).admin_password }}"
   loop: "{{ software_info_vsmart.installed_devices | map(attribute='available_versions') | first }}"
   loop_control:
     loop_var: version_item
@@ -341,7 +341,7 @@
 
 - name: "Install and activate software operation on cEdges, image: {{ cedge_remote_software_filename }}"
   cisco.catalystwan.software_upgrade:
-    state: "present"  # present with reboot: true -> ACTIVATE in vManage
+    state: "present"  # present with reboot: true -> ACTIVATE in Manager
     reboot: true
     remote_server_name: "{{ remote_server_name }}"
     remote_image_filename: "{{ remote_server_image_location_prefix }}{{ cedge_remote_software_filename }}"
@@ -350,9 +350,9 @@
     filters:
       personality: "vedge"
     manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
+      url: "{{ (manager_instances | first).mgmt_public_ip }}"
+      username: "{{ (manager_instances | first).admin_username }}"
+      password: "{{ (manager_instances | first).admin_password }}"
 
 - name: "Set default software version from current version on cEdges"
   cisco.catalystwan.software_upgrade:
@@ -361,9 +361,9 @@
     filters:
       personality: "vedge"
     manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
+      url: "{{ (manager_instances | first).mgmt_public_ip }}"
+      username: "{{ (manager_instances | first).admin_username }}"
+      password: "{{ (manager_instances | first).admin_password }}"
 
 - name: "Get details of software installed on edge components - filter cEdges"
   cisco.catalystwan.software_upgrade_info:
@@ -371,9 +371,9 @@
     filters:
       personality: "vedge"
     manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
+      url: "{{ (manager_instances | first).mgmt_public_ip }}"
+      username: "{{ (manager_instances | first).admin_username }}"
+      password: "{{ (manager_instances | first).admin_password }}"
   register: software_info_cedges
 
 - name: "Delete available software from vSmart"
@@ -383,9 +383,9 @@
     filters:
       personality: "vedge"
     manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
+      url: "{{ (manager_instances | first).mgmt_public_ip }}"
+      username: "{{ (manager_instances | first).admin_username }}"
+      password: "{{ (manager_instances | first).admin_password }}"
   loop: "{{ software_info_cedges.installed_devices | map(attribute='available_versions') | first }}"
   loop_control:
     loop_var: version_item

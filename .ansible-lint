@@ -42,9 +42,9 @@ mock_modules:
   - cisco.catalystwan.software_upgrade_info
   - cisco.catalystwan.device_templates_info
   - cisco.catalystwan.users
-  - cisco.catalystwan.vmanage_mode
+  - cisco.catalystwan.manager_mode
   - cisco.catalystwan.wait_for_api_server
-  - cisco.catalystwan.vmanage_mode
+  - cisco.catalystwan.manager_mode
   - cisco.catalystwan.config_groups
   - cisco.catalystwan.config_group_deployment
   - cisco.catalystwan.feature_profile_builder

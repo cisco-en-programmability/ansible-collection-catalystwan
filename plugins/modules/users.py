@@ -8,10 +8,10 @@
 DOCUMENTATION = r"""
 ---
 module: users
-short_description: Manage users in vManage.
+short_description: Manage users in Manager.
 version_added: "0.1.0"
 description:
-  - This module allows you to manage users within Cisco vManage.
+  - This module allows you to manage users within Cisco Manager.
   - You can create, update, reset, or delete user accounts, as well as retrieve all user accounts.
 options:
   get_all:
@@ -49,7 +49,7 @@ options:
     required: false
     default: []
 notes:
-  - Ensure that the provided credentials have sufficient permissions to manage users in vManage.
+  - Ensure that the provided credentials have sufficient permissions to manage users in Manager.
   - Passwords should be handled carefully, consider using Ansible Vault for sensitive data.
 author:
   - Arkadiusz Cichon (acichon@cisco.com)
@@ -59,11 +59,11 @@ extends_documentation_fragment:
 
 EXAMPLES = r"""
 ---
-- name: Retrieve all users from vManage
+- name: Retrieve all users from Manager
   cisco.catalystwan.users:
     get_all: true
 
-- name: Create a new user in vManage
+- name: Create a new user in Manager
   cisco.catalystwan.users:
     mode: create
     username: 'johndoe'
@@ -72,7 +72,7 @@ EXAMPLES = r"""
     group:
       - 'admin'
 
-- name: Delete a user from vManage
+- name: Delete a user from Manager
   cisco.catalystwan.users:
     mode: delete
     username: 'janedoe'
@@ -117,7 +117,7 @@ from catalystwan.session import ManagerHTTPError
 from pydantic import Field
 
 from ..module_utils.result import ModuleResult
-from ..module_utils.vmanage_module import AnsibleCatalystwanModule
+from ..module_utils.manager_module import AnsibleCatalystwanModule
 
 
 class ExtendedModuleResult(ModuleResult):

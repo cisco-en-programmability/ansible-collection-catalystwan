@@ -56,16 +56,16 @@
             software:
               image_local_path: "{{ viptela_software_path }}"
             manager_authentication:
-              url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-              username: "{{ (vmanage_instances | first).admin_username }}"
-              password: "{{ (vmanage_instances | first).admin_password }}"
+              url: "{{ (manager_instances | first).mgmt_public_ip }}"
+              username: "{{ (manager_instances | first).admin_username }}"
+              password: "{{ (manager_instances | first).admin_password }}"
 
 
     # --- vBond upgrade operations --- #
 
     - name: "[TEST] 1. Install software operation on vBonds, image_version: {{ higher_software_version }}"
       cisco.catalystwan.software_upgrade:
-        state: "present"  # present with reboot: true -> ACTIVATE in vManage
+        state: "present"  # present with reboot: true -> ACTIVATE in Manager
         reboot: true
         image_version: "{{ higher_software_version }}"
         wait_for_completed: true
@@ -73,9 +73,9 @@
         filters:
           personality: "vbond"
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"
 
     - name: "Get details of software installed on control components - filter vBond"
       cisco.catalystwan.software_upgrade_info:
@@ -83,9 +83,9 @@
         filters:
           personality: "vbond"
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"
       register: software_info
 
     - name: "[TEST] 2. Verify that activated version appears as current version and old version in available files"
@@ -107,9 +107,9 @@
         filters:
           personality: "vbond"
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"
 
     - name: "Get details of software installed on control components - filter vBond"
       cisco.catalystwan.software_upgrade_info:
@@ -117,9 +117,9 @@
         filters:
           personality: "vbond"
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"
       register: software_info
 
     - name: "[TEST] 4. Verify that default version set correctly as version: {{ higher_software_version }}"
@@ -138,9 +138,9 @@
         filters:
           personality: "vbond"
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"
 
     - name: "Get details of software installed on control components - filter vBond"
       cisco.catalystwan.software_upgrade_info:
@@ -148,9 +148,9 @@
         filters:
           personality: "vbond"
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"
       register: software_info
 
     - name: "[TEST] 6. Verify that installed version appears as current version: {{ lower_software_version }}"
@@ -174,9 +174,9 @@
         filters:
           personality: "vbond"
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"
 
     - name: "Get details of software installed on control components - filter vBond"
       cisco.catalystwan.software_upgrade_info:
@@ -184,9 +184,9 @@
         filters:
           personality: "vbond"
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"
       register: software_info
 
     - name: "Verify that activated version appears as current version and old version in available files"

@@ -8,12 +8,12 @@
 
 - name: Set facts
   ansible.builtin.set_fact:
-    url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-    username: "{{ (vmanage_instances | first).admin_username }}"
-    password: "{{ (vmanage_instances | first).admin_password }}"
-    system_ip: "{{ (vmanage_instances | first).system_ip }}"
+    url: "{{ (manager_instances | first).mgmt_public_ip }}"
+    username: "{{ (manager_instances | first).admin_username }}"
+    password: "{{ (manager_instances | first).admin_password }}"
+    system_ip: "{{ (manager_instances | first).system_ip }}"
 
-- name: Authenticate to vManage
+- name: Authenticate to Manager
   ansible.builtin.uri:
     url: "https://{{ url }}/j_security_check"
     method: POST
@@ -25,10 +25,10 @@
 
 - name: Check if login was successful
   ansible.builtin.fail:
-    msg: "vManage Login failed. Check your credentials."
+    msg: "Manager Login failed. Check your credentials."
   when: '"JSESSIONID" not in login_response.cookies'
 
-- name: Get vManage version
+- name: Get Manager version
   ansible.builtin.uri:
     url: "https://{{ url }}/dataservice/device/system/info?deviceId={{ system_ip }}"
     method: GET
@@ -40,12 +40,12 @@
   register: version_response
   when: '"JSESSIONID" in login_response.cookies'
 
-- name: Set vManage version fact
+- name: Set Manager version fact
   ansible.builtin.set_fact:
-    vmanage_version: "{{ version_response.json.data[0].version }}"
+    manager_version: "{{ version_response.json.data[0].version }}"
   when: version_response is defined
 
-- name: Ensure vManage version is greater than or equal to specified version
+- name: Ensure Manager version is greater than or equal to specified version
   ansible.builtin.fail:
-    msg: "vManage software version {{ vmanage_version }} is lower than the required version {{ min_version_required }}."
-  when: vmanage_version is version(min_version_required, '<')
+    msg: "Manager software version {{ manager_version }} is lower than the required version {{ min_version_required }}."
+  when: manager_version is version(min_version_required, '<')

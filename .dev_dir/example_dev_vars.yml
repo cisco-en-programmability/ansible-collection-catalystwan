@@ -18,7 +18,7 @@ remote_server_url: null
 remote_server_user: null
 remote_server_password: null
 remote_server_image_location_prefix: null
-vmanage_remote_software_filename: null
+manager_remote_software_filename: null
 viptela_remote_software_filename: null
 cedge_remote_software_filename: null
 
@@ -31,7 +31,7 @@ vbond_instances:
   mgmt_public_ip: null
   system_ip: null
   transport_public_ip: null
-vmanage_instances:
+manager_instances:
 - admin_password: null
   admin_username: null
   hostname: null

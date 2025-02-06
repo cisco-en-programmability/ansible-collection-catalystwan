@@ -22,7 +22,7 @@ msg:
   returned: always
   type: str
 response:
-  description: Detailed response from the vManage API if applicable.
+  description: Detailed response from the Manager API if applicable.
   returned: when API call is made
   type: dict
 changed:
@@ -64,7 +64,7 @@ import traceback
 from catalystwan.endpoints.configuration_group import DeviceVariables, VariableData
 
 from ..module_utils.result import ModuleResult
-from ..module_utils.vmanage_module import AnsibleCatalystwanModule
+from ..module_utils.manager_module import AnsibleCatalystwanModule
 
 
 def normalize_variables(variables: dict):
