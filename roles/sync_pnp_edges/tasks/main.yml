@@ -62,7 +62,7 @@
       hostname: "{{ organization_name }}-cedge-{{ index + 1 }}"
       otp: "{{ instance.otp }}"
       uuid: "{{ instance.uuid }}"
-      validator: "{{ instance.validator }}"
+      validator: "{{ instance.vbond }}"
       system_ip: "192.168.10{{ index + 1 }}.1"
       site_id: "{{ 1000 + index + 1 }}"
   loop: "{{ all_bootstrap_cfg.bootstrap_configuration }}"

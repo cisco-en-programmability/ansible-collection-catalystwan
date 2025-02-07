@@ -99,11 +99,11 @@ Also, the order they are presented is the order of precedence.
     ...
 ```
 
-### #FIXME 2. Env variables (`VMANAGE_URL`, `VMANAGE_USERNAME`, `VMANAGE_PASSWORD`)
+### #FIXME 2. Env variables (`MANAGER_URL`, `MANAGER_USERNAME`, `MANAGER_PASSWORD`)
 
 Mostly useful if you connect to ST Manager instance.
 
-### #FIXME 3. Dedicated yaml credentials file indicated by setting env variable - `VMANAGE_CREDS_PATH`
+### #FIXME 3. Dedicated yaml credentials file indicated by setting env variable - `MANAGER_CREDS_PATH`
 
 Mostly useful if you connect to ST Manager instance.
 
@@ -116,5 +116,5 @@ manager_password: "XXX"
 Then export path to `manager_creds.yml` file:
 
 ```bash
-export VMANAGE_CREDS_PATH="YOURPATH/manager_creds.yml"
+export MANAGER_CREDS_PATH="YOURPATH/manager_creds.yml"
 ```

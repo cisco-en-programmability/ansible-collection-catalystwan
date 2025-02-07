@@ -57,10 +57,10 @@ class AnsibleCatalystwanModule:
             required=True,
             aliases=["manager_authentication"],
             options=dict(
-                url=dict(type="str", required=True, fallback=(env_fallback, ["VMANAGE_URL"])),
-                username=dict(type="str", required=True, fallback=(env_fallback, ["VMANAGE_USERNAME"])),
-                password=dict(type="str", required=True, fallback=(env_fallback, ["VMANAGE_PASSWORD"]), no_log=True),
-                port=dict(type="str", required=False, fallback=(env_fallback, ["VMANAGE_PORT"])),
+                url=dict(type="str", required=True, fallback=(env_fallback, ["MANAGER_URL"])),
+                username=dict(type="str", required=True, fallback=(env_fallback, ["MANAGER_USERNAME"])),
+                password=dict(type="str", required=True, fallback=(env_fallback, ["MANAGER_PASSWORD"]), no_log=True),
+                port=dict(type="str", required=False, fallback=(env_fallback, ["MANAGER_PORT"])),
             ),
         )
     )
