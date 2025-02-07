@@ -270,7 +270,7 @@
         template_name: "CiscoOMPFeatureTemplate"
         template_description: "Comprehensive OMP Configuration"
         device_models:
-          - "controller"
+          - "vsmart"
         cisco_omp:
           graceful_restart: true
           overlay_as: "65000"

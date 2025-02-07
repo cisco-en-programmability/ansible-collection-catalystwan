@@ -55,11 +55,11 @@ extends_documentation_fragment:
   - cisco.catalystwan.feature_template_cisco_system
   - cisco.catalystwan.feature_template_cisco_vpn
   - cisco.catalystwan.feature_template_cisco_vpn_interface
-  - cisco.catalystwan.feature_template_omp_controller
-  - cisco.catalystwan.feature_template_security_controller
-  - cisco.catalystwan.feature_template_system_controller
-  - cisco.catalystwan.feature_template_vpn_controller_interface
-  - cisco.catalystwan.feature_template_vpn_controller
+  - cisco.catalystwan.feature_template_omp_vsmart
+  - cisco.catalystwan.feature_template_security_vsmart
+  - cisco.catalystwan.feature_template_system_vsmart
+  - cisco.catalystwan.feature_template_vpn_vsmart_interface
+  - cisco.catalystwan.feature_template_vpn_vsmart
   - cisco.catalystwan.device_models_feature_template
   - cisco.catalystwan.manager_authentication
 author:
