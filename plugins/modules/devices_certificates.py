@@ -13,7 +13,7 @@ version_added: "0.1.0"
 description:
   - This module manages the certificates for devices in Manager.
   - It can generate a Certificate Signing Request (CSR), send configuration to controllers,
-    send configuration to vBond, invalidate certificates, and change the validity of the device list.
+    send configuration to Validator, invalidate certificates, and change the validity of the device list.
 options:
   generate_csr:
     description:
@@ -26,12 +26,12 @@ options:
     type: bool
     default: False
     aliases: [ "save_vedge_list" ]
-  send_to_vbond:
+  send_to_validator:
     description:
-      - Whether to send the device list to vBond.
+      - Whether to send the device list to Validator.
     type: bool
     default: False
-    aliases: [ "save_vsmart_list" ]
+    aliases: [ "save_controller_list" ]
   invalidate:
     description:
       - Whether to invalidate the device's certificates.
@@ -129,7 +129,7 @@ def run_module():
     module_args = dict(
         generate_csr=dict(type=bool, default=False),
         send_to_controllers=dict(type=bool, default=False, aliases=["save_vedge_list"]),
-        send_to_vbond=dict(type=bool, default=False, aliases=["save_vsmart_list"]),
+        send_to_validator=dict(type=bool, default=False, aliases=["save_controller_list"]),
         invalidate=dict(type=bool, default=False),
         change_vedge_list_validity=dict(
             type=dict,
@@ -150,11 +150,11 @@ def run_module():
         mutually_exclusive=[
             ("invalidate", "generate_csr"),
             ("invalidate", "send_to_controllers"),
-            ("invalidate", "send_to_vbond"),
+            ("invalidate", "send_to_validator"),
             ("invalidate", "change_vedge_list_validity"),
         ],
         required_one_of=[
-            ("invalidate", "generate_csr", "send_to_controllers", "send_to_vbond", "change_vedge_list_validity")
+            ("invalidate", "generate_csr", "send_to_controllers", "send_to_validator", "change_vedge_list_validity")
         ],
     )
     result = ModuleResult()
@@ -218,13 +218,13 @@ def run_module():
             wait_for_completed=module.params.get("wait_for_completed"),
         )
 
-    if module.params.get("send_to_vbond"):
+    if module.params.get("send_to_validator"):
         module.execute_action_safely(
             result,
-            action_name="Send to vBond",
-            send_func=module.session.endpoints.certificate_management_device.send_to_vbond,
-            success_msg="Send to vBond (Save vSmart List) completed.\n",
-            failure_msg="Couldn't send to vBond (Save vSmart List), task failed or task has reached timeout.",
+            action_name="Send to Validator",
+            send_func=module.session.endpoints.certificate_management_device.send_to_validator,
+            success_msg="Send to Validator (Save Controller List) completed.\n",
+            failure_msg="Couldn't send to Validator (Save Controller List), task failed or task has reached timeout.",
             wait_for_completed=module.params.get("wait_for_completed"),
         )
 

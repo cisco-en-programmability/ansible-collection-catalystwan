@@ -13,8 +13,8 @@ from __future__ import annotations
 class ModuleDocFragment(object):
     DOCUMENTATION = r"""
 options:
-    vpn_vsmart_interface:
-        description: vSmart VPN Interface Feature Template configuration
+    vpn_controller_interface:
+        description: Controller VPN Interface Feature Template configuration
         type: dict
         suboptions:
             if_name:

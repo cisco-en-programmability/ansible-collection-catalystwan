@@ -32,7 +32,7 @@ options:
     default: null
   device_role:
     description:
-      - The device role. Applicable to all devices except 'Manager' and 'vSmart'
+      - The device role. Applicable to all devices except 'Manager' and 'Controller'
     required: false
     default: null
     type: str

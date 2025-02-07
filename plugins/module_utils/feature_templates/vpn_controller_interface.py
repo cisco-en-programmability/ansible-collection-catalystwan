@@ -1,5 +1,5 @@
-vpn_vsmart_interface_definition = {
-    "vpn_vsmart_interface": {
+vpn_controller_interface_definition = {
+    "vpn_controller_interface": {
         "default": None,
         "options": {
             "all": {"default": None, "required": False, "type": "bool"},

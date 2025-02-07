@@ -22,7 +22,7 @@
     - name: 1. Set initial configuration via administration settings
       cisco.catalystwan.administration_settings:
         validator:
-          domain_ip: "{{ vbond_instances[0].transport_public_ip }}"
+          domain_ip: "{{ validator_instances[0].transport_public_ip }}"
           port: 12346
         organization: "{{ organization_name }}"
         certificates:
@@ -37,7 +37,7 @@
       cisco.catalystwan.administration_settings:
         validator:
           port: 222
-          domain_ip: "{{ vbond_instances[0].transport_public_ip }}"
+          domain_ip: "{{ validator_instances[0].transport_public_ip }}"
         organization: "{{ organization_name }}"
         certificates:
           retrieve_interval: 2
@@ -55,7 +55,7 @@
     - name: 3. Set again initial configuration via administration settings
       cisco.catalystwan.administration_settings:
         validator:
-          domain_ip: "{{ vbond_instances[0].transport_public_ip }}"
+          domain_ip: "{{ validator_instances[0].transport_public_ip }}"
           port: 12346
         organization: "{{ organization_name }}"
         certificates:

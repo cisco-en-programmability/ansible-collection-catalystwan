@@ -1,5 +1,5 @@
-omp_vsmart_definition = {
-    "omp_vsmart": {
+omp_controller_definition = {
+    "omp_controller": {
         "default": None,
         "options": {
             "advertisement_interval": {"default": None, "required": False, "type": "int"},

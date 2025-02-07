@@ -52,7 +52,7 @@
           username: "{{ (manager_instances | first).admin_username }}"
           password: "{{ (manager_instances | first).admin_password }}"
       register: device_details_info
-      loop: "{{ vsmart_instances + vbond_instances + manager_instances }}"
+      loop: "{{ controller_instances + validator_instances + manager_instances }}"
       loop_control:
         loop_var: device_item
         label: "hostname: {{ device_item.hostname }}, device_ip: {{ device_item.system_ip }}"

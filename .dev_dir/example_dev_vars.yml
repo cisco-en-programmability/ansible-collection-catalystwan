@@ -24,7 +24,7 @@ cedge_remote_software_filename: null
 
 
 organization_name: null
-vbond_instances:
+validator_instances:
 - admin_password: null
   admin_username: null
   hostname: null
@@ -39,7 +39,7 @@ manager_instances:
   system_ip: null
   transport_public_ip: null
   cluster_private_ip: null
-vsmart_instances:
+controller_instances:
 - admin_password: null
   admin_username: null
   hostname: null

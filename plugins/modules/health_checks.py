@@ -165,8 +165,8 @@ def orchestrator_connections_have_state_up(
     orchestrator_connections_health = []
     result.response[f"{HealthCheckTypes.ORCHERSTRATOR_CONNECTIONS.value}"] = {}
 
-    vbonds = [dev for dev in devices if dev.personality == Personality.VBOND]
-    for dev in vbonds:
+    validators = [dev for dev in devices if dev.personality == Personality.VBOND]
+    for dev in validators:
         # if device not reachable report problem but move with other devices to have all reported
         if dev.reachability != "reachable":
             orchestrator_connections_health.append(False)

@@ -1,6 +1,6 @@
 # Ansible Role: software_upgrades_remote
 
-This Ansible role is designed to perform software upgrades on Cisco SD-WAN devices using a remote server. It covers the entire workflow for upgrading Manager, vBond, vSmar devices using software images stored on a remote server configured with SCP.
+This Ansible role is designed to perform software upgrades on Cisco SD-WAN devices using a remote server. It covers the entire workflow for upgrading Manager, Validator, Controller devices using software images stored on a remote server configured with SCP.
 
 ## Role Description
 
@@ -12,7 +12,7 @@ The `software_upgrades_remote` role performs the following tasks:
 4. Retrieves and validates the list of remote server repositories.
 5. Uploads software images from the remote server to the Cisco Manager software repository.
 6. Filters and asserts the presence of required software images in the Manager software repository.
-7. Executes software upgrade operations on Manager, vBond, and vSmart controllers.
+7. Executes software upgrade operations on Manager, Validator, and Controller controllers.
 8. Sets the default software version on the controllers.
 9. Cleans up available software images from the controllers if desired.
 10. Verifies that the activated version is set as the current and default version.
@@ -37,7 +37,7 @@ Variables expected by this role:
 - `remote_server_password`: Password for the remote server.
 - `remote_server_image_location_prefix`: Prefix for the image location on the remote server.
 - `manager_remote_software_filename`: Software image filename for Manager.
-- `viptela_remote_software_filename`: Software image filename for vBond and vSmart.
+- `viptela_remote_software_filename`: Software image filename for Validator and Controller.
 - `cedge_remote_software_filename`: Software image filename for cEdge.
 - `controller_software_version_to_activate`: Version of the software to activate on controllers.
 - `edge_software_version_to_activate`: Version of the software to activate on cEdge devices.

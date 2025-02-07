@@ -1,5 +1,5 @@
-system_vsmart_definition = {
-    "system_vsmart": {
+system_controller_definition = {
+    "system_controller": {
         "default": None,
         "options": {
             "admin_tech_on_failure": {"default": True, "required": False, "type": "bool"},

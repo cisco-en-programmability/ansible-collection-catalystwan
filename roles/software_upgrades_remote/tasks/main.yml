@@ -199,10 +199,10 @@
     success_msg: "{{ software_info_manager.installed_devices | first | to_nice_yaml }}"
 
 
-# --- vBond software upgrades --- #
+# --- Validator software upgrades --- #
 
 
-- name: "Install and activate software operation on vBond, image: {{ viptela_remote_software_filename }}"
+- name: "Install and activate software operation on Validator, image: {{ viptela_remote_software_filename }}"
   cisco.catalystwan.software_upgrade:
     state: "present"  # present with reboot: true -> ACTIVE in Manager
     reboot: true
@@ -218,7 +218,7 @@
       username: "{{ (manager_instances | first).admin_username }}"
       password: "{{ (manager_instances | first).admin_password }}"
 
-- name: "Set default software version from current version on vBond"
+- name: "Set default software version from current version on Validator"
   cisco.catalystwan.software_upgrade:
     state: "default"
     image_version: "current"
@@ -229,7 +229,7 @@
       username: "{{ (manager_instances | first).admin_username }}"
       password: "{{ (manager_instances | first).admin_password }}"
 
-- name: "Get details of software info - filter vBond"
+- name: "Get details of software info - filter Validator"
   cisco.catalystwan.software_upgrade_info:
     device_type: "controller"
     filters:
@@ -238,9 +238,9 @@
       url: "{{ (manager_instances | first).mgmt_public_ip }}"
       username: "{{ (manager_instances | first).admin_username }}"
       password: "{{ (manager_instances | first).admin_password }}"
-  register: software_info_vbond
+  register: software_info_validator
 
-- name: "Delete available software from vBond"
+- name: "Delete available software from Validator"
   cisco.catalystwan.software_upgrade:
     state: "absent"
     image_version: "{{ version_item }}"
@@ -250,12 +250,12 @@
       url: "{{ (manager_instances | first).mgmt_public_ip }}"
       username: "{{ (manager_instances | first).admin_username }}"
       password: "{{ (manager_instances | first).admin_password }}"
-  loop: "{{ software_info_vbond.installed_devices | map(attribute='available_versions') | first }}"
+  loop: "{{ software_info_validator.installed_devices | map(attribute='available_versions') | first }}"
   loop_control:
     loop_var: version_item
   when:
     - remove_available_software_from_device | default('false') | bool
-    - software_info_vbond.installed_devices | map(attribute='available_versions') | length > 0
+    - software_info_validator.installed_devices | map(attribute='available_versions') | length > 0
 
 - name: "Verify that activated version appears as current version and as default version"
   ansible.builtin.assert:
@@ -264,14 +264,14 @@
       - "controller_software_version_to_activate in device_item.default_version"
     fail_msg: "{{ device_item | to_nice_yaml }}"
     success_msg: "{{ device_item | to_nice_yaml }}"
-  loop: "{{ software_info_vbond.installed_devices }}"
+  loop: "{{ software_info_validator.installed_devices }}"
   loop_control:
     loop_var: device_item
 
-# --- vSmart software upgrades --- #
+# --- Controller software upgrades --- #
 
 
-- name: "Install and activate software operation on vSmart, image: {{ viptela_remote_software_filename }}"
+- name: "Install and activate software operation on Controller, image: {{ viptela_remote_software_filename }}"
   cisco.catalystwan.software_upgrade:
     state: "present"  # present with reboot: true -> ACTIVE in Manager
     reboot: true
@@ -287,7 +287,7 @@
       username: "{{ (manager_instances | first).admin_username }}"
       password: "{{ (manager_instances | first).admin_password }}"
 
-- name: "Set default software version from current version on vSmart"
+- name: "Set default software version from current version on Controller"
   cisco.catalystwan.software_upgrade:
     state: "default"
     image_version: "current"
@@ -298,7 +298,7 @@
       username: "{{ (manager_instances | first).admin_username }}"
       password: "{{ (manager_instances | first).admin_password }}"
 
-- name: "Get details of software info - filter vSmart"
+- name: "Get details of software info - filter Controller"
   cisco.catalystwan.software_upgrade_info:
     device_type: "controller"
     filters:
@@ -307,9 +307,9 @@
       url: "{{ (manager_instances | first).mgmt_public_ip }}"
       username: "{{ (manager_instances | first).admin_username }}"
       password: "{{ (manager_instances | first).admin_password }}"
-  register: software_info_vsmart
+  register: software_info_controller
 
-- name: "Delete available software from vSmart"
+- name: "Delete available software from Controller"
   cisco.catalystwan.software_upgrade:
     state: "absent"
     image_version: "{{ version_item }}"
@@ -319,12 +319,12 @@
       url: "{{ (manager_instances | first).mgmt_public_ip }}"
       username: "{{ (manager_instances | first).admin_username }}"
       password: "{{ (manager_instances | first).admin_password }}"
-  loop: "{{ software_info_vsmart.installed_devices | map(attribute='available_versions') | first }}"
+  loop: "{{ software_info_controller.installed_devices | map(attribute='available_versions') | first }}"
   loop_control:
     loop_var: version_item
   when:
     - remove_available_software_from_device | default('false') | bool
-    - software_info_vsmart.installed_devices | map(attribute='available_versions') | length > 0
+    - software_info_controller.installed_devices | map(attribute='available_versions') | length > 0
 
 - name: "Verify that activated version appears as current version and as default version"
   ansible.builtin.assert:
@@ -333,11 +333,11 @@
       - "controller_software_version_to_activate in device_item.default_version"
     fail_msg: "{{ device_item | to_nice_yaml }}"
     success_msg: "{{ device_item | to_nice_yaml }}"
-  loop: "{{ software_info_vsmart.installed_devices }}"
+  loop: "{{ software_info_controller.installed_devices }}"
   loop_control:
     loop_var: device_item
 
-# --- vSmart software upgrades --- #
+# --- Controller software upgrades --- #
 
 - name: "Install and activate software operation on cEdges, image: {{ cedge_remote_software_filename }}"
   cisco.catalystwan.software_upgrade:
@@ -376,7 +376,7 @@
       password: "{{ (manager_instances | first).admin_password }}"
   register: software_info_cedges
 
-- name: "Delete available software from vSmart"
+- name: "Delete available software from Controller"
   cisco.catalystwan.software_upgrade:
     state: "absent"
     image_version: "{{ version_item }}"

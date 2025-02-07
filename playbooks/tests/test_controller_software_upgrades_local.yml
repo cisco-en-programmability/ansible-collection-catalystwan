@@ -10,11 +10,10 @@
 
 # Tested operations:
 
-# --- Remote image upload --- #
+# --- Local image upload --- #
 # Upload viptela-20.13.1-x86_64.tar.gz
 
-
-# --- vBond upgrade operations --- #
+# --- Controller upgrade operations --- #
 # 1. Install viptela-20.13.1-x86_64.tar.gz - with reboot
 # 2. Verify that activated version appears as current version and old version in available files
 # 3. Set default software operation
@@ -22,8 +21,8 @@
 # 5. Try to downgrade by activating lower version
 # 6. Verify that installed version appears as current version
 
-# --- Post test operations - vBond upgrade to higher version --- #
-# Activate software 20.13.1 on all vBond devices
+# --- Post test operations - Controller upgrade to higher version --- #
+# Activate software 20.13.1 on all Controller devices
 
 
 - name: Testing playbook to verify cisco.catalystwan.software_repository module operations
@@ -32,82 +31,59 @@
   vars_files:
     - configuration_file_dev_vars.yml
   vars:
-    remote_software_filename: "viptela-20.13.1-x86_64.tar.gz"
+    viptela_software_path: null  # "/example-path/viptela-20.13.1-x86_64.tar.gz"
     higher_software_version: "20.13.1"
-    lower_software_version: "20.12.1"
+    lower_software_version: "20.12.2"
   tasks:
-    - name: "Provide software images for testing - remote"
+    - name: "Provide software images for testing - local"
       block:
-        - name: "Configure aws-software-repo Remote Server"
-          cisco.catalystwan.software_repository:
-            remote_server:
-              state: present
-              name: "{{ remote_server_name }}"
-              url: "{{ remote_server_url }}"
-              protocol: SCP
-              port: 22
-              vpn: 512
-              user: "{{ remote_server_user }}"
-              password: "{{ remote_server_password }}"
-              image_location_prefix: "{{ remote_server_image_location_prefix }}"
-            manager_authentication:
-              url: "{{ (manager_instances | first).mgmt_public_ip }}"
-              username: "{{ (manager_instances | first).admin_username }}"
-              password: "{{ (manager_instances | first).admin_password }}"
-          failed_when: false
-          changed_when: false
+        # --- Local image upload --- #
+        - name: "Get provdied paths stat information"
+          ansible.builtin.stat:
+            path: "{{ item }}"
+          register: stat_result
+          loop:
+            - "{{ viptela_software_path }}"
 
-        - name: "Get list of all Remote Server repositories on Manager"
-          cisco.catalystwan.software_repository_info:
-            category: "remote_servers"
-            manager_authentication:
-              url: "{{ (manager_instances | first).mgmt_public_ip }}"
-              username: "{{ (manager_instances | first).admin_username }}"
-              password: "{{ (manager_instances | first).admin_password }}"
-          register: all_remote_servers
-
-        - name: "Debug all_remote_servers - expect one, and verify port is == 22"
+        - name: "Check if all paths exist"
           ansible.builtin.assert:
             that:
-              - all_remote_servers.remote_servers | length == 1
-              - ( all_remote_servers.remote_servers | first ).remote_server_name == remote_server_name
-              - ( all_remote_servers.remote_servers | first ).remote_server_port == 22
+              - item.stat.exists
+          loop: "{{ stat_result.results }}"
 
-        - name: "Upload image to Manager from Remote Server, image: {{ remote_software_filename }}"
+        - name: "Upload images to Manager from local system: {{ viptela_software_path }}"
           cisco.catalystwan.software_repository:
             software:
-              filename: "{{ remote_software_filename }}"
-              remote_server_name: "{{ remote_server_name }}"
+              image_local_path: "{{ viptela_software_path }}"
             manager_authentication:
               url: "{{ (manager_instances | first).mgmt_public_ip }}"
               username: "{{ (manager_instances | first).admin_username }}"
               password: "{{ (manager_instances | first).admin_password }}"
 
 
-    # --- vBond upgrade operations --- #
+    # --- Controller upgrade operations --- #
 
 
-    - name: "[TEST] 1. Install software operation on vBond"
+    - name: "[TEST] 1 Install software operation on Controller, image_version: {{ higher_software_version }}"
       cisco.catalystwan.software_upgrade:
         state: "present"  # present with reboot: true -> ACTIVATE in Manager
         reboot: true
-        remote_server_name: "{{ remote_server_name }}"
-        remote_image_filename: "{{ remote_server_image_location_prefix }}{{ remote_software_filename }}"
+        image_version: "{{ higher_software_version }}"
+        # image_path: "{{ viptela_software_path }}" # FIXME test also with path
         wait_for_completed: true
         wait_timeout_seconds: 3600
-        downgrade_check: false
         filters:
-          personality: "vbond"
+          personality: "vsmart"
         manager_authentication:
           url: "{{ (manager_instances | first).mgmt_public_ip }}"
           username: "{{ (manager_instances | first).admin_username }}"
           password: "{{ (manager_instances | first).admin_password }}"
 
-    - name: "Get details of software installed on control components - filter vBond"
+    - name: "Get details of software installed on control components - filter Controller"
       cisco.catalystwan.software_upgrade_info:
         device_type: "controller"
         filters:
-          personality: "vbond"
+          personality: "vsmart"
         manager_authentication:
           url: "{{ (manager_instances | first).mgmt_public_ip }}"
           username: "{{ (manager_instances | first).admin_username }}"
@@ -126,22 +102,22 @@
       loop: "{{ software_info.installed_devices }}"
 
 
-    - name: "[TEST] 3. Set default software operation on vBond, version: {{ higher_software_version }}"
+    - name: "[TEST] 3. Set default software operation on Controller, version: {{ higher_software_version }}"
       cisco.catalystwan.software_upgrade:
         state: "default"
         image_version: "current"
         filters:
-          personality: "vbond"
+          personality: "vsmart"
         manager_authentication:
           url: "{{ (manager_instances | first).mgmt_public_ip }}"
           username: "{{ (manager_instances | first).admin_username }}"
           password: "{{ (manager_instances | first).admin_password }}"
 
-    - name: "Get details of software installed on control components - filter vBond"
+    - name: "Get details of software installed on control components - filter Controller"
       cisco.catalystwan.software_upgrade_info:
         device_type: "controller"
         filters:
-          personality: "vbond"
+          personality: "vsmart"
         manager_authentication:
           url: "{{ (manager_instances | first).mgmt_public_ip }}"
           username: "{{ (manager_instances | first).admin_username }}"
@@ -156,23 +132,22 @@
         success_msg: "{{ item | to_nice_yaml }}"
       loop: "{{ software_info.installed_devices }}"
 
-
     - name: "[TEST] 5. Try to downgrade by activating lower version"
       cisco.catalystwan.software_upgrade:
         state: "active"
         image_version: "{{ lower_software_version }}"
         filters:
-          personality: "vbond"
+          personality: "vsmart"
         manager_authentication:
           url: "{{ (manager_instances | first).mgmt_public_ip }}"
           username: "{{ (manager_instances | first).admin_username }}"
           password: "{{ (manager_instances | first).admin_password }}"
 
-    - name: "Get details of software installed on control components - filter vBond"
+    - name: "Get details of software installed on control components - filter Controller"
       cisco.catalystwan.software_upgrade_info:
         device_type: "controller"
         filters:
-          personality: "vbond"
+          personality: "vsmart"
         manager_authentication:
           url: "{{ (manager_instances | first).mgmt_public_ip }}"
           username: "{{ (manager_instances | first).admin_username }}"
@@ -188,27 +163,29 @@
       loop: "{{ software_info.installed_devices }}"
 
 
-    # --- Post test operations - vBond upgrade to higher version --- #
+    # --- Post test operations - Controller upgrade to higher version --- #
 
 
-    - name: "Prepare for vSmart upgrade - activate software operation on vBond"
+    - name: "Prepare for cEdge - Install software operation on Controller, version: {{ higher_software_version }}"
       cisco.catalystwan.software_upgrade:
-        state: "active"
+        state: "present"  # present with reboot: true -> ACTIVATE in Manager
+        reboot: true
         image_version: "{{ higher_software_version }}"
+        # image_path: "{{ viptela_software_path }}" # FIXME test also with path
         wait_for_completed: true
         wait_timeout_seconds: 3600
         filters:
-          personality: "vbond"
+          personality: "vsmart"
         manager_authentication:
           url: "{{ (manager_instances | first).mgmt_public_ip }}"
           username: "{{ (manager_instances | first).admin_username }}"
           password: "{{ (manager_instances | first).admin_password }}"
 
-    - name: "Get details of software installed on control components - filter vBond"
+    - name: "Get details of software installed on control components - filter Controller"
       cisco.catalystwan.software_upgrade_info:
         device_type: "controller"
         filters:
-          personality: "vbond"
+          personality: "vsmart"
         manager_authentication:
           url: "{{ (manager_instances | first).mgmt_public_ip }}"
           username: "{{ (manager_instances | first).admin_username }}"
@@ -219,6 +196,7 @@
       ansible.builtin.assert:
         that:
           - "'{{ higher_software_version }}' in {{ item }}.current_partition"
+          - "not '{{ higher_software_version }}' in {{ item }}.available_versions"
           - "'{{ lower_software_version }}' in {{ item }}.available_versions"
         fail_msg: "{{ item | to_nice_yaml }}"
         success_msg: "{{ item | to_nice_yaml }}"

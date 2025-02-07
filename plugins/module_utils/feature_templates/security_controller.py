@@ -1,5 +1,5 @@
-security_vsmart_definition = {
-    "security_vsmart": {
+security_controller_definition = {
+    "security_controller": {
         "default": None,
         "options": {
             "protocol": {"default": None, "required": False, "type": "str"},

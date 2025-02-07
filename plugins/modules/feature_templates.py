@@ -55,11 +55,11 @@ extends_documentation_fragment:
   - cisco.catalystwan.feature_template_cisco_system
   - cisco.catalystwan.feature_template_cisco_vpn
   - cisco.catalystwan.feature_template_cisco_vpn_interface
-  - cisco.catalystwan.feature_template_omp_vsmart
-  - cisco.catalystwan.feature_template_security_vsmart
-  - cisco.catalystwan.feature_template_system_vsmart
-  - cisco.catalystwan.feature_template_vpn_vsmart_interface
-  - cisco.catalystwan.feature_template_vpn_vsmart
+  - cisco.catalystwan.feature_template_omp_controller
+  - cisco.catalystwan.feature_template_security_controller
+  - cisco.catalystwan.feature_template_system_controller
+  - cisco.catalystwan.feature_template_vpn_controller_interface
+  - cisco.catalystwan.feature_template_vpn_controller
   - cisco.catalystwan.device_models_feature_template
   - cisco.catalystwan.manager_authentication
 author:
@@ -91,11 +91,11 @@ from ..module_utils.feature_templates.cisco_snmp import cisco_snmp_definition
 from ..module_utils.feature_templates.cisco_system import cisco_system_definition
 from ..module_utils.feature_templates.cisco_vpn import cisco_vpn_definition
 from ..module_utils.feature_templates.cisco_vpn_interface import cisco_vpn_interface_definition
-from ..module_utils.feature_templates.omp_vsmart import omp_vsmart_definition
-from ..module_utils.feature_templates.security_vsmart import security_vsmart_definition
-from ..module_utils.feature_templates.system_vsmart import system_vsmart_definition
-from ..module_utils.feature_templates.vpn_vsmart import vpn_vsmart_definition
-from ..module_utils.feature_templates.vpn_vsmart_interface import vpn_vsmart_interface_definition
+from ..module_utils.feature_templates.omp_controller import omp_controller_definition
+from ..module_utils.feature_templates.security_controller import security_controller_definition
+from ..module_utils.feature_templates.system_controller import system_controller_definition
+from ..module_utils.feature_templates.vpn_controller import vpn_controller_definition
+from ..module_utils.feature_templates.vpn_controller_interface import vpn_controller_interface_definition
 from ..module_utils.result import ModuleResult
 from ..module_utils.manager_module import AnsibleCatalystwanModule
 
@@ -139,11 +139,11 @@ def run_module():
         **cisco_system_definition,
         **cisco_vpn_interface_definition,
         **cisco_vpn_definition,
-        **omp_vsmart_definition,
-        **security_vsmart_definition,
-        **system_vsmart_definition,
-        **vpn_vsmart_definition,
-        **vpn_vsmart_interface_definition,
+        **omp_controller_definition,
+        **security_controller_definition,
+        **system_controller_definition,
+        **vpn_controller_definition,
+        **vpn_controller_interface_definition,
     )
 
     result = ExtendedModuleResult()

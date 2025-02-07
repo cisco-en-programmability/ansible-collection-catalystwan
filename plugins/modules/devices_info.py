@@ -69,7 +69,7 @@ devices:
         "status": "active"
       },
       {
-        "host-name": "vsmart",
+        "host-name": "controller",
         "device-type": "controller",
         "system-ip": "192.168.1.2",
         "uuid": "0987-6543-21dc-ba98",

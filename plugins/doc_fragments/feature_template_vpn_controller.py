@@ -13,14 +13,14 @@ from __future__ import annotations
 class ModuleDocFragment(object):
     DOCUMENTATION = r"""
 options:
-    vpn_vsmart:
-        description: vSmart VPN Feature Template configuration.
+    vpn_controller:
+        description: Controller VPN Feature Template configuration.
         type: dict
         suboptions:
             vpn_id:
                 description:
                 - The unique identifier for the VPN, only 0 and 512 are allowed on
-                    vsmart
+                    controller
                 required: true
                 default: null
                 type: str

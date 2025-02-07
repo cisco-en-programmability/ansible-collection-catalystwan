@@ -1,13 +1,13 @@
 # Ansible Role: manager_mode
 
-This Ansible role is designed to configure the operational mode of Cisco SD-WAN devices within a Manager environment. It can be used to set the mode for both controller (vSmart, vBond, Manager) and Edge (vEdge, cEdge) devices.
+This Ansible role is designed to configure the operational mode of Cisco SD-WAN devices within a Manager environment. It can be used to set the mode for both controller (Controller, Validator, Manager) and Edge (vEdge, cEdge) devices.
 
 ## Role Description
 
 The `manager_mode` role performs the following tasks:
 
 1. Verifies that the required variables for the role are present.
-2. Sets the Manager mode for all controller devices including vSmart, vBond, and Manager instances.
+2. Sets the Manager mode for all controller devices including Controller, Validator, and Manager instances.
 3. Optionally sets the Manager mode for all Edge devices if `edge_instances` are defined.
 
 ## Requirements
@@ -24,8 +24,8 @@ There are no external role dependencies. Only `cisco.catalystwan` collection is 
 Variables expected by this role:
 
 - `manager_instances`: List of Manager instances containing management IP, admin username, and admin password.
-- `vsmart_instances`: List of vSmart controller instances with hostnames.
-- `vbond_instances`: List of vBond controller instances with hostnames.
+- `controller_instances`: List of Controller controller instances with hostnames.
+- `validator_instances`: List of Validator controller instances with hostnames.
 - `edge_instances`: Optional list of Edge device instances with hostnames.
 
 ## Example Playbook
@@ -44,17 +44,17 @@ Including an example of how to use your role (with variables passed in as parame
           - mgmt_public_ip: '192.0.2.1'
             admin_username: 'admin'
             admin_password: 'password'
-        vsmart_instances:
-          - hostname: 'vsmart01'
-        vbond_instances:
-          - hostname: 'vbond01'
+        controller_instances:
+          - hostname: 'controller01'
+        validator_instances:
+          - hostname: 'validator01'
         edge_instances:
           - hostname: 'vedge01'
 ```
 
 ## Known Limitations
 
-- The role assumes that the Manager, vSmart, vBond, and Edge devices are already registered and accessible within the Manager environment.
+- The role assumes that the Manager, Controller, Validator, and Edge devices are already registered and accessible within the Manager environment.
 - The role does not cover initial device registration or provisioning in Manager.
 
 ## License

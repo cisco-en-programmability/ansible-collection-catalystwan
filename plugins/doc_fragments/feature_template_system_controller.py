@@ -13,13 +13,13 @@ from __future__ import annotations
 class ModuleDocFragment(object):
     DOCUMENTATION = r"""
 options:
-    system_vsmart:
-        description: Security settings for vSmart controller
+    system_controller:
+        description: Security settings for Controller controller
         type: dict
         suboptions:
             timezone:
                 description:
-                - The timezone setting for the vSmart controller
+                - The timezone setting for the Controller controller
                 required: false
                 default: UTC
                 type: str
@@ -442,7 +442,7 @@ options:
                 - UTC
             host_name:
                 description:
-                - The hostname for the vSmart controller
+                - The hostname for the Controller controller
                 required: false
                 type: raw
                 suboptions:
@@ -470,7 +470,7 @@ options:
                 type: str
             location:
                 description:
-                - A description of the physical location of the vSmart controller
+                - A description of the physical location of the Controller controller
                 required: false
                 default: null
                 type: str
@@ -482,26 +482,26 @@ options:
                 type: int
             latitude:
                 description:
-                - Geographical latitude of the vSmart controller
+                - Geographical latitude of the Controller controller
                 required: false
                 default: null
                 type: int
             longitude:
                 description:
-                - Geographical longitude of the vSmart controller
+                - Geographical longitude of the Controller controller
                 required: false
                 default: null
                 type: int
             device_groups:
                 description:
-                - Device group names for the vSmart controller
+                - Device group names for the Controller controller
                 required: false
                 default: null
                 type: list
                 elements: str
             system_ip:
                 description:
-                - System IP address for the vSmart controller
+                - System IP address for the Controller controller
                 required: false
                 type: raw
                 suboptions:
@@ -512,7 +512,7 @@ options:
                         description: Device Specific Variables name
             site_id:
                 description:
-                - Site ID for the vSmart controller
+                - Site ID for the Controller controller
                 required: false
                 type: raw
                 suboptions:
@@ -523,7 +523,7 @@ options:
                         description: Device Specific Variables name
             overlay_id:
                 description:
-                - Overlay ID for the vSmart controller
+                - Overlay ID for the Controller controller
                 required: false
                 default: null
                 type: int
@@ -556,7 +556,7 @@ options:
                 type: int
             controller_group_id:
                 description:
-                - Group ID for the vSmart controller
+                - Group ID for the Controller controller
                 required: false
                 default: null
                 type: int

@@ -19,7 +19,7 @@
     loop_var: device_item
     label: "hostname: {{ device_item.hostname }}, device_ip: {{ device_item.system_ip }}"
 
-- name: Add vSmart devices
+- name: Add Controller devices
   cisco.catalystwan.devices_controllers:
     device_ip: "{{ device_item.transport_public_ip }}"
     username: "{{ device_item.admin_username }}"
@@ -31,13 +31,13 @@
       url: "{{ (manager_instances | first).mgmt_public_ip }}"
       username: "{{ (manager_instances | first).admin_username }}"
       password: "{{ (manager_instances | first).admin_password }}"
-  loop: "{{ vsmart_instances }}"
+  loop: "{{ controller_instances }}"
   loop_control:
     loop_var: device_item
     label: "hostname: {{ device_item.hostname }}"
   register: devices_result
 
-- name: Add vBond devices
+- name: Add Validator devices
   cisco.catalystwan.devices_controllers:
     device_ip: "{{ device_item.transport_public_ip }}"
     username: "{{ device_item.admin_username }}"
@@ -51,7 +51,7 @@
       url: "{{ (manager_instances | first).mgmt_public_ip }}"
       username: "{{ (manager_instances | first).admin_username }}"
       password: "{{ (manager_instances | first).admin_password }}"
-  loop: "{{ vbond_instances }}"
+  loop: "{{ validator_instances }}"
   loop_control:
     loop_var: device_item
     label: "hostname: {{ device_item.hostname }}"
@@ -67,7 +67,7 @@
       username: "{{ (manager_instances | first).admin_username }}"
       password: "{{ (manager_instances | first).admin_password }}"
   register: device_details_info
-  loop: "{{ vsmart_instances + vbond_instances + [(manager_instances | first)] }}"
+  loop: "{{ controller_instances + validator_instances + [(manager_instances | first)] }}"
   loop_control:
     loop_var: device_item
     label: "hostname: {{ device_item.hostname }}, device_ip: {{ device_item.system_ip }}"
@@ -85,7 +85,7 @@
       username: "{{ (manager_instances | first).admin_username }}"
       password: "{{ (manager_instances | first).admin_password }}"
   register: device_details_info
-  loop: "{{ vsmart_instances + vbond_instances + [(manager_instances | first)] }}"
+  loop: "{{ controller_instances + validator_instances + [(manager_instances | first)] }}"
   loop_control:
     loop_var: device_item
     label: "hostname: {{ device_item.hostname }}, device_ip: {{ device_item.system_ip }}"

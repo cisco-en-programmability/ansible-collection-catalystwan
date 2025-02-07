@@ -16,7 +16,7 @@
     quiet: true
   loop:
     - "{{ manager_instances }}"
-    - "{{ vbond_instances }}"
-    - "{{ vsmart_instances }}"
+    - "{{ validator_instances }}"
+    - "{{ controller_instances }}"
   loop_control:
     loop_var: required_var

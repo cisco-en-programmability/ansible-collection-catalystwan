@@ -47,7 +47,7 @@
           password: "{{ (manager_instances | first).admin_password }}"
 
     - name: |
-        "Health check: system status with health metrics - vsmart:
+        "Health check: system status with health metrics - controller:
         - cpu_state == normal
         - mem_state == normal
         - mem_usaage <= 90
@@ -63,7 +63,7 @@
           password: "{{ (manager_instances | first).admin_password }}"
 
     - name: |
-        "Health check: system status with health metrics - vbond:
+        "Health check: system status with health metrics - validator:
         - cpu_state == normal
         - mem_state == normal
         - mem_usaage <= 90

@@ -90,7 +90,7 @@ Also, the order they are presented is the order of precedence.
 ### 1. Module (task) common parameters
 
 ```yml
-- name: Add vbond device
+- name: Add validator device
   cisco.catalystwan.devices:
     manager_authentication:
       url:  Y.Y.Y.Y

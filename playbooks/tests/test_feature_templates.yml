@@ -270,7 +270,7 @@
         template_name: "CiscoOMPFeatureTemplate"
         template_description: "Comprehensive OMP Configuration"
         device_models:
-          - "vsmart"
+          - "controller"
         cisco_omp:
           graceful_restart: true
           overlay_as: "65000"
@@ -953,13 +953,13 @@
         manager_credentials:
           <<: *manager_authentication
 
-    - name: 14. Create Comprehensive OMP vSmart Template
+    - name: 14. Create Comprehensive OMP Controller Template
       cisco.catalystwan.feature_templates:
         state: present
-        template_name: "OMPvSmartConfigTemplate"
-        template_description: "Apply OMP settings for vSmart controller"
+        template_name: "OMPControllerConfigTemplate"
+        template_description: "Apply OMP settings for Controller controller"
         device_models: "vsmart"
-        omp_vsmart:
+        omp_controller:
           graceful_restart: true
           graceful_restart_timer: 120
           send_path_limit: 100
@@ -974,29 +974,29 @@
         manager_credentials:
           <<: *manager_authentication
 
-    - name: 15. Create Comprehensive Security vSmart Template
+    - name: 15. Create Comprehensive Security Controller Template
       cisco.catalystwan.feature_templates:
         state: present
-        template_name: "SecurityvSmartConfigTemplate"
-        template_description: "Apply Security settings for vSmart controller"
+        template_name: "SecurityControllerConfigTemplate"
+        template_description: "Apply Security settings for Controller controller"
         device_models: vsmart
-        security_vsmart:
+        security_controller:
           protocol: dtls
           tls_port: 120
         manager_credentials:
           <<: *manager_authentication
 
-    - name: 16. Create Comprehensive System vSmart Template
+    - name: 16. Create Comprehensive System Controller Template
       cisco.catalystwan.feature_templates:
         state: present
-        template_name: "SystemvSmartConfigTemplate"
-        template_description: "Apply System settings for vSmart controller"
+        template_name: "SystemControllerConfigTemplate"
+        template_description: "Apply System settings for Controller controller"
         device_models: vsmart
         device_specific_variables:
           site_id: "side_id_variable"
           host_name: "host_name_variable"
           system_ip: "system_ip_variable"
-        system_vsmart:
+        system_controller:
           host_name: device_specific_variable
           site_id: device_specific_variable
           system_ip: device_specific_variable

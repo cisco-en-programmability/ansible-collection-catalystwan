@@ -31,9 +31,9 @@ options:
     no_log: True
   personality:
     description:
-      - Personality of the device. Choices are 'vSmart', 'vBond', or 'Manager'.
+      - Personality of the device. Choices are 'Controller', 'Validator', or 'Manager'.
     type: str
-    choices: ["vSmart", "vBond", "Manager"]
+    choices: ["Controller", "Validator", "Manager"]
   generate_csr:
     description:
       - Whether to generate a CSR (Certificate Signing Request) for the device.
@@ -63,7 +63,7 @@ options:
 author:
   - Arkadiusz Cichon (acichon@cisco.com)
 notes:
-  - "Only vSmart, vBond, and Manager device personalities are currently supported."
+  - "Only Controller, Validator, and Manager device personalities are currently supported."
   - "The 'state' option 'invalidated' will delete the device configuration in Manager."
   - "For 'present' state, 'username', 'password', 'personality', and 'device_ip' are required."
   - "For 'invalidated' state, either 'uuid' or 'device_ip' is required."
@@ -76,7 +76,7 @@ msg:
   description: Message detailing the outcome of the operation.
   returned: always
   type: str
-  sample: "Added new device: 192.168.1.1, personality: vSmart"
+  sample: "Added new device: 192.168.1.1, personality: Controller"
 response:
   description: Detailed response from the Manager API if applicable.
   returned: when API call is made

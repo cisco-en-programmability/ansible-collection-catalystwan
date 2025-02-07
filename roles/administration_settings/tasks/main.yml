@@ -7,10 +7,10 @@
   ansible.builtin.pause:
     prompt: |-
 
-      Please verify that your PnP Portal Controller Profile is up to date with vbond and organization name.
+      Please verify that your PnP Portal Controller Profile is up to date with validator and organization name.
 
-      vBond_transport_public_ip:
-          {{ vbond_transport_public_ip }}
+      validator_transport_public_ip:
+          {{ validator_transport_public_ip }}
       organization_name:
           {{ organization_name }}
 
@@ -23,7 +23,7 @@
 - name: Set initial configuration via administration settings - loop through all Manager devices
   cisco.catalystwan.administration_settings:
     validator:
-      domain_ip: "{{ vbond_transport_public_ip }}"
+      domain_ip: "{{ validator_transport_public_ip }}"
       port: "{{ validator_port }}"
     organization: "{{ organization_name }}"
     certificates:

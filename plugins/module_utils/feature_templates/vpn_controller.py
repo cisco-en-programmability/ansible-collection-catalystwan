@@ -1,5 +1,5 @@
-vpn_vsmart_definition = {
-    "vpn_vsmart": {
+vpn_controller_definition = {
+    "vpn_controller": {
         "default": None,
         "options": {
             "dns": {

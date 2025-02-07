@@ -13,8 +13,8 @@ from __future__ import annotations
 class ModuleDocFragment(object):
     DOCUMENTATION = r"""
 options:
-    security_vsmart:
-        description: Security settings for vSmart controller
+    security_controller:
+        description: Security settings for Controller controller
         type: dict
         suboptions:
             protocol:

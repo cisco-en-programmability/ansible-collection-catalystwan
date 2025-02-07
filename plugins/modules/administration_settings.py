@@ -12,7 +12,7 @@ version_added: "0.1.0"
 short_description: Manages administration settings on a Manager instance
 description:
   - Manages various administration settings on a Manager instance, including
-    validator (vBond), certificates, smart account credentials, PnP Connect Sync,
+    validator (Validator), certificates, smart account credentials, PnP Connect Sync,
     and organization settings.
   - More settings can be enhanced by reusing
     https://github.com/cisco-en-programmability/catalystwan-sdk/blob/main/catalystwan/api/administration.py
@@ -75,15 +75,15 @@ options:
         type: str
         required: true
   validator:
-    description: Configuration for vBond validator.
+    description: Configuration for Validator validator.
     type: dict
-    aliases: [vbond]
+    aliases: [validator]
     suboptions:
       domain_ip:
-        description: Domain IP of the vBond validator.
+        description: Domain IP of the Validator validator.
         type: str
       port:
-        description: Port number for the vBond validator.
+        description: Port number for the Validator validator.
         type: int
   software_install_timeout:
     description: Configuration for upgrades timeout.
@@ -106,8 +106,8 @@ extends_documentation_fragment:
 """
 
 EXAMPLES = r"""
-# Example of using the module to configure vBond validator
-- name: Configure vBond validator
+# Example of using the module to configure Validator validator
+- name: Configure Validator validator
   cisco.catalystwan.administration_settings:
     validator:
       domain_ip: "192.0.2.1"
@@ -175,7 +175,7 @@ response:
       type: dict
       sample: {"name": "ExampleOrganization"}
     validator:
-      description: vBond validator settings.
+      description: Validator validator settings.
       returned: when validator is provided
       type: dict
       sample: {"domain_ip": "192.0.2.1", "port": "12346"}
@@ -224,7 +224,7 @@ def run_module():
     module_args = dict(
         validator=dict(
             type="dict",
-            aliases=["vbond"],
+            aliases=["validator"],
             options=dict(
                 domain_ip=dict(type="str"),
                 port=dict(type="str"),
@@ -292,14 +292,14 @@ def run_module():
     )
     result = ModuleResult()
 
-    modify_vbond = False
+    modify_validator = False
     modify_org = False
     modify_certificates = False
     modify_enterprise_root_ca = False
     modify_smart_account_credentials = False
     modify_pnp_sync = False
     modify_software_install_timeout = False
-    vbond_device_data, vbond_payload = None, None
+    validator_device_data, validator_payload = None, None
     organization_data, org_payload = None, None
     smart_account_payload = None
     certificates_data, certificates_payload = None, None
@@ -316,11 +316,11 @@ def run_module():
     # STEP 2 - verify if any action required or state is changed = OK #
     # ----------------------------------------------------------------#
     if module.params.get("validator"):
-        vbond_payload = Device(**module.params_without_none_values.get("validator"))
-        vbond_device_data = module.get_response_safely(
+        validator_payload = Device(**module.params_without_none_values.get("validator"))
+        validator_device_data = module.get_response_safely(
             module.session.endpoints.configuration_settings.get_devices
         ).single_or_default()
-        modify_vbond = True if vbond_device_data != vbond_payload else False
+        modify_validator = True if validator_device_data != validator_payload else False
 
     if module.params.get("org"):
         org_payload = Organization(**module.params_without_none_values)
@@ -383,12 +383,12 @@ def run_module():
             response_key="org",
         )
 
-    if modify_vbond:
+    if modify_validator:
         module.send_request_safely(
             result,
             action_name="Administration Settings: Validator",
             send_func=module.session.endpoints.configuration_settings.edit_devices,
-            payload=vbond_payload,
+            payload=validator_payload,
             response_key="validator",
         )
 
@@ -446,8 +446,8 @@ def run_module():
 
     if organization_data and not modify_org:
         result.state["org"] = organization_data.dict()
-    if vbond_device_data and not modify_vbond:
-        result.state["validator"] = vbond_device_data.dict()
+    if validator_device_data and not modify_validator:
+        result.state["validator"] = validator_device_data.dict()
     if certificates_data and not modify_certificates:
         result.state["certificates"] = certificates_data.dict()
     if pnp_sync_data and not modify_pnp_sync:

@@ -17,9 +17,9 @@
     quiet: true
   loop:
     - "{{ manager_instances }}"
-    - "{{ vbond_instances }}"
+    - "{{ validator_instances }}"
     - "{{ organization_name }}"
-    - "{{ (vbond_instances | first).transport_public_ip }}"
+    - "{{ (validator_instances | first).transport_public_ip }}"
   loop_control:
     loop_var: required_var
 

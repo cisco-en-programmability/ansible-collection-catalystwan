@@ -1,6 +1,6 @@
 # Ansible Role: remove_controllers
 
-This Ansible role is designed to remove all discoverable Cisco SD-WAN controllers, including Manager, vSmart, and vBond devices, from the Cisco Manager inventory.
+This Ansible role is designed to remove all discoverable Cisco SD-WAN controllers, including Manager, Controller, and Validator devices, from the Cisco Manager inventory.
 
 ## Role Description
 

@@ -15,14 +15,14 @@
 # 4. Using backup files, create CLI templates for each device available
 # 5. Get all Non-Default Feature Templates available
 # 6. Delete all Non-Default Feature templates
-# 7. Create AAA Template for vSmart devices
-# 8. Create System Template for vSmart devices
-# 9. Create VPN template for vSmart devices - VPN 0
-# 10. Create VPN template for vSmart devices - VPN 512
-# 11. Create VPN Interface template for vSmart devices - VPN 0
-# 12. Create VPN Interface template for vSmart devices - VPN 512
-# 13. Create example Device Template for vSmart
-# 14. Attach example Device Template for vSmart
+# 7. Create AAA Template for Controller devices
+# 8. Create System Template for Controller devices
+# 9. Create VPN template for Controller devices - VPN 0
+# 10. Create VPN template for Controller devices - VPN 512
+# 11. Create VPN Interface template for Controller devices - VPN 0
+# 12. Create VPN Interface template for Controller devices - VPN 512
+# 13. Create example Device Template for Controller
+# 14. Attach example Device Template for Controller
 
 
 - name: Testing playbook to verify cisco.catalystwan.device_templates module operations
@@ -70,8 +70,8 @@
         template_description: "Template for {{ device_item.hostname }} created from backup file."
         config_file: "{{ device_item.backup_path }}"
         device_model: "{% if 'cedge' in device_item.hostname %}vedge-C8000V\
-                       {% elif 'vSmart' in device_item.hostname %}vsmart{% elif 'Manager' in device_item.hostname %}vmanage\
-                       {% elif 'vBond' in device_item.hostname %}vedge-cloud{% endif %}"
+                       {% elif 'Controller' in device_item.hostname %}vsmart{% elif 'Manager' in device_item.hostname %}vmanage\
+                       {% elif 'Validator' in device_item.hostname %}vedge-cloud{% endif %}"
         manager_credentials:
           <<: *manager_authentication
       loop: "{{ backup_info.backup_paths }}"
@@ -100,12 +100,12 @@
         label: "template: {{ template.name }}"
 
     # Create now all Feature Templates that are necessary to form minimal Device Template, and attach this template
-    # These will be applicable for vSmart devices
+    # These will be applicable for Controller devices
 
-    - name: 7. Create AAA Template for vSmart devices
+    - name: 7. Create AAA Template for Controller devices
       cisco.catalystwan.feature_templates:
         state: present
-        template_name: "AAA_for_vSmart"
+        template_name: "AAA_for_Controller"
         template_description: "AAA Template for testing"
         device_models: vsmart
         debug: true
@@ -147,53 +147,53 @@
         manager_credentials:
           <<: *manager_authentication
 
-    - name: 8. Create System Template for vSmart devices
+    - name: 8. Create System Template for Controller devices
       cisco.catalystwan.feature_templates:
         state: present
-        template_name: "System_for_vSmart"
+        template_name: "System_for_Controller"
         template_description: "System Template for testing"
         device_specific_variables:
           site_id: "side_id_variable"
         device_models: vsmart
         debug: true
-        system_vsmart:
+        system_controller:
           site_id: device_specific_variable
         manager_credentials:
           <<: *manager_authentication
 
     # Now for vpn and vpn interfaces, and then attach device template with device specific variables
-    - name: 9. Create VPN template for vSmart devices - VPN 0
+    - name: 9. Create VPN template for Controller devices - VPN 0
       cisco.catalystwan.feature_templates:
         state: present
-        template_name: "VPN_0_for_vSmart"
+        template_name: "VPN_0_for_Controller"
         template_description: "VPN_0 Template for testing"
         device_models: vsmart
         debug: true
-        vpn_vsmart:
+        vpn_controller:
           vpn_id: 0
         manager_credentials:
           <<: *manager_authentication
 
-    - name: 10. Create VPN template for vSmart devices - VPN 512
+    - name: 10. Create VPN template for Controller devices - VPN 512
       cisco.catalystwan.feature_templates:
         state: present
-        template_name: "VPN_512_for_vSmart"
+        template_name: "VPN_512_for_Controller"
         template_description: "VPN_512 Template for testing"
         device_models: vsmart
         debug: true
-        vpn_vsmart:
+        vpn_controller:
           vpn_id: 512
         manager_credentials:
           <<: *manager_authentication
 
-    - name: 11. Create VPN Interface template for vSmart devices - VPN 0
+    - name: 11. Create VPN Interface template for Controller devices - VPN 0
       cisco.catalystwan.feature_templates:
         state: present
-        template_name: "VPN_0_Interface_for_vSmart"
+        template_name: "VPN_0_Interface_for_Controller"
         template_description: "VPN_0 Interface Template for testing"
         device_models: vsmart
         debug: true
-        vpn_vsmart_interface:
+        vpn_controller_interface:
           if_name: eth1
           shutdown: false
           dhcp_ipv4_client: true
@@ -207,51 +207,51 @@
         manager_credentials:
           <<: *manager_authentication
 
-    - name: 12. Create VPN Interface template for vSmart devices - VPN 512
+    - name: 12. Create VPN Interface template for Controller devices - VPN 512
       cisco.catalystwan.feature_templates:
         state: present
-        template_name: "VPN_512_Interface_for_vSmart"
+        template_name: "VPN_512_Interface_for_Controller"
         template_description: "VPN_512 Interface Template for testing"
         device_models: vsmart
         debug: true
-        vpn_vsmart_interface:
+        vpn_controller_interface:
           if_name: eth0
           shutdown: false
           dhcp_ipv4_client: true
         manager_credentials:
           <<: *manager_authentication
 
-    - name: 13. Create example Device Template for vSmart
+    - name: 13. Create example Device Template for Controller
       cisco.catalystwan.device_templates:
         state: present
-        template_name: "vSmart-test-device-template"
-        template_description: "vSmart-test-device-template"
+        template_name: "Controller-test-device-template"
+        template_description: "Controller-test-device-template"
         device_type: vsmart
         general_templates:
-          - name: "System_for_vSmart"
+          - name: "System_for_Controller"
             subtemplates:
               - "Factory_Default_Logging_Template_V01"
-          - name: "AAA_for_vSmart"
-          - name: "Factory_Default_vSmart_OMP_Template"
-          - name: "Factory_Default_vSmart_Manager_Security_Template"
-          - name: "VPN_0_for_vSmart"
+          - name: "AAA_for_Controller"
+          - name: "Factory_Default_Controller_OMP_Template"
+          - name: "Factory_Default_Controller_Manager_Security_Template"
+          - name: "VPN_0_for_Controller"
             subtemplates:
-              - "VPN_0_Interface_for_vSmart"
-          - name: "VPN_512_for_vSmart"
+              - "VPN_0_Interface_for_Controller"
+          - name: "VPN_512_for_Controller"
             subtemplates:
-              - "VPN_512_Interface_for_vSmart"
+              - "VPN_512_Interface_for_Controller"
         manager_credentials:
           <<: *manager_authentication
 
-    - name: 14. Attach example Device Template for vSmart
+    - name: 14. Attach example Device Template for Controller
       cisco.catalystwan.device_templates:
         state: attached
-        template_name: "vSmart-test-device-template"
+        template_name: "Controller-test-device-template"
         device_type: vsmart
-        hostname: "acich-rg-vSmart"
+        hostname: "acich-rg-Controller"
         device_specific_vars:
           - "//system/site-id": "333"
-          - "//system/host-name": "acich-rg-vSmart"
+          - "//system/host-name": "acich-rg-Controller"
           - "//system/system-ip": "192.168.2.1"
           - "//system/ipv6-strict-control": false
         manager_credentials:
