@@ -10,9 +10,9 @@
   cisco.catalystwan.devices_info:
     device_category: controllers
     manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
+      url: "{{ (manager_instances | first).mgmt_public_ip }}"
+      username: "{{ (manager_instances | first).admin_username }}"
+      password: "{{ (manager_instances | first).admin_password }}"
   register: devices_details_info
 
 - name: Remove all discoverable controllers
@@ -21,9 +21,9 @@
     state: invalidated
     personality: "{{ device_controller.personality }}"
     manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
+      url: "{{ (manager_instances | first).mgmt_public_ip }}"
+      username: "{{ (manager_instances | first).admin_username }}"
+      password: "{{ (manager_instances | first).admin_password }}"
   loop: "{{ devices_details_info.devices }}"
   loop_control:
     loop_var: device_controller

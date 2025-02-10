@@ -21,22 +21,22 @@
       cisco.catalystwan.server_info:
         information_category: "server_info"
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"
 
     - name: 2. Check if server is ready
       cisco.catalystwan.server_info:
         information_category: "server_ready"
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"
 
     - name: 3. Get server 'about' information
       cisco.catalystwan.server_info:
         information_category: "about_info"
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"

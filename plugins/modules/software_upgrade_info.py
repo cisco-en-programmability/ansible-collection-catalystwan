@@ -8,12 +8,12 @@ DOCUMENTATION = r"""
 ---
 module: software_upgrade_info
 
-short_description: Gathers information about software upgrades on devices managed by vManage
+short_description: Gathers information about software upgrades on devices managed by Manager
 
 version_added: "0.1.0"
 
 description:
-  - This module can be used to retrieve information about software upgrades on devices managed by vManage.
+  - This module can be used to retrieve information about software upgrades on devices managed by Manager.
   - It allows for fetching a list of installed devices with the option to filter based on specific criteria.
 
 options:
@@ -49,8 +49,8 @@ EXAMPLES = r"""
       version: "20.3.2"
       status: "installed"
 
-# Example of getting software upgrade information for vManage without any filters
-- name: Get software upgrade info for vManage
+# Example of getting software upgrade information for Manager without any filters
+- name: Get software upgrade info for Manager
   cisco.catalystwan.software_upgrade_info:
     device_type: vmanage
 """

@@ -1,7 +1,7 @@
 Ansible Role: cluster
 =========
 
-This Ansible role facilitates the process of adding and editing controllers to the cluster for Cisco SD-WAN vManage devices.
+This Ansible role facilitates the process of adding and editing controllers to the cluster for Cisco SD-WAN Manager devices.
 
 Requirements
 ------------
@@ -11,7 +11,7 @@ Requirements
 
 Role Variables
 --------------
-- `vmanage_instances`: A list of vManage instances containing management IP, admin username, and admin password. May also include vManage persona and services configuration for cluster usage.
+- `manager_instances`: A list of Manager instances containing management IP, admin username, and admin password. May also include Manager persona and services configuration for cluster usage.
 - `default_services`: A list of services for cluster usage, such as `sd-avc`.
 
 Dependencies
@@ -23,16 +23,16 @@ Example Playbook
 ----------------
 
 ```yaml
-- name: Edit vManage cluster IP address
+- name: Edit Manager cluster IP address
   hosts: localhost
   import_role:
     name: cluster
   vars:
-    vmanage_instances:
+    manager_instances:
     - admin_password: password
       admin_username: user
       cluster_private_ip: 10.0.3.4
-      hostname: vManage1
+      hostname: Manager1
       mgmt_public_ip: 170.170.170.10
       persona: COMPUTE_AND_DATA
       cluster_services:
@@ -41,7 +41,7 @@ Example Playbook
     - admin_password: password
       admin_username: user
       cluster_private_ip: 10.0.3.5
-      hostname: vManage2
+      hostname: Manager2
       mgmt_public_ip: 170.170.170.20
       persona: COMPUTE_AND_DATA
     default_services:

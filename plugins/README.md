@@ -22,7 +22,7 @@ Justification:
 * APIs are nested structures that couldn't be reflected in Modules structure
   Instead we will use roles to gather Modules into Workflows
 
-## Gathering information about state of SD-WAN from vManage
+## Gathering information about state of SD-WAN from Manager
 
 Recommended convention:
 
@@ -30,7 +30,7 @@ Recommended convention:
 
 Justification:
 
-* Currently we are not operating on vManages like they are host (we do not specify them in inventory).
+* Currently we are not operating on Managers like they are host (we do not specify them in inventory).
   Therefore we don't want to fetch information about the system and store it in `ansible_facts` - our goal
   is to fetch and if necessary reuse.
 
@@ -84,13 +84,13 @@ With these 2 files, you can extend `feature_templates` module by using `extends_
 
 ## Providing credentials to catalystwan Ansible modules
 
-There are 3 ways to provide information to module about vManage you want to work with.
+There are 3 ways to provide information to module about Manager you want to work with.
 Also, the order they are presented is the order of precedence.
 
 ### 1. Module (task) common parameters
 
 ```yml
-- name: Add vbond device
+- name: Add validator device
   cisco.catalystwan.devices:
     manager_authentication:
       url:  Y.Y.Y.Y
@@ -99,22 +99,22 @@ Also, the order they are presented is the order of precedence.
     ...
 ```
 
-### #FIXME 2. Env variables (`VMANAGE_URL`, `VMANAGE_USERNAME`, `VMANAGE_PASSWORD`)
+### #FIXME 2. Env variables (`MANAGER_URL`, `MANAGER_USERNAME`, `MANAGER_PASSWORD`)
 
-Mostly useful if you connect to ST vManage instance.
+Mostly useful if you connect to ST Manager instance.
 
-### #FIXME 3. Dedicated yaml credentials file indicated by setting env variable - `VMANAGE_CREDS_PATH`
+### #FIXME 3. Dedicated yaml credentials file indicated by setting env variable - `MANAGER_CREDS_PATH`
 
-Mostly useful if you connect to ST vManage instance.
+Mostly useful if you connect to ST Manager instance.
 
 ```yml
-vmanage_url: "XXX:10100"
-vmanage_username: "XXX"
-vmanage_password: "XXX"
+manager_url: "XXX:10100"
+manager_username: "XXX"
+manager_password: "XXX"
 ```
 
-Then export path to `vmanage_creds.yml` file:
+Then export path to `manager_creds.yml` file:
 
 ```bash
-export VMANAGE_CREDS_PATH="YOURPATH/vmanage_creds.yml"
+export MANAGER_CREDS_PATH="YOURPATH/manager_creds.yml"
 ```

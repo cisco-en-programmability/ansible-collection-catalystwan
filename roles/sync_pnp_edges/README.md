@@ -28,7 +28,7 @@ There are no external role dependencies. Only `cisco.catalystwan` collection is 
 
 Variables expected by this role:
 
-- `vmanage_instances`: List of vManage instances containing management IP, admin username, and admin password.
+- `manager_instances`: List of Manager instances containing management IP, admin username, and admin password.
 - `wan_edge_list_path`: Optional path to the custom WAN Edge list.
 - `pnp_username`: Username for the PnP Portal.
 - `pnp_password`: Password for the PnP Portal.
@@ -47,7 +47,7 @@ Including an example of how to use your role (with variables passed in as parame
       import_role:
         name: sync_pnp_edges
       vars:
-        vmanage_instances:
+        manager_instances:
           - mgmt_public_ip: '192.0.2.1'
             admin_username: 'admin'
             admin_password: 'password'

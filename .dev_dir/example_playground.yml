@@ -12,23 +12,23 @@
     - name: Get all active sessions
       cisco.catalystwan.active_sessions_info:
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"
       register: active_sessions
 
     - name: "Health check: BFD sessions - verifies if all have state up"
       cisco.catalystwan.health_checks:
         check_type: bfd
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"
 
     - name: "Health check: OMP sessions - verifies if all have state up"
       cisco.catalystwan.health_checks:
         check_type: omp
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"

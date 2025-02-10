@@ -10,7 +10,7 @@
     Check that API server is ready - verify "isServerReady" response with "/dataservice/client/server/ready" endpoint.
     Parameters:    retries: {{ retry_value_manager_api_ready }}    delay: {{ delay_value_manager_api_ready }}
   ansible.builtin.uri:
-    url: "https://{{ (vmanage_instances | first).mgmt_public_ip }}/dataservice/client/server/ready"
+    url: "https://{{ (manager_instances | first).mgmt_public_ip }}/dataservice/client/server/ready"
     method: "GET"
     validate_certs: false
     return_content: true

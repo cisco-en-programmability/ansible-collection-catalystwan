@@ -21,10 +21,10 @@ There are no external role dependencies. Only `cisco.catalystwan` collection is 
 
 ## Role Variables
 
-Example of `vmanage_instances`:
+Example of `manager_instances`:
 
 ```yaml
-vmanage_instances:
+manager_instances:
     - mgmt_public_ip: '198.51.100.10'
       admin_username: 'admin'
       admin_password: 'password'
@@ -40,7 +40,7 @@ Including an example of how to use your role (with variables passed in as parame
   roles:
     - role: cisco.catalystwan.api_ready
       vars:
-        vmanage_instances:
+        manager_instances:
           - mgmt_public_ip: '198.51.100.10'
             admin_username: 'admin'
             admin_password: 'password'

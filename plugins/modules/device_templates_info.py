@@ -8,10 +8,10 @@
 DOCUMENTATION = r"""
 ---
 module: Device_templates_info
-short_description: Get information about Device Templates on vManage.
+short_description: Get information about Device Templates on Manager.
 version_added: "0.2.0"
 description:
-  - This module allows you to get Device Templates Info from vManage.
+  - This module allows you to get Device Templates Info from Manager.
   - Device Templates can be filtered by Device Templates Info key:values.
 options:
   filters:
@@ -122,7 +122,7 @@ author:
 extends_documentation_fragment:
   - cisco.catalystwan.manager_authentication
 notes:
-  - Ensure that the provided credentials have sufficient permissions to manage templates and devices in vManage.
+  - Ensure that the provided credentials have sufficient permissions to manage templates and devices in Manager.
 """
 
 EXAMPLES = r"""
@@ -180,7 +180,7 @@ from catalystwan.typed_list import DataSequence
 from pydantic import BaseModel, Field
 
 from ..module_utils.result import ModuleResult
-from ..module_utils.vmanage_module import AnsibleCatalystwanModule
+from ..module_utils.manager_module import AnsibleCatalystwanModule
 
 
 class BackupPathModel(BaseModel):
@@ -215,13 +215,13 @@ def run_module():
         filtered_templates = all_templates.filter(**filters)
         if filtered_templates:
             module.logger.info(f"All Device Templates filtered with filters: {filters}:\n{filtered_templates}")
-            result.msg = "Succesfully got all requested Device Templates Info from vManage"
+            result.msg = "Succesfully got all requested Device Templates Info from Manager"
             result.templates_info = [template for template in filtered_templates]
         else:
             module.logger.warning(msg=f"Device templates filtered with `{filters}` not present.")
-            result.msg = f"Device templates filtered with `{filters}` not present on vManage."
+            result.msg = f"Device templates filtered with `{filters}` not present on Manager."
     else:
-        result.msg = "Succesfully got all Device Templates Info from vManage"
+        result.msg = "Succesfully got all Device Templates Info from Manager"
         result.templates_info = [template for template in all_templates]
 
     if module.params.get("backup"):

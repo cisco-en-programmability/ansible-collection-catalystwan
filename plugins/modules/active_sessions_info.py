@@ -11,35 +11,35 @@ module: active_sessions_info
 short_description: Retrieves information about active sessions
 version_added: "0.1.0"
 description:
-  - This module retrieves information about active sessions from a vManage instance.
+  - This module retrieves information about active sessions from a Manager instance.
   - Each session includes details such as UUID, source IP, remote host, username, and more.
 options:
   manager_credentials:
     description:
-      - Credentials to authenticate with the vManage instance.
+      - Credentials to authenticate with the Manager instance.
     required: true
     type: dict
     aliases: [ manager_authentication ]
     suboptions:
       url:
         description:
-          - URL of the vManage instance.
+          - URL of the Manager instance.
         required: true
         type: str
       username:
         description:
-          - Username for authentication with vManage.
+          - Username for authentication with Manager.
         required: true
         type: str
       password:
         description:
-          - Password for authentication with vManage.
+          - Password for authentication with Manager.
         required: true
         type: str
         no_log: true
       port:
         description:
-          - Port number to use for connecting to vManage.
+          - Port number to use for connecting to Manager.
         required: false
         type: str
 author:
@@ -47,11 +47,11 @@ author:
 """
 
 EXAMPLES = r"""
-# Retrieve information about all active sessions with explicitly provided vManage credentials
+# Retrieve information about all active sessions with explicitly provided Manager credentials
 - name: Get active sessions with explicit credentials
   active_sessions_info:
     manager_credentials:
-      url: "https://vmanage.example.com"
+      url: "https://manager.example.com"
       username: "admin"
       password: "securepassword123"  # pragma: allowlist secret
       port: "8443"
@@ -92,7 +92,7 @@ from typing import List, Optional
 from pydantic import Field
 
 from ..module_utils.result import ModuleResult
-from ..module_utils.vmanage_module import AnsibleCatalystwanModule
+from ..module_utils.manager_module import AnsibleCatalystwanModule
 
 
 class ExtendedModuleResult(ModuleResult):

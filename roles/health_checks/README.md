@@ -1,6 +1,6 @@
 # Ansible Role: health_checks
 
-This Ansible role performs health checks on Cisco vManage devices.
+This Ansible role performs health checks on Cisco Manager devices.
 
 ## Role Description
 
@@ -24,12 +24,12 @@ There are no external role dependencies. Only `cisco.catalystwan` collection is 
 
 Variables expected by this role:
 
-- `vmanage_instances`: List of vManage instances containing management IP, admin username, and admin password.
+- `manager_instances`: List of Manager instances containing management IP, admin username, and admin password.
 
 Example:
 
 ```yaml
-vmanage_instances:
+manager_instances:
   - mgmt_public_ip: '192.0.2.1'
     admin_username: 'admin'
     admin_password: 'password'
@@ -47,7 +47,7 @@ Including an example of how to use your role (for instance, with variables passe
       import_role:
         name: health_checks
       vars:
-        vmanage_instances:
+        manager_instances:
           - mgmt_public_ip: '192.0.2.1'
             admin_username: 'admin'
             admin_password: 'password'

@@ -10,9 +10,9 @@
   cisco.catalystwan.devices_info:
     device_category: vedges
     manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
+      url: "{{ (manager_instances | first).mgmt_public_ip }}"
+      username: "{{ (manager_instances | first).admin_username }}"
+      password: "{{ (manager_instances | first).admin_password }}"
   register: edge_devices
 
 # We do PnP sync with validity set to valid, task obsolete, kept only as reference
@@ -22,9 +22,9 @@
 #       chasis_number: "{{ item.chasis_number }}"
 #       validity: "valid"
 #     manager_authentication:
-#       url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-#       username: "{{ (vmanage_instances | first).admin_username }}"
-#       password: "{{ (vmanage_instances | first).admin_password }}"
+#       url: "{{ (manager_instances | first).mgmt_public_ip }}"
+#       username: "{{ (manager_instances | first).admin_username }}"
+#       password: "{{ (manager_instances | first).admin_password }}"
 #   loop: "{{ edge_devices.devices }}"
 #   loop_control:
 #     label: "Device chasis number: {{ item.chasis_number }}"
@@ -33,9 +33,9 @@
   cisco.catalystwan.devices_certificates:
     send_to_controllers: true
     manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
+      url: "{{ (manager_instances | first).mgmt_public_ip }}"
+      username: "{{ (manager_instances | first).admin_username }}"
+      password: "{{ (manager_instances | first).admin_password }}"
 
 
 - name: Wait until edge devices are reachable and OTP phase is over
@@ -44,9 +44,9 @@
     filters:
       chasis_number: "{{ device_item.chasis_number }}"
     manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
+      url: "{{ (manager_instances | first).mgmt_public_ip }}"
+      username: "{{ (manager_instances | first).admin_username }}"
+      password: "{{ (manager_instances | first).admin_password }}"
   register: edge_device_details
   loop: "{{ edge_devices.devices }}"
   loop_control:
@@ -63,9 +63,9 @@
     filters:
       chasis_number: "{{ device_item.chasis_number }}"
     manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
+      url: "{{ (manager_instances | first).mgmt_public_ip }}"
+      username: "{{ (manager_instances | first).admin_username }}"
+      password: "{{ (manager_instances | first).admin_password }}"
   register: edge_device_details
   loop: "{{ edge_devices.devices }}"
   loop_control:

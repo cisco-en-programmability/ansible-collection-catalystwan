@@ -192,17 +192,17 @@ from urllib3.exceptions import NewConnectionError, TimeoutError
 
 from ..module_utils.filters import get_devices_details
 from ..module_utils.result import ModuleResult
-from ..module_utils.vmanage_module import AnsibleCatalystwanModule
+from ..module_utils.manager_module import AnsibleCatalystwanModule
 
 INTERVAL_SECONDS = 30
 TIMEOUT_SECONDS = 7200
 
 
 class SoftwareState(str, Enum):
-    PRESENT = "present"  # in vManage -> INSTALLED
-    ACTIVE = "active"  # in vManage -> ACTIVATED
-    ABSENT = "absent"  # in vManage -> REMOVED
-    DEFAULT = "default"  # in vManage -> DEFAULT
+    PRESENT = "present"  # in Manager -> INSTALLED
+    ACTIVE = "active"  # in Manager -> ACTIVATED
+    ABSENT = "absent"  # in Manager -> REMOVED
+    DEFAULT = "default"  # in Manager -> DEFAULT
 
 
 @retry(
@@ -236,7 +236,7 @@ def run_module():
         wait_for_completed=dict(type="bool", default=True),  # If task has to wait for installation finish
         wait_timeout_seconds=dict(
             type="int", default=7200
-        ),  # 3600 is because vManage reports: 'configuration-dbStatus it may take up to 40 mins or longer'
+        ),  # 3600 is because Manager reports: 'configuration-dbStatus it may take up to 40 mins or longer'
         reboot=dict(type="bool", default=False),
         sync=dict(type="bool", default=True),
         force=dict(type="bool", default=False),  # Only for REMOVE

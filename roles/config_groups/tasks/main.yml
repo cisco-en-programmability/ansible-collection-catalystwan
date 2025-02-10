@@ -5,9 +5,9 @@
 - name: Set manager_authentication fact if needed
   ansible.builtin.set_fact:
     manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
+      url: "{{ (manager_instances | first).mgmt_public_ip }}"
+      username: "{{ (manager_instances | first).admin_username }}"
+      password: "{{ (manager_instances | first).admin_password }}"
   when: manager_authentication is not defined
 
 - name: Create config group

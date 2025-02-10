@@ -6,7 +6,7 @@
 - name: Verify required variables for selected role
   ansible.builtin.include_tasks: variables_assertion.yml
 
-- name: Generate CSR for vManages
+- name: Generate CSR for Managers
   cisco.catalystwan.devices_certificates:
     generate_csr: true
     device_ip: "{{ device_item.system_ip }}"
@@ -14,12 +14,12 @@
       url: "{{ device_item.mgmt_public_ip }}"
       username: "{{ device_item.admin_username }}"
       password: "{{ device_item.admin_password }}"
-  loop: "{{ vmanage_instances }}"
+  loop: "{{ manager_instances }}"
   loop_control:
     loop_var: device_item
     label: "hostname: {{ device_item.hostname }}, device_ip: {{ device_item.system_ip }}"
 
-- name: Add vSmart devices
+- name: Add Controller devices
   cisco.catalystwan.devices_controllers:
     device_ip: "{{ device_item.transport_public_ip }}"
     username: "{{ device_item.admin_username }}"
@@ -28,16 +28,16 @@
     personality: "vsmart"
     state: present
     manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
-  loop: "{{ vsmart_instances }}"
+      url: "{{ (manager_instances | first).mgmt_public_ip }}"
+      username: "{{ (manager_instances | first).admin_username }}"
+      password: "{{ (manager_instances | first).admin_password }}"
+  loop: "{{ controller_instances }}"
   loop_control:
     loop_var: device_item
     label: "hostname: {{ device_item.hostname }}"
   register: devices_result
 
-- name: Add vBond devices
+- name: Add Validator devices
   cisco.catalystwan.devices_controllers:
     device_ip: "{{ device_item.transport_public_ip }}"
     username: "{{ device_item.admin_username }}"
@@ -46,12 +46,12 @@
     personality: "vbond"
     state: present  # state present means that device was added and certificated was installed
     # Consider using loop to check certificates check
-    # Currently we cannot implement wait because of the mixed ips in vmanage itself
+    # Currently we cannot implement wait because of the mixed ips in manager itself
     manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
-  loop: "{{ vbond_instances }}"
+      url: "{{ (manager_instances | first).mgmt_public_ip }}"
+      username: "{{ (manager_instances | first).admin_username }}"
+      password: "{{ (manager_instances | first).admin_password }}"
+  loop: "{{ validator_instances }}"
   loop_control:
     loop_var: device_item
     label: "hostname: {{ device_item.hostname }}"
@@ -63,11 +63,11 @@
     filters:
       device_ip: "{{ device_item.system_ip }}"
     manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
+      url: "{{ (manager_instances | first).mgmt_public_ip }}"
+      username: "{{ (manager_instances | first).admin_username }}"
+      password: "{{ (manager_instances | first).admin_password }}"
   register: device_details_info
-  loop: "{{ vsmart_instances + vbond_instances + [(vmanage_instances | first)] }}"
+  loop: "{{ controller_instances + validator_instances + [(manager_instances | first)] }}"
   loop_control:
     loop_var: device_item
     label: "hostname: {{ device_item.hostname }}, device_ip: {{ device_item.system_ip }}"
@@ -81,11 +81,11 @@
     filters:
       device_ip: "{{ device_item.system_ip }}"
     manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
+      url: "{{ (manager_instances | first).mgmt_public_ip }}"
+      username: "{{ (manager_instances | first).admin_username }}"
+      password: "{{ (manager_instances | first).admin_password }}"
   register: device_details_info
-  loop: "{{ vsmart_instances + vbond_instances + [(vmanage_instances | first)] }}"
+  loop: "{{ controller_instances + validator_instances + [(manager_instances | first)] }}"
   loop_control:
     loop_var: device_item
     label: "hostname: {{ device_item.hostname }}, device_ip: {{ device_item.system_ip }}"

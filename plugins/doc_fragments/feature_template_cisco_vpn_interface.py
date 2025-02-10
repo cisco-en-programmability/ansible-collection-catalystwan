@@ -510,7 +510,7 @@ options:
                 type: bool
             vbond_as_stun_server:
                 description:
-                - Configures the vBond orchestrator to act as a STUN server for the
+                - Configures the Validator orchestrator to act as a STUN server for the
                     interface.
                 required: false
                 default: null
@@ -522,9 +522,9 @@ options:
                 default: null
                 type: list
                 elements: int
-            vmanage_connection_preference:
+            manager_connection_preference:
                 description:
-                - Preference value for establishing vManage connections.
+                - Preference value for establishing Manager connections.
                 required: false
                 default: null
                 type: int
