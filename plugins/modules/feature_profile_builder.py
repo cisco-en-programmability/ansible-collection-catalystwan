@@ -150,13 +150,12 @@ def get_settable_vars_for_profile(profile_type: str) -> SettableVars.Vars:
 
 def update_template(template, config: dict):
     for key, value in config.items():
-        if key in template:
-            if isinstance(value, dict) and isinstance(template[key], dict):
-                update_template(template[key], value)
-            else:
-                if isinstance(value, str) and value.startswith("{"):
-                    value = "{{ '" + value + "' }}"
-                template[key] = value
+        if key in template and isinstance(value, dict) and isinstance(template[key], dict):
+            update_template(template[key], value)
+        elif key in template or key == "value":
+            if isinstance(value, str) and value.startswith("{"):
+                value = "{{ '" + value + "' }}"
+            template[key] = value
 
 
 def append_settable_vars(config: dict, profile_type: str):
