@@ -8,10 +8,10 @@
 DOCUMENTATION = r"""
 ---
 module: server_info
-short_description: Retrieves server information categories from vManage
+short_description: Retrieves server information categories from Manager
 version_added: "0.1.0"
 description:
-  - This module fetches different types of information about a server managed by vManage.
+  - This module fetches different types of information about a server managed by Manager.
   - The information that can be retrieved includes server general info, server readiness, and about info.
 options:
   information_category:
@@ -68,7 +68,7 @@ EXAMPLES = r"""
 from enum import Enum
 
 from ..module_utils.result import ModuleResult
-from ..module_utils.vmanage_module import AnsibleCatalystwanModule
+from ..module_utils.manager_module import AnsibleCatalystwanModule
 
 
 class InformationCategory(str, Enum):

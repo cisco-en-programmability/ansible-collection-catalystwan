@@ -6,9 +6,9 @@
 # Helper playbooks to test modules and flows while developing them
 
 # Tested operations:
-# 1. Retrieve all users from vManage
-# 2. Create a new user in vManage
-# 3. Delete a user from vManage
+# 1. Retrieve all users from Manager
+# 2. Create a new user in Manager
+# 3. Delete a user from Manager
 
 
 - name: Testing playbook to verify cisco.catalystwan.users module operations
@@ -17,15 +17,15 @@
   vars_files:
     - configuration_file_dev_vars.yml
   tasks:
-    - name: 1. Retrieve all users from vManage
+    - name: 1. Retrieve all users from Manager
       cisco.catalystwan.users:
         get_all: true
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"
 
-    - name: 2. Create a new user in vManage
+    - name: 2. Create a new user in Manager
       cisco.catalystwan.users:
         mode: create
         username: 'johndoe'
@@ -34,15 +34,15 @@
         group:
           - 'admin'
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"
 
-    - name: 3. Delete a user from vManage
+    - name: 3. Delete a user from Manager
       cisco.catalystwan.users:
         mode: delete
         username: 'johndoe'
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"

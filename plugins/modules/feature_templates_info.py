@@ -8,10 +8,10 @@
 DOCUMENTATION = r"""
 ---
 module: feature_templates_info
-short_description: Get information about Feature Templates on vManage.
+short_description: Get information about Feature Templates on Manager.
 version_added: "0.2.0"
 description:
-  - This module allows you to get and filter Feature Templates from vManage.
+  - This module allows you to get and filter Feature Templates from Manager.
 options:
   filters:
     description:
@@ -97,7 +97,7 @@ author:
 extends_documentation_fragment:
   - cisco.catalystwan.manager_authentication
 notes:
-  - Ensure that the provided credentials have sufficient permissions to manage templates and devices in vManage.
+  - Ensure that the provided credentials have sufficient permissions to manage templates and devices in Manager.
 """
 
 EXAMPLES = r"""
@@ -150,7 +150,7 @@ from catalystwan.typed_list import DataSequence
 from pydantic import Field
 
 from ..module_utils.result import ModuleResult
-from ..module_utils.vmanage_module import AnsibleCatalystwanModule
+from ..module_utils.manager_module import AnsibleCatalystwanModule
 
 
 class ExtendedModuleResult(ModuleResult):
@@ -175,13 +175,13 @@ def run_module():
         filtered_templates = all_templates.filter(**filters)
         if filtered_templates:
             module.logger.info(f"All Feature Templates filtered with filters: {filters}:\n{filtered_templates}")
-            result.msg = "Succesfully got all requested Feature Templates Info from vManage"
+            result.msg = "Succesfully got all requested Feature Templates Info from Manager"
             result.templates_info = [template for template in filtered_templates]
         else:
             module.logger.warning(msg=f"Feature templates filtered with `{filters}` not present.")
-            result.msg = f"Feature templates filtered with `{filters}` not present on vManage."
+            result.msg = f"Feature templates filtered with `{filters}` not present on Manager."
     else:
-        result.msg = "Succesfully got all Feature Templates Info from vManage"
+        result.msg = "Succesfully got all Feature Templates Info from Manager"
         result.templates_info = [template for template in all_templates]
 
     module.exit_json(**result.model_dump(mode="json"))

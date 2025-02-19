@@ -23,38 +23,38 @@ Collection available on Ansible Galaxy: [cisco.catalystwan](https://galaxy.ansib
 
 ## Roadmap
 
-Support for the following workflows in vManage client and as Ansible modules:
+Support for the following workflows in Manager client and as Ansible modules:
 
 - Detect API server readiness:
-  - [x] in vManage-client?
+  - [x] in Manager-client?
   - [x] in cisco.catalystwan module
 
 - Device onboarding (virtual and physical devices):
-  - [x] in vManage-client?
+  - [x] in Manager-client?
   - [x] in cisco.catalystwan module
 
 - Device health checks:
   - control/orchestrator connections check, and devices system health check
-    - [x] in vManage-client?
+    - [x] in Manager-client?
     - [x] in cisco.catalystwan module
   - BFD and OMP checks (BFD needs at least 2 edge devices to talk to each other)
-    - [x] in vManage-client?
+    - [x] in Manager-client?
     - [x] in cisco.catalystwan module
 
 - Day 0 template attachment
-  - [x] in vManage-client?
+  - [x] in Manager-client?
   - [x] in cisco.catalystwan module
 
 - Onboarding via PNP (Smart account sync & certificates sync)
-  - [x] in vManage-client?
+  - [x] in Manager-client?
   - [x] in cisco.catalystwan module
 
 - Software upgrades
-  - [x] in vManage-client?
+  - [x] in Manager-client?
   - [x] in cisco.catalystwan module
 
 - Day 1 configuration(Edit)
-  - [x] in vManage-client?
+  - [x] in Manager-client?
   - [ ] in cisco.catalystwan module
 
 ---

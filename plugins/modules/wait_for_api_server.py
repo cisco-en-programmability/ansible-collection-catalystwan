@@ -70,7 +70,7 @@ from tenacity import retry, retry_if_exception_type, stop_after_delay, wait_fixe
 from urllib3.exceptions import NewConnectionError, TimeoutError
 
 from ..module_utils.result import ModuleResult
-from ..module_utils.vmanage_module import AnsibleCatalystwanModule
+from ..module_utils.manager_module import AnsibleCatalystwanModule
 
 
 class ExtendedModuleResult(ModuleResult):
@@ -98,7 +98,7 @@ def run_module():
     )
     def get_server_ready_response(module: AnsibleCatalystwanModule, result: ExtendedModuleResult) -> Dict[str, Any]:
         module.logger.debug(
-            f"Trying to establish API connection with vManage, retry: {get_server_ready_response.retry.statistics}"
+            f"Trying to establish API connection with Manager, retry: {get_server_ready_response.retry.statistics}"
         )
         module._session = create_manager_session(
             url=module.params.get("manager_credentials").get("url"),

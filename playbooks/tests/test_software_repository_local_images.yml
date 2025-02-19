@@ -17,7 +17,7 @@
 # 5. Try to Upload non existing image
 # 6. Verify that previous task has changed=false value and expected msg present
 # 7. Try to filter specific image by its name splitted from path
-# 8. Assert that required image present and version_type == vmanage
+# 8. Assert that required image present and version_type == manager
 # 9. Remove viptela-20.13.1-x86_64.tar.gz image from repository
 # 10. Assert that remove image action has changed=true
 
@@ -47,9 +47,9 @@
         software:
           image_local_path: "{{ viptela_software_path }}"
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"
       register: upload_action
 
     - name: "[TEST] 2. Verify that previous task has changed=true value and expected response present"
@@ -64,9 +64,9 @@
         software:
           image_local_path: "{{ viptela_software_path }}"
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"
       register: reupload_action
 
     - name: "[TEST] 4. Verify that previous task has changed=false value and expected msg present"
@@ -83,9 +83,9 @@
         software:
           image_local_path: "{{ non_existing_software_path }}"
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"
       register: upload_non_existing
       ignore_errors: true
 
@@ -104,9 +104,9 @@
         filters:
           available_files: "{{ software_filename_without_full_path }}"
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"
       register: software_images_info
 
     - name: "[TEST] 8. Assert that required image present and version_type == vmanage for image: {{ remote_software_filename }}"
@@ -123,9 +123,9 @@
           state: "absent"
           software_id: "{{ (software_images_info.software_images | first).version_id }}"
         manager_authentication:
-          url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-          username: "{{ (vmanage_instances | first).admin_username }}"
-          password: "{{ (vmanage_instances | first).admin_password }}"
+          url: "{{ (manager_instances | first).mgmt_public_ip }}"
+          username: "{{ (manager_instances | first).admin_username }}"
+          password: "{{ (manager_instances | first).admin_password }}"
       register: remove_local_image
 
     - name: "[TEST] 10. Assert that remove image action has changed=true"
