@@ -1,21 +1,25 @@
-# Ansible Role: software_upgrades_remote
+# Ansible Role: software_upgrades
 
-This Ansible role is designed to perform software upgrades on Cisco SD-WAN devices using a remote server. It covers the entire workflow for upgrading vManage, vBond, vSmar devices using software images stored on a remote server configured with SCP.
+This Ansible role is designed to perform software upgrades on Cisco SD-WAN devices. Upgrade can be performed using images stored on remote server or by uploading images from local machine directly to vManage. Role covers the entire workflow for upgrading vManage, vBond, vSmart devices.
 
 ## Role Description
 
-The `software_upgrades_remote` role performs the following tasks:
+The `software_upgrades` role performs the following tasks:
 
 1. Verifies that required variables for the role are present.
-2. Informs the user to ensure the FTP server is correctly configured for remote server upgrades.
-3. Configures the remote server within Cisco vManage.
-4. Retrieves and validates the list of remote server repositories.
-5. Uploads software images from the remote server to the Cisco vManage software repository.
+2. (with remote server) Informs the user to ensure the FTP server is correctly configured for remote server upgrades.
+3. (with remote server) Configures the remote server within Cisco vManage.
+4. (with remote server) Retrieves and validates the list of remote server repositories.
+5. Uploads software images to the Cisco vManage software repository.
 6. Filters and asserts the presence of required software images in the vManage software repository.
 7. Executes software upgrade operations on vManage, vBond, and vSmart controllers.
 8. Sets the default software version on the controllers.
 9. Cleans up available software images from the controllers if desired.
 10. Verifies that the activated version is set as the current and default version.
+11. (with manual upload) Executes software upgrade operations on cEdges.
+12. (with manual upload) Sets the default software version on the cEdges.
+13. (with manual upload) Cleans up available software images from the cEdges if desired.
+14. (with manual upload) Verifies that the activated version is set as the current and default version.
 
 ## Requirements
 
@@ -31,11 +35,11 @@ There are no external role dependencies. Only `cisco.catalystwan` collection is 
 Variables expected by this role:
 
 - `vmanage_instances`: List of vManage instances containing management IP, admin username, and admin password.
-- `remote_server_name`: Name of the remote server to be used.
-- `remote_server_url`: URL of the remote server.
-- `remote_server_user`: Username for the remote server.
-- `remote_server_password`: Password for the remote server.
-- `remote_server_image_location_prefix`: Prefix for the image location on the remote server.
+- `remote_server_name`: Name of the remote server to be used. Only needed for upgrades with remote server.
+- `remote_server_url`: URL of the remote server. Only needed for upgrades with remote server.
+- `remote_server_user`: Username for the remote server. Only needed for upgrades with remote server.
+- `remote_server_password`: Password for the remote server. Only needed for upgrades with remote server.
+- `remote_server_image_location_prefix`: Prefix for the image location on the remote server. Only needed for upgrades with remote server.
 - `vmanage_remote_software_filename`: Software image filename for vManage.
 - `viptela_remote_software_filename`: Software image filename for vBond and vSmart.
 - `cedge_remote_software_filename`: Software image filename for cEdge.
@@ -51,9 +55,9 @@ Including an example of how to use your role (with variables passed in as parame
 - hosts: localhost
   gather_facts: no
   tasks:
-    - name: Run software_upgrades_remote
+    - name: Run software_upgrades
       import_role:
-        name: software_upgrades_remote
+        name: software_upgrades
       vars:
         vmanage_instances:
           - mgmt_public_ip: '192.0.2.1'
@@ -76,6 +80,7 @@ Including an example of how to use your role (with variables passed in as parame
 
 - The role assumes that controllers are <20.13 version.
 - Upgrades of cEdges from Remote Server are currently not included
+- When directly uploading images from local machine to vManage, upload of a single image must complete within Server Session Timeout
 
 ## License
 

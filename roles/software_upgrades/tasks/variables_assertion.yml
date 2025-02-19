@@ -19,12 +19,33 @@
     - "{{ cedge_remote_software_filename }}"
     - "{{ vmanage_remote_software_filename }}"
     - "{{ viptela_remote_software_filename }}"
+    - "{{ controller_software_version_to_activate }}"
+    - "{{ edge_software_version_to_activate }}"
+  loop_control:
+    loop_var: required_var
+
+- name: Assert that remote_server variables are provided
+  ansible.builtin.assert:
+    that:
+      - required_var
+      - required_var is defined
+      - required_var != None
+      - required_var != "None"
+      - required_var != ""
+      - required_var | length > 0
+    fail_msg: "Your SD-WAN config file missing required variable: {{ required_var }}"
+    quiet: true
+  loop:
     - "{{ remote_server_name }}"
     - "{{ remote_server_url }}"
     - "{{ remote_server_user }}"
     - "{{ remote_server_password }}"
     - "{{ remote_server_image_location_prefix }}"
-    - "{{ controller_software_version_to_activate }}"
-    - "{{ edge_software_version_to_activate }}"
   loop_control:
     loop_var: required_var
+  when: >
+    remote_server_name is defined
+    or remote_server_url is defined
+    or remote_server_user is defined
+    or remote_server_password is defined
+    or remote_server_image_location_prefix is defined

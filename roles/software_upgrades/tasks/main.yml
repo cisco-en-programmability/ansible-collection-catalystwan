@@ -10,108 +10,16 @@
 - name: "Verify required variables for selected role"
   ansible.builtin.include_tasks: variables_assertion.yml
 
-- name: "Inform user that in case of Remote Server configuration, provided paths cannot be verified by role"
-  ansible.builtin.pause:
-    prompt: |-
+- name: Set variables
+  ansible.builtin.set_fact:
+    upgrade_from_remote_server: "{{ remote_server_name is defined }}"
 
-      Please verify that your FTP server is correctly configured.
-
-      Press any key to continue, press `Ctrl + C` and `Shift + A` to abort
-  register: user_response
-
-
-# --- Remote server configuration --- #
-
-
-- name: "Configure Remote Server: {{ remote_server_name }}"
-  cisco.catalystwan.software_repository:
-    remote_server:
-      state: present
-      name: "{{ remote_server_name }}"
-      url: "{{ remote_server_url }}"
-      protocol: SCP
-      port: 22
-      vpn: 512
-      user: "{{ remote_server_user }}"
-      password: "{{ remote_server_password }}"
-      image_location_prefix: "{{ remote_server_image_location_prefix }}"
-    manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
-  failed_when: false
-  changed_when: false
-
-- name: "Get list of all Remote Server repositories on Manager"
-  cisco.catalystwan.software_repository_info:
-    category: "remote_servers"
-    filters:
-      remote_server_name: "{{ remote_server_name }}"
-    manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
-  register: remote_servers_info
-
-- name: "Debug all_remote_servers - expect one, and verify port is == 22"
-  ansible.builtin.assert:
-    that:
-      - remote_servers_info.remote_servers | length == 1
-      - ( remote_servers_info.remote_servers | first ).remote_server_name == remote_server_name
-      - ( remote_servers_info.remote_servers | first ).remote_server_port == 22
-    fail_msg: "Requested Remote Server not found in configured Remote Servers list"
-
-
-# --- Remote Server images upload --- #
-
-
-- name: |
-    Upload software image to Manager from Remote Server:
-    - {{ vmanage_remote_software_filename }}
-    - {{ viptela_remote_software_filename }}
-    - {{ cedge_remote_software_filename }}
-  cisco.catalystwan.software_repository:
-    software:
-      filename: "{{ filename_item }}"
-      remote_server_name: "{{ remote_server_name }}"
-    manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
-  loop:
-    - "{{ vmanage_remote_software_filename }}"
-    - "{{ viptela_remote_software_filename }}"
-    - "{{ cedge_remote_software_filename }}"
-  loop_control:
-    loop_var: filename_item
-
-- name: "Filter list of all software images on Manager to find these from Remote Server"
-  cisco.catalystwan.software_repository_info:
-    category: "software_images"
-    filters:
-      version_type: "{{ remote_server_name }}"
-    manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
-  register: software_images_info
-
-- name: "Assert that required images present on Manager Software Images list"
-  ansible.builtin.assert:
-    that:
-      - software_images_info.software_images | length == 3
-      - "{{ software_files_names | difference(software_basenames) | length == 0 }}"
-    fail_msg: |
-      Cannot find all required images, see:
-      all_available_files: {{ all_available_files }}, software_files_names: {{ software_files_names }}
-    success_msg: "All required files present on Manager Software Images list"
+# --- Upload images from local machine or remote server --- #
+- name: "Upload images from {{ upload_method }}"
+  ansible.builtin.include_tasks:
+    file: "{{ upload_method }}.yml"
   vars:
-    all_available_files: "{{ software_images_info.software_images | map(attribute='available_files') | list }}"
-    software_basenames: "{{ all_available_files | map('regex_replace', '^.*/([^/]+)$', '\\1') | list }}"
-    software_files_names:
-      - "{{ vmanage_remote_software_filename }}"
-      - "{{ viptela_remote_software_filename }}"
-      - "{{ cedge_remote_software_filename }}"
+    upload_method: "{{ upgrade_from_remote_server | ternary('upload_from_remote_server', 'upload_directly_to_manager') }}"
 
 
 # --- Upgrade operations on controllers --- #
@@ -119,12 +27,13 @@
 
 # --- vManage software upgrades --- #
 
-- name: "Install software on vManage, image: {{ vmanage_remote_software_filename }}"
+- name: "Install software on vManage, image: {{ vmanage_remote_software_filename | basename }}"
   cisco.catalystwan.software_upgrade:
     state: "present"
     reboot: false
-    remote_server_name: "{{ remote_server_name }}"
-    remote_image_filename: "{{ remote_server_image_location_prefix }}{{ vmanage_remote_software_filename }}"
+    image_path: "{{ omit if upgrade_from_remote_server else vmanage_remote_software_filename }}"
+    remote_server_name: "{{ remote_server_name if upgrade_from_remote_server else omit }}"
+    remote_image_filename: "{{ remote_server_image_location_prefix ~ vmanage_remote_software_filename if upgrade_from_remote_server else omit }}"
     downgrade_check: false
     wait_for_completed: true
     wait_timeout_seconds: 3600
@@ -137,12 +46,12 @@
 
 # FIXME image_path doesn't work because Remote images don't include version_name in repository
 - name: |
-    Activate software (include reboot) on vManage from software: {{ vmanage_remote_software_filename }}
+    Activate software (include reboot) on vManage from software: {{ vmanage_remote_software_filename | basename }}
     Version to activate: {{ controller_software_version_to_activate }}
   cisco.catalystwan.software_upgrade:
     state: "active"
-    # image_path: "{{ remote_server_image_location_prefix }}{{ vmanage_remote_software_filename }}"
-    image_version: "{{ controller_software_version_to_activate }}"
+    image_path: "{{ omit if upgrade_from_remote_server else vmanage_remote_software_filename | basename }}"
+    image_version: "{{ controller_software_version_to_activate if upgrade_from_remote_server else omit }}"
     wait_timeout_seconds: 3600
     filters:
       personality: "vmanage"
@@ -202,12 +111,13 @@
 # --- vBond software upgrades --- #
 
 
-- name: "Install and activate software operation on vBond, image: {{ viptela_remote_software_filename }}"
+- name: "Install and activate software operation on vBond, image: {{ viptela_remote_software_filename | basename }}"
   cisco.catalystwan.software_upgrade:
     state: "present"  # present with reboot: true -> ACTIVE in vManage
     reboot: true
-    remote_server_name: "{{ remote_server_name }}"
-    remote_image_filename: "{{ remote_server_image_location_prefix }}{{ viptela_remote_software_filename }}"
+    image_path: "{{ omit if upgrade_from_remote_server else viptela_remote_software_filename }}"
+    remote_server_name: "{{ remote_server_name if upgrade_from_remote_server else omit }}"
+    remote_image_filename: "{{ remote_server_image_location_prefix ~ viptela_remote_software_filename if upgrade_from_remote_server else omit }}"
     wait_for_completed: true
     wait_timeout_seconds: 3600
     downgrade_check: false
@@ -271,12 +181,13 @@
 # --- vSmart software upgrades --- #
 
 
-- name: "Install and activate software operation on vSmart, image: {{ viptela_remote_software_filename }}"
+- name: "Install and activate software operation on vSmart, image: {{ viptela_remote_software_filename | basename }}"
   cisco.catalystwan.software_upgrade:
     state: "present"  # present with reboot: true -> ACTIVE in vManage
     reboot: true
-    remote_server_name: "{{ remote_server_name }}"
-    remote_image_filename: "{{ remote_server_image_location_prefix }}{{ viptela_remote_software_filename }}"
+    image_path: "{{ omit if upgrade_from_remote_server else viptela_remote_software_filename }}"
+    remote_server_name: "{{ remote_server_name if upgrade_from_remote_server else omit }}"
+    remote_image_filename: "{{ remote_server_image_location_prefix ~ viptela_remote_software_filename if upgrade_from_remote_server else omit }}"
     wait_for_completed: true
     wait_timeout_seconds: 3600
     downgrade_check: false
@@ -339,12 +250,13 @@
 
 # --- vSmart software upgrades --- #
 
-- name: "Install and activate software operation on cEdges, image: {{ cedge_remote_software_filename }}"
+- name: "Install and activate software operation on cEdges, image: {{ cedge_remote_software_filename | basename }}"
   cisco.catalystwan.software_upgrade:
     state: "present"  # present with reboot: true -> ACTIVATE in vManage
     reboot: true
-    remote_server_name: "{{ remote_server_name }}"
-    remote_image_filename: "{{ remote_server_image_location_prefix }}{{ cedge_remote_software_filename }}"
+    image_path: "{{ omit if upgrade_from_remote_server else cedge_remote_software_filename }}"
+    remote_server_name: "{{ remote_server_name if upgrade_from_remote_server else omit }}"
+    remote_image_filename: "{{ remote_server_image_location_prefix ~ cedge_remote_software_filename if upgrade_from_remote_server else omit }}"
     wait_for_completed: true
     downgrade_check: false
     filters:

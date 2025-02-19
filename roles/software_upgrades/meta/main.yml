@@ -2,7 +2,7 @@
 
 galaxy_info:
   author: Arkadiusz Cichon <acichon@cisco.com>
-  description: Perform software upgrades of controllers and edges with Remote Server as repository
+  description: Perform software upgrades of controllers and edges
   license: GPL-3.0-or-later
   min_ansible_version: "2.16.6"
 
