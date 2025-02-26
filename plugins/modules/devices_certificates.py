@@ -58,9 +58,9 @@ options:
         type: str
         choices: [ "valid", "invalid" ]
         required: True
-  install_certificate:
+  install_signed_certificate:
     description:
-      - Install locally signed certificate.
+      - Certificate in PEM format, that will be installed in vManage
     type: str
   device_ip:
     description:
@@ -144,7 +144,7 @@ def run_module():
                 validity=dict(type=str, choices=[Validity.VALID, Validity.INVALID], required=True),
             ),
         ),
-        install_certificate=dict(type=str),
+        install_signed_certificate=dict(type=str),
         device_ip=dict(type=str, aliases=["target_ip"]),
         uuid=dict(type=str),
         wait_for_completed=dict(type="bool", default=True),
@@ -157,7 +157,7 @@ def run_module():
             ("invalidate", "send_to_controllers"),
             ("invalidate", "send_to_vbond"),
             ("invalidate", "change_vedge_list_validity"),
-            ("invalidate", "install_certificate"),
+            ("invalidate", "install_signed_certificate"),
         ],
         required_one_of=[
             (
@@ -166,7 +166,7 @@ def run_module():
                 "send_to_controllers",
                 "send_to_vbond",
                 "change_vedge_list_validity",
-                "install_certificate",
+                "install_signed_certificate",
             )
         ],
     )
@@ -252,11 +252,11 @@ def run_module():
             payload=payload,
             wait_for_completed=module.params.get("wait_for_completed"),
         )
-    if module.params.get("install_certificate"):
-        payload = module.params.get("install_certificate")
+    if module.params.get("install_signed_certificate"):
+        payload = module.params.get("install_signed_certificate")
         module.send_request_safely(
             result=result,
-            action_name="Install certificate",
+            action_name="Install signed certificate",
             send_func=module.session.endpoints.certificate_management_device.install_signed_cert,
             payload=payload,
             response_key="install_signed_cert",

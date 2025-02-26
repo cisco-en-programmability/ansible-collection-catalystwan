@@ -21,7 +21,7 @@
   register: generate_csr_response
 
 - name: Sign vManage CSR with enterprise CA
-  ansible.builtin.include_tasks: sign_certificate.yml
+  ansible.builtin.include_tasks: certificates.yml
   loop: "{{ generate_csr_response['results'] }}"
   loop_control:
     loop_var: csr_item
@@ -69,7 +69,7 @@
   register: generate_csr_response
 
 - name: Sign vSmart CSR with enterprise CA
-  ansible.builtin.include_tasks: sign_certificate.yml
+  ansible.builtin.include_tasks: certificates.yml
   loop: "{{ generate_csr_response['results'] }}"
   loop_control:
     loop_var: csr_item
@@ -119,7 +119,7 @@
   register: generate_csr_response
 
 - name: Sign vBond CSR with enterprise CA
-  ansible.builtin.include_tasks: sign_certificate.yml
+  ansible.builtin.include_tasks: certificates.yml
   loop: "{{ generate_csr_response['results'] }}"
   loop_control:
     loop_var: csr_item
