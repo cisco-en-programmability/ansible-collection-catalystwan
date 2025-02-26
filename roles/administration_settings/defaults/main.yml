@@ -1,3 +1,4 @@
 ---
 
 validator_port: "12346"
+controller_certificate_auth: cisco

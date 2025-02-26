@@ -18,6 +18,20 @@
   loop_control:
     loop_var: device_item
     label: "hostname: {{ device_item.hostname }}, device_ip: {{ device_item.system_ip }}"
+  register: generate_csr_response
+
+- name: Sign vManage CSR with enterprise CA
+  ansible.builtin.include_tasks: certificates.yml
+  loop: "{{ generate_csr_response['results'] }}"
+  loop_control:
+    loop_var: csr_item
+    label: "hostname: {{ csr_item.device_item.hostname }}, device_ip: {{ csr_item.device_item.system_ip }}"
+  when:
+    - controller_certificate_auth is defined and controller_certificate_auth == "enterprise"
+    - csr_item.changed
+  vars:
+    csr_content: "{{ (csr_item['response']['generate_csr'] | first)['deviceCSR'] }}"
+    csr_system_ip: "{{ csr_item.device_item.system_ip }}"
 
 - name: Add vSmart devices
   cisco.catalystwan.devices_controllers:
@@ -36,6 +50,36 @@
     loop_var: device_item
     label: "hostname: {{ device_item.hostname }}"
   register: devices_result
+
+- name: Generate CSR for vSmarts
+  cisco.catalystwan.devices_certificates:
+    generate_csr: true
+    device_ip: "{{ device_item.device_item.transport_public_ip }}"
+    manager_authentication:
+      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
+      username: "{{ (vmanage_instances | first).admin_username }}"
+      password: "{{ (vmanage_instances | first).admin_password }}"
+  loop: "{{ devices_result['results'] }}"
+  loop_control:
+    loop_var: device_item
+    label: "hostname: {{ device_item.device_item.hostname }}"
+  when:
+    - controller_certificate_auth is defined and controller_certificate_auth == "enterprise"
+    - device_item.changed
+  register: generate_csr_response
+
+- name: Sign vSmart CSR with enterprise CA
+  ansible.builtin.include_tasks: certificates.yml
+  loop: "{{ generate_csr_response['results'] }}"
+  loop_control:
+    loop_var: csr_item
+    label: "hostname: {{ csr_item.device_item.device_item.hostname }}, device_ip: {{ csr_item.device_item.device_item.system_ip }}"
+  when:
+    - controller_certificate_auth is defined and controller_certificate_auth == "enterprise"
+    - csr_item.changed
+  vars:
+    csr_content: "{{ (csr_item['response']['generate_csr'] | first)['deviceCSR'] }}"
+    csr_system_ip: "{{ csr_item.device_item.device_item.system_ip }}"
 
 - name: Add vBond devices
   cisco.catalystwan.devices_controllers:
@@ -56,6 +100,36 @@
     loop_var: device_item
     label: "hostname: {{ device_item.hostname }}"
   register: devices_result
+
+- name: Generate CSR for vBonds
+  cisco.catalystwan.devices_certificates:
+    generate_csr: true
+    device_ip: "{{ device_item.device_item.transport_public_ip }}"
+    manager_authentication:
+      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
+      username: "{{ (vmanage_instances | first).admin_username }}"
+      password: "{{ (vmanage_instances | first).admin_password }}"
+  loop: "{{ devices_result['results'] }}"
+  loop_control:
+    loop_var: device_item
+    label: "hostname: {{ device_item.device_item.hostname }}"
+  when:
+    - controller_certificate_auth is defined and controller_certificate_auth == "enterprise"
+    - device_item.changed
+  register: generate_csr_response
+
+- name: Sign vBond CSR with enterprise CA
+  ansible.builtin.include_tasks: certificates.yml
+  loop: "{{ generate_csr_response['results'] }}"
+  loop_control:
+    loop_var: csr_item
+    label: "hostname: {{ csr_item.device_item.device_item.hostname }}, device_ip: {{ csr_item.device_item.device_item.system_ip }}"
+  when:
+    - controller_certificate_auth is defined and controller_certificate_auth == "enterprise"
+    - csr_item.changed
+  vars:
+    csr_content: "{{ (csr_item['response']['generate_csr'] | first)['deviceCSR'] }}"
+    csr_system_ip: "{{ csr_item.device_item.device_item.system_ip }}"
 
 - name: Wait until all controller devices are discoverable via system ip
   cisco.catalystwan.devices_info:

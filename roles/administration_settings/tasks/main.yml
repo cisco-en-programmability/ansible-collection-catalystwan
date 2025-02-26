@@ -20,6 +20,12 @@
 - name: Verify required variables for selected role
   ansible.builtin.include_tasks: variables_assertion.yml
 
+- name: Generate certificates when not provided
+  ansible.builtin.include_tasks: certificates.yml
+  when:
+    - controller_certificate_auth == "enterprise"
+    - enterprise_ca_cert_path is not defined
+
 - name: Set initial configuration via administration settings - loop through all vManage devices
   cisco.catalystwan.administration_settings:
     validator:
@@ -27,7 +33,11 @@
       port: "{{ validator_port }}"
     organization: "{{ organization_name }}"
     certificates:
+      certificate_signing: "{{ controller_certificate_auth }}"
       retrieve_interval: "2"
+    enterprise_root_ca: >-
+      {{ lookup('file', enterprise_ca_cert_path | default(results_dir~'/certificates/ca.crt'))
+      if controller_certificate_auth == 'enterprise' else omit }}
     pnp_connect_sync: "on"
     smart_account_credentials:
       username: "{{ pnp_username }}"

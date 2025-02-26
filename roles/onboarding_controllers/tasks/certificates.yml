@@ -1,0 +1,34 @@
+# Copyright 2024 Cisco Systems, Inc. and its affiliates
+# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+---
+
+- name: Create directory for generated certificates
+  ansible.builtin.file:
+    state: directory
+    path: "{{ results_dir }}/certificates"
+    mode: "0700"
+
+- name: Name save CSR to local drive
+  ansible.builtin.copy:
+    dest: "{{ results_dir }}/certificates/{{ csr_system_ip }}.csr"
+    content: "{{ csr_content }}"
+    mode: "0600"
+
+- name: Sign CSR
+  community.crypto.x509_certificate:
+    path: "{{ results_dir }}/certificates/{{ csr_system_ip }}.crt"
+    csr_path: "{{ results_dir }}/certificates/{{ csr_system_ip }}.csr"
+    ownca_path: "{{ enterprise_ca_cert_path | default(results_dir~'/certificates/ca.crt') }}"
+    ownca_privatekey_path: "{{ enterprise_ca_key_path | default(results_dir~'/certificates/ca.pem') }}"
+    provider: ownca
+    return_content: true
+  register: signed_cert
+
+- name: Install signed certificate
+  cisco.catalystwan.devices_certificates:
+    install_signed_certificate: "{{ signed_cert['certificate'] }}"
+    manager_authentication:
+      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
+      username: "{{ (vmanage_instances | first).admin_username }}"
+      password: "{{ (vmanage_instances | first).admin_password }}"
