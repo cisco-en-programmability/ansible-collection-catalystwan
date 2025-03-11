@@ -20,11 +20,11 @@
   cisco.catalystwan.software_repository:
     remote_server:
       state: present
-      name: "{{ remote_server_name }}"
+      name: "{{ item['name'] }}"
       url: "{{ remote_server_url }}"
       protocol: SCP
       port: 22
-      vpn: 512
+      vpn: "{{ item['vpn'] }}"
       user: "{{ remote_server_user }}"
       password: "{{ remote_server_password }}"
       image_location_prefix: "{{ remote_server_image_location_prefix }}"
@@ -32,6 +32,11 @@
       url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
       username: "{{ (vmanage_instances | first).admin_username }}"
       password: "{{ (vmanage_instances | first).admin_password }}"
+  loop:
+    - name: "{{ remote_server_name }}"
+      vpn: 512
+    - name: "{{ remote_server_name }}-edge"
+      vpn: 0
   failed_when: false
   changed_when: false
 
@@ -39,19 +44,21 @@
   cisco.catalystwan.software_repository_info:
     category: "remote_servers"
     filters:
-      remote_server_name: "{{ remote_server_name }}"
+      remote_server_url: "{{ remote_server_url }}"
     manager_authentication:
       url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
       username: "{{ (vmanage_instances | first).admin_username }}"
       password: "{{ (vmanage_instances | first).admin_password }}"
   register: remote_servers_info
 
-- name: "Debug all_remote_servers - expect one, and verify port is == 22"
+- name: "Debug all_remote_servers - expect two, and verify port is == 22"
   ansible.builtin.assert:
     that:
-      - remote_servers_info.remote_servers | length == 1
+      - remote_servers_info.remote_servers | length == 2
       - ( remote_servers_info.remote_servers | first ).remote_server_name == remote_server_name
       - ( remote_servers_info.remote_servers | first ).remote_server_port == 22
+      - ( remote_servers_info.remote_servers | last ).remote_server_name == remote_server_name~'-edge'
+      - ( remote_servers_info.remote_servers | last ).remote_server_port == 22
     fail_msg: "Requested Remote Server not found in configured Remote Servers list"
 
 
@@ -62,7 +69,6 @@
     Upload software image to Manager from Remote Server:
     - {{ vmanage_remote_software_filename }}
     - {{ viptela_remote_software_filename }}
-    - {{ cedge_remote_software_filename }}
   cisco.catalystwan.software_repository:
     software:
       filename: "{{ filename_item }}"
@@ -74,6 +80,21 @@
   loop:
     - "{{ vmanage_remote_software_filename }}"
     - "{{ viptela_remote_software_filename }}"
+  loop_control:
+    loop_var: filename_item
+
+- name: |
+    Upload software image to Manager from Remote Server:
+    - {{ cedge_remote_software_filename }}
+  cisco.catalystwan.software_repository:
+    software:
+      filename: "{{ filename_item }}"
+      remote_server_name: "{{ remote_server_name }}-edge"
+    manager_authentication:
+      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
+      username: "{{ (vmanage_instances | first).admin_username }}"
+      password: "{{ (vmanage_instances | first).admin_password }}"
+  loop:
     - "{{ cedge_remote_software_filename }}"
   loop_control:
     loop_var: filename_item
@@ -92,7 +113,7 @@
 - name: "Assert that required images present on Manager Software Images list"
   ansible.builtin.assert:
     that:
-      - software_images_info.software_images | length == 3
+      - software_images_info.software_images | length == 2
       - "{{ software_files_names | difference(software_basenames) | length == 0 }}"
     fail_msg: |
       Cannot find all required images, see:
@@ -104,4 +125,29 @@
     software_files_names:
       - "{{ vmanage_remote_software_filename }}"
       - "{{ viptela_remote_software_filename }}"
+
+- name: "Filter list of all software images on Manager to find these from Remote Server"
+  cisco.catalystwan.software_repository_info:
+    category: "software_images"
+    filters:
+      version_type: "{{ remote_server_name }}-edge"
+    manager_authentication:
+      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
+      username: "{{ (vmanage_instances | first).admin_username }}"
+      password: "{{ (vmanage_instances | first).admin_password }}"
+  register: software_images_info
+
+- name: "Assert that required images present on Manager Software Images list"
+  ansible.builtin.assert:
+    that:
+      - software_images_info.software_images | length == 1
+      - "{{ software_files_names | difference(software_basenames) | length == 0 }}"
+    fail_msg: |
+      Cannot find all required images, see:
+      all_available_files: {{ all_available_files }}, software_files_names: {{ software_files_names }}
+    success_msg: "All required files present on Manager Software Images list"
+  vars:
+    all_available_files: "{{ software_images_info.software_images | map(attribute='available_files') | list }}"
+    software_basenames: "{{ all_available_files | map('regex_replace', '^.*/([^/]+)$', '\\1') | list }}"
+    software_files_names:
       - "{{ cedge_remote_software_filename }}"

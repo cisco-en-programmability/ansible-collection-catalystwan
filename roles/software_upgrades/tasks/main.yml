@@ -248,14 +248,14 @@
   loop_control:
     loop_var: device_item
 
-# --- vSmart software upgrades --- #
+# --- Edge software upgrades --- #
 
 - name: "Install and activate software operation on cEdges, image: {{ cedge_remote_software_filename | basename }}"
   cisco.catalystwan.software_upgrade:
     state: "present"  # present with reboot: true -> ACTIVATE in vManage
     reboot: true
     image_path: "{{ omit if upgrade_from_remote_server else cedge_remote_software_filename }}"
-    remote_server_name: "{{ remote_server_name if upgrade_from_remote_server else omit }}"
+    remote_server_name: "{{ remote_server_name~'-edge' if upgrade_from_remote_server else omit }}"
     remote_image_filename: "{{ remote_server_image_location_prefix ~ cedge_remote_software_filename if upgrade_from_remote_server else omit }}"
     wait_for_completed: true
     downgrade_check: false
@@ -288,7 +288,7 @@
       password: "{{ (vmanage_instances | first).admin_password }}"
   register: software_info_cedges
 
-- name: "Delete available software from vSmart"
+- name: "Delete available software from Edge"
   cisco.catalystwan.software_upgrade:
     state: "absent"
     image_version: "{{ version_item }}"
