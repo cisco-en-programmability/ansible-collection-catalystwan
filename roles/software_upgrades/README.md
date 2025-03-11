@@ -79,7 +79,6 @@ Including an example of how to use your role (with variables passed in as parame
 ## Known Limitations
 
 - The role assumes that controllers are <20.13 version.
-- Upgrades of cEdges from Remote Server are currently not included
 - When directly uploading images from local machine to vManage, upload of a single image must complete within Server Session Timeout
 
 ## License
