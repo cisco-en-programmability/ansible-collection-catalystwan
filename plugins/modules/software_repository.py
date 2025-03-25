@@ -369,9 +369,9 @@ def run_module():
             if existing_server:
                 remove_remote_server = True
             else:
-                result.response[
-                    "remove_remote_server"
-                ] = f"Server with UUID: {remote_server_id} not present in Remote Servers List"
+                result.response["remove_remote_server"] = (
+                    f"Server with UUID: {remote_server_id} not present in Remote Servers List"
+                )
 
     if module.params.get("software"):
         image_path = module.params["software"].get("image_path")

@@ -57,9 +57,9 @@ def get_vedges_details(
     module: AnsibleCatalystwanModule,
     deployed_only: bool,
 ) -> DataSequence[DeviceDetailsResponse]:
-    vedge_details: DataSequence[
-        DeviceDetailsResponse
-    ] = module.session.endpoints.configuration_device_inventory.get_device_details(device_category="vedges")
+    vedge_details: DataSequence[DeviceDetailsResponse] = (
+        module.session.endpoints.configuration_device_inventory.get_device_details(device_category="vedges")
+    )
     if not deployed_only:
         return vedge_details
 
