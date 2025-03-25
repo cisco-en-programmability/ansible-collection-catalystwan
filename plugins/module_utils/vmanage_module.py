@@ -61,7 +61,8 @@ class AnsibleCatalystwanModule:
                 password=dict(type="str", required=True, fallback=(env_fallback, ["VMANAGE_PASSWORD"]), no_log=True),
                 port=dict(type="str", required=False, fallback=(env_fallback, ["VMANAGE_PORT"])),
             ),
-        )
+        ),
+        catalystwan_log_dir=dict(type="str", required=False, fallback=(env_fallback, ["CATALYSTWAN_LOG_DIR"])),
     )
 
     def __init__(self, argument_spec=None, supports_check_mode=False, session_reconnect_retries=0, **kwargs):
@@ -77,8 +78,12 @@ class AnsibleCatalystwanModule:
             if self.module._verbosity == 0
             else logging.INFO if self.module._verbosity == 1 else logging.DEBUG
         )
-        self.logger = configure_logger(name="ansible_catalystwan_module", loglevel=log_level)
-        self._vmanage_logger = configure_logger(name="ansible_catalystwan", loglevel=log_level)
+        self.logger = configure_logger(
+            name="ansible_catalystwan_module", loglevel=log_level, logfile_dir=self.module.params["catalystwan_log_dir"]
+        )
+        self._vmanage_logger = configure_logger(
+            name="ansible_catalystwan", loglevel=log_level, logfile_dir=self.module.params["catalystwan_log_dir"]
+        )
 
         if not HAS_LIB:
             self.module.fail_json(msg=missing_required_lib("catalystwan"), exception=LIB_IMP_ERR)
