@@ -36,7 +36,8 @@ ReturnType = TypeVar("ReturnType")
 
 
 class GetDataFunc(Protocol[ReturnType]):
-    def __call__(self, **kwargs: Any) -> ReturnType: ...
+    def __call__(self, **kwargs: Any) -> ReturnType:
+        ...
 
 
 class AnsibleCatalystwanModule:
@@ -76,7 +77,9 @@ class AnsibleCatalystwanModule:
         log_level = (
             logging.ERROR
             if self.module._verbosity == 0
-            else logging.INFO if self.module._verbosity == 1 else logging.DEBUG
+            else logging.INFO
+            if self.module._verbosity == 1
+            else logging.DEBUG
         )
         self.logger = configure_logger(
             name="ansible_catalystwan_module", loglevel=log_level, logfile_dir=self.module.params["catalystwan_log_dir"]
