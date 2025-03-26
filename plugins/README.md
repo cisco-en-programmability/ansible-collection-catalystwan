@@ -118,3 +118,10 @@ Then export path to `vmanage_creds.yml` file:
 ```bash
 export VMANAGE_CREDS_PATH="YOURPATH/vmanage_creds.yml"
 ```
+
+## Troubleshooting
+
+All modules generate additional log messages in the ansible_catalystwan_module.log and ansible_catalystwan.log files. These files are stored in the directory specified by the CATALYSTWAN_LOG_DIR environment variable. If this variable is not set, the files default to being created in the current working directory.
+
+
+The logging level is determined by the Ansible verbosity setting. By default, only ERROR messages are logged. When verbosity is set to 1 (-v), INFO messages are included, and with higher verbosity levels (-vv or more), all messages are logged.

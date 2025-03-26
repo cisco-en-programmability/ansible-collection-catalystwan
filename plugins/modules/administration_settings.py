@@ -330,7 +330,12 @@ def run_module():
         modify_org = True if organization_data.org != org_payload.org else False
 
     if module.params.get("certificates"):
-        certificates_payload = Certificate(**module.params_without_none_values.get("certificates"))
+        if module.params.get("certificates").get("certificate_signing") == "cisco":
+            certificates_payload = Certificate(**module.params_without_none_values.get("certificates"))
+        else:
+            certificates_payload = Certificate(
+                certificate_signing=module.params.get("certificates").get("certificate_signing")
+            )
         certificates_data = module.get_response_safely(
             module.session.endpoints.configuration_settings.get_certificates
         ).single_or_default()
