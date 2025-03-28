@@ -245,13 +245,6 @@ class State(str, Enum):
     ABSENT = "absent"
 
 
-def check_version_id_exists_in_repository(version_id: UUID, all_images: DataSequence[SoftwareImageDetails]):
-    for image_details in all_images:
-        if version_id == image_details.version_id:
-            return True
-    return False
-
-
 def run_module():
     module_args = dict(
         remote_server=dict(
@@ -443,7 +436,7 @@ def run_module():
 
         if module.params["software"]["state"] == State.ABSENT.value and software_id:
             # NOTE We only can remove by software_id -> therefore it is on user side to find proper software_id
-            if check_version_id_exists_in_repository(software_id, all_images):
+            if all_images.filter(version_id=software_id):
                 delete_software_from_software_repository = True
                 remove_software_id = software_id
             else:
