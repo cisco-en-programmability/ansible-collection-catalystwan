@@ -245,6 +245,7 @@ class AnsibleCatalystwanModule:
 
                 else:
                     result.changed = False
+                    result.response = [task.dict() for task in task_result.sub_tasks_data]
                     result.msg = failure_msg
                     self.fail_json(**result.model_dump(mode="json"))
             else:
