@@ -39,9 +39,19 @@
       password: "{{ (vmanage_instances | first).admin_password }}"
   when: wan_edge_list_path is not defined
 
+- name: Get list of Edge devices
+  cisco.catalystwan.devices_info:
+    device_category: vedges
+    manager_authentication:
+      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
+      username: "{{ (vmanage_instances | first).admin_username }}"
+      password: "{{ (vmanage_instances | first).admin_password }}"
+  register: all_edge_devices
+
 - name: Generate bootstrap configuration for all devices
   cisco.catalystwan.devices_wan_edges:
     generate_bootstrap_configuration: true
+    uuid: "{{ (all_edge_devices['devices'] | selectattr('cert_install_status', '!=', 'Installed')) | map(attribute='uuid') }}"
     manager_authentication:
       url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
       username: "{{ (vmanage_instances | first).admin_username }}"
