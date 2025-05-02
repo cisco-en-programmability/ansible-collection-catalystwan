@@ -1,13 +1,14 @@
 from typing import Mapping
+
 from catalystwan.models.policy import (
-    AclPolicy,
     AclIPv6Policy,
+    AclPolicy,
     AdvancedInspectionProfilePolicy,
     AdvancedMalwareProtectionPolicy,
     CflowdPolicy,
     ControlPolicy,
-    DeviceAccessPolicy,
     DeviceAccessIPv6Policy,
+    DeviceAccessPolicy,
     DnsSecurityPolicy,
     HubAndSpokePolicy,
     IntrusionPreventionPolicy,

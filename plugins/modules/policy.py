@@ -223,27 +223,28 @@ response:
 """
 
 
-from typing import Literal, Mapping, Optional, Union, get_args
+from typing import Literal, Optional, get_args
 from uuid import UUID
 
+from catalystwan.api.task_status_api import Task
 from catalystwan.models.policy import (
     AnyPolicyDefinition,
     AnyPolicyList,
     CentralizedPolicy,
     CentralizedPolicyInfo,
     LocalizedPolicy,
+    LocalizedPolicyInfo,
 )
-from catalystwan.api.task_status_api import Task
 from catalystwan.models.policy.centralized import CentralizedPolicyEditPayload
 from catalystwan.session import ManagerHTTPError
 from catalystwan.typed_list import DataSequence
 
+from ..module_utils.policy_templates.centralized import policy_centralized_definition
+from ..module_utils.policy_templates.definition import policy_definition_definition, policy_definition_type_mapping
+from ..module_utils.policy_templates.list import policy_list_definition, policy_list_type_mapping
+from ..module_utils.policy_templates.localized import policy_localized_definition
 from ..module_utils.result import ModuleResult
 from ..module_utils.vmanage_module import AnsibleCatalystwanModule
-from ..module_utils.policy_templates.list import policy_list_type_mapping, policy_list_definition
-from ..module_utils.policy_templates.definition import policy_definition_type_mapping, policy_definition_definition
-from ..module_utils.policy_templates.centralized import policy_centralized_definition
-from ..module_utils.policy_templates.localized import policy_localized_definition
 
 State = Literal["active", "present", "absent"]
 
@@ -361,7 +362,7 @@ def run_module():
                 policy_definition=module.params.get("localized").get("definition"),
             )
         elif module.params.get("state") in ("active", "present"):
-            object_to_create = LocalizedPolicyEditPayload(
+            object_to_create = LocalizedPolicy(
                 policy_name=object_name,
                 policy_description=object_description,
                 policy_type=module.params.get("localized").get("type"),
@@ -485,9 +486,7 @@ def run_module():
         if existing_object:
             if module.params.get("centralized") or module.params.get("localized"):
                 if module.params.get("centralized") and existing_object[0].is_policy_activated:
-                    device_action: Task = module.get_response_safely(
-                        object_endpoint.deactivate, id=existing_object_id
-                    )
+                    device_action: Task = module.get_response_safely(object_endpoint.deactivate, id=existing_object_id)
                     device_action.wait_for_completed()
                 module.send_request_safely(
                     result,

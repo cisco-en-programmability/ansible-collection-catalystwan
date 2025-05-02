@@ -1,4 +1,5 @@
 from typing import Mapping
+
 from catalystwan.models.policy import (
     AppList,
     AppProbeClassList,
