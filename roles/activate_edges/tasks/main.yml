@@ -76,3 +76,6 @@
   until:
     - edge_device_details.devices[0].cert_install_status == "Installed"
     - edge_device_details.devices[0].reachability == "reachable"
+  when: >
+    wan_edges is not defined
+    or wan_edges | json_query('[?uuid==`'~device_item['uuid']~'`] | [?!contains(keys(@), `foreign`) || !foreign || contains(keys(@), `mgmt_public_ip`)]')
