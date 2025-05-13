@@ -224,7 +224,6 @@ EXAMPLES = r"""
 
 from enum import Enum
 from pathlib import Path
-from uuid import UUID
 
 from catalystwan.endpoints.configuration.software_actions import (
     RemoteServer,

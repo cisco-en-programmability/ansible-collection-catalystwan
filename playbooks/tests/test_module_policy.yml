@@ -1,0 +1,244 @@
+# Copyright 2024 Cisco Systems, Inc. and its affiliates
+# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+---
+
+# Helper playbooks to test modules and flows while developing them
+
+# Tested operations:
+
+# 0. Delete leftover objects
+# 1. Create Policy list
+# 2. Create already existing Policy list (should return not changed)
+# 3. Update Policy list
+# 4. Create Policy definition
+# 5. Update Policy definition
+# 6. Create centralized policy
+# 7. Activate centralized policy
+# 8. Create localized policy
+# 9. Delete all created objects
+
+- name: Testing playbook to verify cisco.catalystwan.device_templates module operations
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+    - configuration_file_dev_vars.yml
+  vars:
+    manager_authentication: &manager_authentication
+      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
+      username: "{{ (vmanage_instances | first).admin_username }}"
+      password: "{{ (vmanage_instances | first).admin_password }}"
+
+  tasks:
+    - name: Delete pre existing centralized policy
+      cisco.catalystwan.policy:
+        name: test_centralized_policy
+        centralized:
+          type: feature
+        state: absent
+        manager_credentials:
+          <<: *manager_authentication
+
+    - name: Delete pre existing localized policy
+      cisco.catalystwan.policy:
+        name: test_localized_policy
+        localized:
+          type: feature
+        state: absent
+        manager_credentials:
+          <<: *manager_authentication
+
+    - name: Delete pre existing policy definitions
+      cisco.catalystwan.policy:
+        name: test_hub_and_spoke_policy
+        definition:
+          type: "hub_and_spoke"
+        state: absent
+        manager_credentials:
+          <<: *manager_authentication
+
+    - name: Delete pre existing policy lists
+      cisco.catalystwan.policy:
+        name: "{{ item['name'] }}"
+        list:
+          type: "{{ item['type'] }}"
+        state: absent
+        manager_credentials:
+          <<: *manager_authentication
+      loop:
+        - name: test_vpn_list
+          type: vpn
+        - name: test_hub_list
+          type: site
+        - name: test_spoke_list
+          type: site
+
+    - name: Create VPN list
+      cisco.catalystwan.policy:
+        name: test_vpn_list
+        list:
+          type: "vpn"
+          entries:
+            - vpn: 100
+        manager_credentials:
+          <<: *manager_authentication
+      register: result_vpn_list
+
+    - name: Create existing VPN list again
+      cisco.catalystwan.policy:
+        name: test_vpn_list
+        list:
+          type: "vpn"
+          entries:
+            - vpn: 100
+        manager_credentials:
+          <<: *manager_authentication
+      register: result_vpn_list
+      failed_when: result_vpn_list['changed']
+
+    - name: Update VPN list
+      cisco.catalystwan.policy:
+        name: test_vpn_list
+        list:
+          type: "vpn"
+          entries:
+            - vpn: 101
+        manager_credentials:
+          <<: *manager_authentication
+      register: result_vpn_list
+      failed_when: not result_vpn_list['changed'] or "updated" not in result_vpn_list['msg']
+
+    - name: Create HUB list
+      cisco.catalystwan.policy:
+        name: test_hub_list
+        list:
+          type: "site"
+          entries:
+            - site_id: "100"
+        manager_credentials:
+          <<: *manager_authentication
+      register: result_hub_list
+
+    - name: Create SPOKE list
+      cisco.catalystwan.policy:
+        name: test_spoke_list
+        list:
+          type: "site"
+          entries:
+            - site_id: "1001"
+        manager_credentials:
+          <<: *manager_authentication
+      register: result_spoke_list
+
+    - name: Create hub and spoke policy
+      cisco.catalystwan.policy:
+        name: test_hub_and_spoke_policy
+        definition:
+          type: "hub_and_spoke"
+          definition:
+            vpnList: "{{ result_vpn_list['id'] }}"
+            subDefinitions:
+              - name: "My Hub-and-Spoke"
+                equalPreference: true
+                advertiseTloc: false
+                spokes:
+                  - siteList: "{{ result_spoke_list['id'] }}"
+                    hubs:
+                      - siteList: "{{ result_spoke_list['id'] }}"
+        manager_credentials:
+          <<: *manager_authentication
+      register: result_hub_and_spoke_policy
+
+    - name: Update hub and spoke policy
+      cisco.catalystwan.policy:
+        name: test_hub_and_spoke_policy
+        definition:
+          type: "hub_and_spoke"
+          definition:
+            vpnList: "{{ result_vpn_list['id'] }}"
+            subDefinitions:
+              - name: "My Hub-and-Spoke"
+                equalPreference: true
+                advertiseTloc: false
+                spokes:
+                  - siteList: "{{ result_spoke_list['id'] }}"
+                    hubs:
+                      - siteList: "{{ result_hub_list['id'] }}"
+        manager_credentials:
+          <<: *manager_authentication
+      register: result_hub_and_spoke_policy
+
+    - name: Create centralized policy
+      cisco.catalystwan.policy:
+        name: test_centralized_policy
+        centralized:
+          definition:
+            assembly:
+              - definitionId: "{{ result_hub_and_spoke_policy['id'] }}"
+                type: "hubAndSpoke"
+        manager_credentials:
+          <<: *manager_authentication
+
+    - name: Activate centralized policy
+      cisco.catalystwan.policy:
+        state: active
+        name: test_centralized_policy
+        centralized:
+          definition:
+            assembly:
+              - definitionId: "{{ result_hub_and_spoke_policy['id'] }}"
+                type: "hubAndSpoke"
+        manager_credentials:
+          <<: *manager_authentication
+
+    - name: Create localized policy
+      cisco.catalystwan.policy:
+        name: test_localized_policy
+        localized:
+          definition:
+            assembly: []
+        manager_credentials:
+          <<: *manager_authentication
+
+    - name: Delete centralized policy
+      cisco.catalystwan.policy:
+        name: test_centralized_policy
+        centralized:
+          type: feature
+        state: absent
+        manager_credentials:
+          <<: *manager_authentication
+
+    - name: Delete localized policy
+      cisco.catalystwan.policy:
+        name: test_localized_policy
+        localized:
+          type: feature
+        state: absent
+        manager_credentials:
+          <<: *manager_authentication
+
+    - name: Delete policy definitions
+      cisco.catalystwan.policy:
+        name: test_hub_and_spoke_policy
+        definition:
+          type: "hub_and_spoke"
+        state: absent
+        manager_credentials:
+          <<: *manager_authentication
+
+    - name: Delete policy lists
+      cisco.catalystwan.policy:
+        name: "{{ item['name'] }}"
+        list:
+          type: "{{ item['type'] }}"
+        state: absent
+        manager_credentials:
+          <<: *manager_authentication
+      loop:
+        - name: test_vpn_list
+          type: vpn
+        - name: test_hub_list
+          type: site
+        - name: test_spoke_list
+          type: site
