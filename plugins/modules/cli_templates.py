@@ -37,6 +37,16 @@ options:
     required: false
     type: str
     aliases: ["running_config_file_path"]
+  force:
+    description:
+      - Update already existing templates. When template is attached to devices, reattach new version.
+    required: false
+    type: bool
+    default: false
+  timeout_seconds:
+    description:
+      - The timeout in seconds for attaching the template. Default is 300.
+    type: int
 author:
   - Arkadiusz Cichon (acichon@cisco.com)
 extends_documentation_fragment:
@@ -81,18 +91,29 @@ template_id:
   sample: "abc123"
 """
 
-from typing import Literal, Optional, get_args
+from typing import List, Literal, Optional, get_args
 
 from catalystwan.api.template_api import CLITemplate
+from catalystwan.api.templates.device_template.device_template import DeviceTemplateConfigAttached
+from catalystwan.dataclasses import Device
 from catalystwan.models.common import DeviceModel
 from catalystwan.models.templates import DeviceTemplateInformation
 from catalystwan.session import ManagerHTTPError
 from catalystwan.typed_list import DataSequence
+from ciscoconfparse import CiscoConfParse  # type: ignore
+from pydantic import BaseModel, Field
 
 from ..module_utils.result import ModuleResult
 from ..module_utils.vmanage_module import AnsibleCatalystwanModule
 
 State = Literal["present", "absent"]
+
+
+class ExtendedManagerResponse(BaseModel):
+    process_id: Optional[str] = Field(default=None, validation_alias="processId", serialization_alias="processId")
+    attached_configs: Optional[List[DeviceTemplateConfigAttached]] = Field(
+        default=None, validation_alias="attachedDevices", serialization_alias="attachedDevices"
+    )
 
 
 def run_module():
@@ -106,6 +127,8 @@ def run_module():
         template_description=dict(type="str", default=None),
         device_model=dict(type="str", aliases=["device_type"], choices=list(get_args(DeviceModel)), default=None),
         config_file=dict(type="str", aliases=["running_config_file_path"]),
+        force=dict(type="bool", default=False),
+        timeout_seconds=dict(type="int", default=300),
     )
     result = ModuleResult()
 
@@ -138,11 +161,57 @@ def run_module():
 
     if module.params.get("state") == "present":
         # Code for checking if template name exists already
-        if target_template:
+        if target_template and not module.params.get("force"):
             module.logger.debug(f"Detected existing template:\n{target_template}\n")
             result.msg = (
                 f"Template with name {template_name} already present on vManage, skipping create template operation."
             )
+        elif target_template:
+            current_template = module.get_response_safely(
+                module.session.api.templates.get_device_template, template_id=target_template[0].id
+            )
+            current_template_configuration = CiscoConfParse(current_template.template_configuration.splitlines())
+
+            new_template = CLITemplate(
+                template_name=template_name,
+                template_description=module.params.get("template_description"),
+                device_model=module.params.get("device_model"),
+            )
+            new_template_configuration = new_template.load_from_file(file=module.params.get("config_file"))
+
+            template_configuration_diff = CLITemplate.compare_template(
+                current_template_configuration, new_template_configuration
+            )
+            if template_configuration_diff:
+                module.logger.debug(f"Detected changes:\n{template_configuration_diff}\nTemplate will be updated")
+                response = module.get_response_safely(module.session.api.templates.edit, template=new_template)
+                template_config_attached = response.dataseq(ExtendedManagerResponse)[0].attached_configs
+                all_devices: DataSequence[Device] = module.get_response_safely(module.session.api.devices.get)
+                for attached_config in template_config_attached:
+                    module.logger.debug(
+                        f"Template is attached to device: {attached_config.uuid}\nReattaching new version"
+                    )
+                    device = all_devices.filter(uuid=attached_config.uuid)[0]
+                    module.get_response_safely(
+                        module.session.api.templates.edit_before_push, name=template_name, device=device
+                    )
+                    response = module.session.api.templates.attach(
+                        name=template_name,
+                        device=device,
+                        timeout_seconds=module.params.get("timeout_seconds"),
+                        is_edited=True,
+                    )
+                result.changed = True
+                result.msg = (
+                    f"Template with name {template_name} already present on vManage is different than provided."
+                    " Updating and reattaching."
+                )
+            else:
+                module.logger.debug(f"Detected existing template:\n{target_template}\n")
+                result.msg = (
+                    f"Template with name {template_name} already present on vManage and is the same as provided."
+                    " Skipping template update."
+                )
         else:
             cli_template = CLITemplate(
                 template_name=template_name,
