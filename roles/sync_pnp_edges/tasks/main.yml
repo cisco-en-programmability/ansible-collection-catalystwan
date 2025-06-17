@@ -68,17 +68,19 @@
     generated_data_edge_instances:
       edge_instances: "{{ generated_data_edge_instances.edge_instances + [new_entry] }}"
   vars:
+    generated_bootstrap: "{{ all_bootstrap_cfg.bootstrap_configuration | json_query('[?uuid==`'~ instance.uuid ~'`]') }}"
     new_entry:
       hostname: "{{ organization_name }}-cedge-{{ index + 1 }}"
-      otp: "{{ instance.otp }}"
+      otp: "{{ generated_bootstrap[0].otp if generated_bootstrap else omit }}"
       uuid: "{{ instance.uuid }}"
-      vbond: "{{ instance.vbond }}"
+      vbond: "{{ generated_bootstrap[0].vbond if generated_bootstrap else instance.vbond }}"
       system_ip: "192.168.10{{ index + 1 }}.1"
       site_id: "{{ 1000 + index + 1 }}"
-  loop: "{{ all_bootstrap_cfg.bootstrap_configuration }}"
+  loop: "{{ all_edge_devices.devices }}"
   loop_control:
     index_var: index
     loop_var: instance
+    label: "{{ instance.uuid }}"
 
 - name: "Generate file to store edge deployment configuration, path: {{ deployment_edges_config }}"
   ansible.builtin.blockinfile:
