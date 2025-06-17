@@ -91,30 +91,30 @@ template_id:
   sample: "abc123"
 """
 
-from typing import Literal, Optional, get_args, List
-from pydantic import BaseModel, Field
+from typing import List, Literal, Optional, get_args
 
-from ciscoconfparse import CiscoConfParse  # type: ignore
 from catalystwan.api.template_api import CLITemplate
+from catalystwan.api.templates.device_template.device_template import DeviceTemplateConfigAttached
+from catalystwan.dataclasses import Device
 from catalystwan.models.common import DeviceModel
 from catalystwan.models.templates import DeviceTemplateInformation
 from catalystwan.session import ManagerHTTPError
 from catalystwan.typed_list import DataSequence
-from catalystwan.api.templates.device_template.device_template import (
-    DeviceTemplateConfigAttached,
-)
+from ciscoconfparse import CiscoConfParse  # type: ignore
+from pydantic import BaseModel, Field
+
 from ..module_utils.result import ModuleResult
 from ..module_utils.vmanage_module import AnsibleCatalystwanModule
 
 State = Literal["present", "absent"]
 
+
 class ExtendedManagerResponse(BaseModel):
-    process_id: Optional[str] = Field(
-        default=None, validation_alias="processId", serialization_alias="processId"
-    )
+    process_id: Optional[str] = Field(default=None, validation_alias="processId", serialization_alias="processId")
     attached_configs: Optional[List[DeviceTemplateConfigAttached]] = Field(
         default=None, validation_alias="attachedDevices", serialization_alias="attachedDevices"
     )
+
 
 def run_module():
     module_args = dict(
@@ -179,16 +179,18 @@ def run_module():
             )
             new_template_configuration = new_template.load_from_file(file=module.params.get("config_file"))
 
-            template_configuration_diff = CLITemplate.compare_template(current_template_configuration, new_template_configuration)
+            template_configuration_diff = CLITemplate.compare_template(
+                current_template_configuration, new_template_configuration
+            )
             if template_configuration_diff:
                 module.logger.debug(f"Detected changes:\n{template_configuration_diff}\nTemplate will be updated")
-                response = module.get_response_safely(
-                    module.session.api.templates.edit, template=new_template
-                )
+                response = module.get_response_safely(module.session.api.templates.edit, template=new_template)
                 template_config_attached = response.dataseq(ExtendedManagerResponse)[0].attached_configs
                 all_devices: DataSequence[Device] = module.get_response_safely(module.session.api.devices.get)
                 for attached_config in template_config_attached:
-                    module.logger.debug(f"Template is attached to device: {attached_config.uuid}\nReattaching new version")
+                    module.logger.debug(
+                        f"Template is attached to device: {attached_config.uuid}\nReattaching new version"
+                    )
                     device = all_devices.filter(uuid=attached_config.uuid)[0]
                     module.get_response_safely(
                         module.session.api.templates.edit_before_push, name=template_name, device=device
@@ -201,12 +203,14 @@ def run_module():
                     )
                 result.changed = True
                 result.msg = (
-                    f"Template with name {template_name} already present on vManage is different than provided. Updating and reattaching."
+                    f"Template with name {template_name} already present on vManage is different than provided."
+                    " Updating and reattaching."
                 )
             else:
                 module.logger.debug(f"Detected existing template:\n{target_template}\n")
                 result.msg = (
-                    f"Template with name {template_name} already present on vManage and is the same as provided. Skipping template update."
+                    f"Template with name {template_name} already present on vManage and is the same as provided."
+                    " Skipping template update."
                 )
         else:
             cli_template = CLITemplate(
