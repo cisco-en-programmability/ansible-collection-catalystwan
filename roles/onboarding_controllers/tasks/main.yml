@@ -19,6 +19,9 @@
     loop_var: device_item
     label: "hostname: {{ device_item.hostname }}, device_ip: {{ device_item.system_ip }}"
   register: generate_csr_response
+  retries: 12
+  delay: 10
+
 
 - name: Sign vManage CSR with enterprise CA
   ansible.builtin.include_tasks: certificates.yml
@@ -50,6 +53,8 @@
     loop_var: device_item
     label: "hostname: {{ device_item.hostname }}"
   register: devices_result
+  retries: 12
+  delay: 10
 
 - name: Generate CSR for vSmarts
   cisco.catalystwan.devices_certificates:
@@ -67,6 +72,8 @@
     - controller_certificate_auth is defined and controller_certificate_auth == "enterprise"
     - device_item.changed
   register: generate_csr_response
+  retries: 12
+  delay: 10
 
 - name: Sign vSmart CSR with enterprise CA
   ansible.builtin.include_tasks: certificates.yml
@@ -100,6 +107,8 @@
     loop_var: device_item
     label: "hostname: {{ device_item.hostname }}"
   register: devices_result
+  retries: 12
+  delay: 10
 
 - name: Generate CSR for vBonds
   cisco.catalystwan.devices_certificates:
@@ -117,6 +126,8 @@
     - controller_certificate_auth is defined and controller_certificate_auth == "enterprise"
     - device_item.changed
   register: generate_csr_response
+  retries: 12
+  delay: 10
 
 - name: Sign vBond CSR with enterprise CA
   ansible.builtin.include_tasks: certificates.yml
@@ -147,7 +158,7 @@
     label: "hostname: {{ device_item.hostname }}, device_ip: {{ device_item.system_ip }}"
   retries: 20
   delay: 10
-  until: device_details_info.devices | length | int == 1
+  until: device_details_info.devices | default([]) and device_details_info.devices | length | int == 1
 
 - name: Wait until cert_install_status == "Installed" on all controllers
   cisco.catalystwan.devices_info:
@@ -165,4 +176,4 @@
     label: "hostname: {{ device_item.hostname }}, device_ip: {{ device_item.system_ip }}"
   retries: 20
   delay: 10
-  until: device_details_info.devices[0].cert_install_status == "Installed"
+  until: device_details_info.devices | default([]) and device_details_info.devices[0].cert_install_status == "Installed"
