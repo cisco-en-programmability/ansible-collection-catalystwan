@@ -1,0 +1,133 @@
+---
+# Copyright 2024 Cisco Systems, Inc. and its affiliates
+# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+# https://www.cisco.com/c/en/us/td/docs/routers/sdwan/configuration/qos/vEdge-20-x/qos-book/forwarding-qos.html#Cisco_Concept.dita_aa3e0d07-462e-463f-8f45-681f38f61ab0
+
+- name: Save list of QoS schedulers
+  set_fact:
+    qos_schedulers:
+      - name: VOICE
+        queue: 0
+        bandwidth: 10
+        buffer: 10
+        dscp: 0
+        l2cos: 0
+      - name: CRITICAL_DATA
+        queue: 1
+        bandwidth: 30
+        buffer: 30
+        dscp: 2
+        l2cos: 18
+      - name: BULK
+        queue: 2
+        bandwidth: 10
+        buffer: 10
+        dscp: 10
+        l2cos: 1
+      - name: DEFAULT
+        queue: 3
+        bandwidth: 20
+        buffer: 20
+        dscp: 0
+        l2cos: 0
+      - name: INTERACTIVE_VIDEO
+        queue: 4
+        bandwidth: 20
+        buffer: 20
+        dscp: 4
+        l2cos: 10
+      - name: CONTROL_SIGNALING
+        queue: 5
+        bandwidth: 10
+        buffer: 10
+        dscp: 18
+        l2cos: 2
+        drops: "tail-drop"
+
+- name: Create ClassMap lists
+  cisco.catalystwan.policy:
+    name: "{{ item.name }}"
+    list:
+      type: "class_map"
+      entries:
+        - queue: "{{ item.queue }}"
+    manager_credentials:
+      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
+      username: "{{ (vmanage_instances | first).admin_username }}"
+      password: "{{ (vmanage_instances | first).admin_password }}"
+  register: created_class_map_lists
+  loop: "{{ qos_schedulers }}"
+
+- name: Prepare QoS schedulers for policy definition
+  set_fact:
+    policy_qos_schedulers: "{{ policy_qos_schedulers | default([]) + [qos_scheduler] }}"
+  loop: "{{ created_class_map_lists.results }}"
+  vars:
+    qos_scheduler:
+      queue: "{{ item.item.queue }}"
+      classMapRef: "{{ item.id | default(omit) }}"
+      bandwidthPercent: "{{ item.item.bandwidth | default(omit) }}"
+      bufferPercent: "{{ item.item.buffer | default(omit) }}"
+      drops: "{{ item.item.drops | default(omit) }}"
+      scheduling: "{{ item.item.scheduling | default(omit) }}"
+
+- name: Create QoS map policy definition
+  cisco.catalystwan.policy:
+    name: "My-QosMap-Policy"
+    definition:
+      type: qos_map
+      definition:
+        qosSchedulers: "{{ policy_qos_schedulers }}"
+    manager_credentials:
+      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
+      username: "{{ (vmanage_instances | first).admin_username }}"
+      password: "{{ (vmanage_instances | first).admin_password }}"
+  register: created_qos_map
+
+- name: Prepare rewrite rules for policy definition
+  set_fact:
+    policy_rewrite_rules: "{{ policy_rewrite_rules | default([]) + rewrite_rules }}"
+  loop: "{{ created_class_map_lists.results }}"
+  when: item.item.queue > 0
+  vars:
+    rewrite_rules:
+      - class: "{{ item.id | default(omit) }}"
+        plp: low
+        dscp: "{{ item.item.dscp | default(omit) }}"
+        l2cos: "{{ item.item.l2cos | default(omit) }}"
+      - class: "{{ item.id | default(omit) }}"
+        plp: high
+        dscp: "{{ item.item.dscp | default(omit) }}"
+        l2cos: "{{ item.item.l2cos | default(omit) }}"
+
+- name: Create Rewrite policy definition
+  cisco.catalystwan.policy:
+    name: "My-Rewrite-Policy"
+    definition:
+      type: rewrite
+      definition:
+        rules: "{{ policy_rewrite_rules }}"
+    manager_credentials:
+      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
+      username: "{{ (vmanage_instances | first).admin_username }}"
+      password: "{{ (vmanage_instances | first).admin_password }}"
+  register: created_rewrite_rules
+
+- name: Create localized policy
+  cisco.catalystwan.policy:
+    name: "My-Localized-Policy"
+    localized:
+      definition:
+        settings:
+          cloudQos: true
+          cloud_qos_service_side: true
+        assembly:
+          - type: qosMap
+            definitionId: "{{ created_qos_map.id }}"
+          - type: rewriteRule
+            definitionId: "{{ created_rewrite_rules.id }}"
+    manager_credentials:
+      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
+      username: "{{ (vmanage_instances | first).admin_username }}"
+      password: "{{ (vmanage_instances | first).admin_password }}"
