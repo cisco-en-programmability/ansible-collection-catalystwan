@@ -26,6 +26,8 @@
       username: "{{ (vmanage_instances | first).admin_username }}"
       password: "{{ (vmanage_instances | first).admin_password }}"
   when: wan_edge_list_path is defined
+  retries: 12
+  delay: 5
 
 - name: Sync devices with Smart Account only if user didn't provide WAN Edge list path
   cisco.catalystwan.devices_wan_edges:
@@ -38,6 +40,8 @@
       username: "{{ (vmanage_instances | first).admin_username }}"
       password: "{{ (vmanage_instances | first).admin_password }}"
   when: wan_edge_list_path is not defined
+  retries: 12
+  delay: 5
 
 - name: Get list of Edge devices
   cisco.catalystwan.devices_info:
@@ -47,6 +51,8 @@
       username: "{{ (vmanage_instances | first).admin_username }}"
       password: "{{ (vmanage_instances | first).admin_password }}"
   register: all_edge_devices
+  retries: 12
+  delay: 5
 
 - name: Generate bootstrap configuration for all devices
   cisco.catalystwan.devices_wan_edges:
@@ -57,6 +63,8 @@
       username: "{{ (vmanage_instances | first).admin_username }}"
       password: "{{ (vmanage_instances | first).admin_password }}"
   register: all_bootstrap_cfg
+  retries: 12
+  delay: 5
 
 - name: Initialize empty dictionary for generated_data_edge_instances
   ansible.builtin.set_fact:

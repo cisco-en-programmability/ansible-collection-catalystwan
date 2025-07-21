@@ -18,6 +18,8 @@
   loop_control:
     loop_var: instance_item
     label: "hostname: {{ instance_item.hostname }}"
+  retries: 20
+  delay: 10
 
 - name: Set vManage mode for all Edge devices
   cisco.catalystwan.vmanage_mode:
@@ -32,3 +34,5 @@
     loop_var: instance_item
     label: "hostname: {{ instance_item.hostname }}"
   when: edge_instances is defined
+  retries: 20
+  delay: 10

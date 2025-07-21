@@ -14,6 +14,8 @@
       username: "{{ (vmanage_instances | first).admin_username }}"
       password: "{{ (vmanage_instances | first).admin_password }}"
   register: edge_devices
+  retries: 12
+  delay: 10
 
 # We do PnP sync with validity set to valid, task obsolete, kept only as reference
 # - name: Change Edge devices validity to Valid
@@ -36,6 +38,8 @@
       url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
       username: "{{ (vmanage_instances | first).admin_username }}"
       password: "{{ (vmanage_instances | first).admin_password }}"
+  retries: 12
+  delay: 10
 
 
 - name: Wait until edge devices are reachable and OTP phase is over
@@ -55,6 +59,7 @@
   retries: 20
   delay: 10
   until:
+    - edge_device_details.devices | default([])
     - edge_device_details.devices[0].device_state == "READY"
 
 - name: Wait until cert_install_status == "Installed" and reachability == "reachable" on all edge devices
@@ -74,6 +79,7 @@
   retries: 20
   delay: 10
   until:
+    - edge_device_details.devices | default([])
     - edge_device_details.devices[0].cert_install_status == "Installed"
     - edge_device_details.devices[0].reachability == "reachable"
   when: >
