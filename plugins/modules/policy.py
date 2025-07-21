@@ -8,7 +8,7 @@
 DOCUMENTATION = r"""
 ---
 module: policy
-version_added: "0.1.0"
+version_added: "0.3.4"
 short_description: Manages policies on Manager instance
 description:
   - Allow to create, update and delete policy lists, policy definitions, centralized policies and localized policies
@@ -33,90 +33,25 @@ options:
     type: str
     required: false
   centralized:
+    description:
+      - Centralized policy definition
+      - The centralized, localized, definition and list options are mutually exclusive.
+    type: dictionary
   localized:
+    description:
+      - Localized policy definition
+      - The centralized, localized, definition and list options are mutually exclusive.
+    type: dictionary
   definition:
+    description:
+      - Policy definition object
+      - The centralized, localized, definition and list options are mutually exclusive.
+    type: dictionary
   list:
-  certificates:
-    description: Configuration for controller certificate authorization.
-    type: dict
-    aliases: [cca, controller_certificate_authorization]
-    suboptions:
-      certificate_signing:
-        description: Defines the certificate signing authority.
-        type: str
-        choices: ["cisco", "manual", "enterprise"]
-        default: "cisco"
-      email:
-        description: Email address to use for the certificate.
-        type: str
-      first_name:
-        description: First name to use for the certificate.
-        type: str
-      last_name:
-        description: Last name to use for the certificate.
-        type: str
-      retrieve_interval:
-        description: Defines the interval to retrieve certificates in minutes.
-        type: str
-        choices: ["1", "2", "3", ..., "60"]
-        default: "5"
-      validity_period:
-        description: Defines the validity period for the certificate.
-        type: str
-        choices: ["1Y", "2Y"]
-        default: "1Y"
-  enterprise_root_ca:
-    description: Configuration for enterprise root certificate.
-    type: str
-    aliases: [enterprise_root_certificate]
-  org:
-    description: Name of the organization.
-    type: str
-    aliases: [organization]
-  pnp_connect_sync:
-    description: Configures the PnP Connect Sync mode.
-    type: str
-    choices: ["on", "off"]
-    default: "off"
-    aliases: [pnp_connect_sync_mode]
-  smart_account_credentials:
-    description: Smart Account credentials for authentication.
-    type: dict
-    aliases: [smart_account]
-    suboptions:
-      password:
-        description: Password for Smart Account.
-        type: str
-        required: true
-        no_log: true
-      username:
-        description: Username for Smart Account.
-        type: str
-        required: true
-  validator:
-    description: Configuration for vBond validator.
-    type: dict
-    aliases: [vbond]
-    suboptions:
-      domain_ip:
-        description: Domain IP of the vBond validator.
-        type: str
-      port:
-        description: Port number for the vBond validator.
-        type: int
-  software_install_timeout:
-    description: Configuration for upgrades timeout.
-    type: dict
-    suboptions:
-      download_timeout:
-        description: Download Timeout in minutes, should be in range 60-360.
-        type: str
-      activate_timeout:
-        description: Activate Timeout in minutes, should be in range 30-180.
-        type: str
-      control_pps:
-        description: Control PPS, should be in range 300-65535.
-        type: str
+    description:
+      - Policy list object
+      - The centralized, localized, definition and list options are mutually exclusive.
+    type: dictionary
 author:
   - Piotr Piwowarski (pipiwowa@cisco.com)
 
@@ -125,54 +60,32 @@ extends_documentation_fragment:
 """
 
 EXAMPLES = r"""
-# Example of using the module to configure vBond validator
-- name: Configure vBond validator
-  cisco.catalystwan.administration_settings:
-    validator:
-      domain_ip: "192.0.2.1"
-      port: "12346"
-    manager_credentials:
-      url: "https://vmanage.example.com"
-      username: "admin"
-      password: "securepassword123"  # pragma: allowlist secret
-      port: "8443"
-
-# Example of using the module to configure certificates
-- name: Configure certificates
-  cisco.catalystwan.administration_settings:
-    certificates:
-      certificate_signing: "cisco"
-      validity_period: "2Y"
-      retrieve_interval: 10
-      first_name: "John"
-      last_name: "Doe"
-      email: "john.doe@example.com"
+# Example of creating VPN list
+- name: Create VPN list
+  cisco.catalystwan.policy:
+    name: my_vpn_list
+    list:
+      type: "vpn"
+      entries:
+        - vpn: 100
     manager_credentials: ...
 
-# Example of using the module to configure the certificate used for enterprise signing
-- name: Configure enterprise root CA
-  cisco.catalystwan.administration_settings:
-    enterprise_root_ca: "-----BEGIN CERTIFICATE-----\n...\n-----END CERTIFICATE-----\n"
-    manager_credentials: ...
-
-# Example of using the module to configure Smart Account credentials
-- name: Configure Smart Account credentials
-  cisco.catalystwan.administration_settings:
-    smart_account_credentials:
-      username: "smartuser"
-      password: "smartpass"  # pragma: allowlist secret
-    manager_credentials: ...
-
-# Example of using the module to configure PnP Connect Sync
-- name: Configure PnP Connect Sync
-  cisco.catalystwan.administration_settings:
-    pnp_connect_sync: "ON"
-    manager_credentials: ...
-
-# Example of using the module to configure the organization name
-- name: Configure organization name
-  cisco.catalystwan.administration_settings:
-    org: "ExampleOrganization"
+# Example of creating hub and spoke policy definition
+- name: Create hub and spoke policy definition
+  cisco.catalystwan.policy:
+    name: my_hub_and_spoke_policy
+    definition:
+      type: "hub_and_spoke"
+      definition:
+        vpnList: "{{ vpn_list.id }}"
+        subDefinitions:
+          - name: "My Hub-and-Spoke"
+            equalPreference: true
+            advertiseTloc: false
+            spokes:
+              - siteList: "{{ spoke_list.id }}"
+                hubs:
+                  - siteList: "{{ hub_list.id }}"
     manager_credentials: ...
 """
 
@@ -181,45 +94,12 @@ msg:
   description: Message detailing the outcome of the operation.
   returned: always
   type: str
-  sample: "Successfully updated requested administration settings."
-response:
-  description: Detailed response for each section of administration settings that has been touched.
-    Includes current state when no changes were applied.
-  returned: always
-  type: complex
-  contains:
-    org:
-      description: Organization settings.
-      returned: when org is provided
-      type: dict
-      sample: {"name": "ExampleOrganization"}
-    validator:
-      description: vBond validator settings.
-      returned: when validator is provided
-      type: dict
-      sample: {"domain_ip": "192.0.2.1", "port": "12346"}
-    certificates:
-      description: Controller certificate authorization settings.
-      returned: when certificates are provided
-      type: dict
-      sample: {
-        "certificate_signing": "cisco",
-        "validity_period": "2Y",
-        "retrieve_interval": "10",
-        "first_name": "John",
-        "last_name": "Doe",
-        "email": "john.doe@example.com"
-      }
-    smart_account_credentials:
-      description: Smart Account credentials settings.
-      returned: when smart_account_credentials are provided
-      type: dict
-      sample: {"username": "smartuser"}
-    pnp_connect_sync:
-      description: PnP Connect Sync mode settings.
-      returned: when pnp_connect_sync is provided
-      type: str
-      sample: "ON"
+  sample: "Centralized policy my-policy created on vManage."
+id:
+  description: The ID of the policy that was created or modified.
+  returned: when a policy object is created
+  type: str
+  sample: "XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXX"
 """
 
 
