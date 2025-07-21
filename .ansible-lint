@@ -49,6 +49,7 @@ mock_modules:
   - cisco.catalystwan.config_groups
   - cisco.catalystwan.config_group_deployment
   - cisco.catalystwan.feature_profile_builder
+  - cisco.catalystwan.policy
 #   - zuul_return
 #   # note the foo.bar is invalid as being neither a module or a collection
 #   - fake_namespace.fake_collection.fake_module
