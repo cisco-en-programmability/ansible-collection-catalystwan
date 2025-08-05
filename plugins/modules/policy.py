@@ -210,12 +210,14 @@ def run_module():
             object_endpoint = module.session.api.policy.security
             policy_definition = module.params.get("security")
 
-        all_policies: DataSequence[CentralizedPolicyInfo | LocalizedPolicyInfo | AnySecurityPolicyInfo] = module.get_response_safely(object_endpoint.get)
+        all_policies: DataSequence[CentralizedPolicyInfo | LocalizedPolicyInfo | AnySecurityPolicyInfo] = (
+            module.get_response_safely(object_endpoint.get)
+        )
         if module.params.get("security"):
             all_policies = all_policies.security
-        filtered_definitions: Optional[DataSequence[CentralizedPolicyInfo | LocalizedPolicyInfo | AnySecurityPolicyInfo]] = all_policies.filter(
-            policy_name=object_name
-        )
+        filtered_definitions: Optional[
+            DataSequence[CentralizedPolicyInfo | LocalizedPolicyInfo | AnySecurityPolicyInfo]
+        ] = all_policies.filter(policy_name=object_name)
         if filtered_definitions:
             existing_object: DataSequence[CentralizedPolicy | LocalizedPolicy | SecurityPolicy] = [
                 module.get_response_safely(object_endpoint.get, id=filtered_definitions[0].policy_id)
@@ -309,7 +311,7 @@ def run_module():
                         device_action.wait_for_completed()
                     object_endpoint.edit(policy=object_to_create)
                 elif module.params.get("localized") or module.params.get("security"):
-                    object_endpoint.edit(policy=object_to_create)
+                    object_endpoint.edit(id=existing_object_id, policy=object_to_create)
                 elif module.params.get("definition"):
                     object_endpoint.edit(
                         id=existing_object_id,

@@ -1,0 +1,70 @@
+# Copyright 2025 Cisco Systems, Inc. and its affiliates
+# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+---
+- name: "Create vpn list for mesh topology {{ policy_item['name'] }}"
+  cisco.catalystwan.policy:
+    name: "{{ policy_item['name'] }}_vpn"
+    list:
+      type: "vpn"
+      entries: "{{ _entries | from_yaml }}"
+    manager_credentials:
+      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
+      username: "{{ (vmanage_instances | first).admin_username }}"
+      password: "{{ (vmanage_instances | first).admin_password }}"
+  register: result_vpn_list
+  vars:
+    _entries: |
+      {% for id in policy_item['vpns'] %}
+      - vpn: {{ id }}
+      {% endfor %}
+
+- name: "Create site list for mesh topology {{ policy_item['name'] }}"
+  cisco.catalystwan.policy:
+    name: "{{ region_item['name'] }}"
+    list:
+      type: "site"
+      entries: "{{ _entries | from_yaml }}"
+    manager_credentials:
+      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
+      username: "{{ (vmanage_instances | first).admin_username }}"
+      password: "{{ (vmanage_instances | first).admin_password }}"
+  loop: "{{ policy_item['regions'] }}"
+  loop_control:
+    loop_var: region_item
+    label: "{{ region_item['name'] }}"
+  register: result_region_list
+  vars:
+    _entries: |
+      {% for id in region_item['sites'] %}
+      - site_id: "{{ id }}"
+      {% endfor %}
+
+- name: "Create mesh policy {{ policy_item['name'] }}"
+  cisco.catalystwan.policy:
+    name: "{{ policy_item['name'] }}"
+    definition:
+      type: "mesh"
+      definition:
+        vpnList: "{{ result_vpn_list['id'] }}"
+        regions: "{{ _regions | from_yaml }}"
+    manager_credentials:
+      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
+      username: "{{ (vmanage_instances | first).admin_username }}"
+      password: "{{ (vmanage_instances | first).admin_password }}"
+  register: result_policy
+  vars:
+    _regions: |
+      {% for region in result_region_list['results'] %}
+      - name: "{{ region['region_item']['name'] }}"
+        siteLists:
+          - {{ region['id'] }}
+      {% endfor %}
+
+- name: Save policy id
+  ansible.builtin.set_fact:
+    created_centralized_policies: "{{ created_centralized_policies + [_created_policy] }}"
+  vars:
+    _created_policy:
+      type: mesh
+      definitionId: "{{ result_policy['id'] }}"
