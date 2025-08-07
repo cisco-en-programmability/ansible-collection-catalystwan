@@ -110,22 +110,22 @@ from catalystwan.api.task_status_api import Task
 from catalystwan.models.policy import (
     AnyPolicyDefinition,
     AnyPolicyList,
+    AnySecurityPolicyInfo,
     CentralizedPolicy,
     CentralizedPolicyInfo,
     LocalizedPolicy,
     LocalizedPolicyInfo,
     SecurityPolicy,
-    AnySecurityPolicyInfo,
 )
 from catalystwan.models.policy.centralized import CentralizedPolicyEditPayload
 from catalystwan.session import ManagerHTTPError
 from catalystwan.typed_list import DataSequence
 
 from ..module_utils.policy_templates.centralized import policy_centralized_definition
-from ..module_utils.policy_templates.security import policy_security_definition
 from ..module_utils.policy_templates.definition import policy_definition_definition, policy_definition_type_mapping
 from ..module_utils.policy_templates.list import policy_list_definition, policy_list_type_mapping
 from ..module_utils.policy_templates.localized import policy_localized_definition
+from ..module_utils.policy_templates.security import policy_security_definition
 from ..module_utils.result import ModuleResult
 from ..module_utils.vmanage_module import AnsibleCatalystwanModule
 
@@ -210,9 +210,9 @@ def run_module():
             object_endpoint = module.session.api.policy.security
             policy_definition = module.params.get("security")
 
-        all_policies: DataSequence[CentralizedPolicyInfo | LocalizedPolicyInfo | AnySecurityPolicyInfo] = (
-            module.get_response_safely(object_endpoint.get)
-        )
+        all_policies: DataSequence[
+            CentralizedPolicyInfo | LocalizedPolicyInfo | AnySecurityPolicyInfo
+        ] = module.get_response_safely(object_endpoint.get)
         if module.params.get("security"):
             all_policies = all_policies.security
         filtered_definitions: Optional[

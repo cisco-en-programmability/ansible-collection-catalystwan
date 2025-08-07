@@ -5,7 +5,7 @@
 # https://www.cisco.com/c/en/us/td/docs/routers/sdwan/configuration/qos/vEdge-20-x/qos-book/forwarding-qos.html#Cisco_Concept.dita_aa3e0d07-462e-463f-8f45-681f38f61ab0
 
 - name: Save list of QoS schedulers
-  set_fact:
+  ansible.builtin.set_fact:
     qos_schedulers:
       - name: VOICE
         queue: 0
@@ -60,7 +60,7 @@
   loop: "{{ qos_schedulers }}"
 
 - name: Prepare QoS schedulers for policy definition
-  set_fact:
+  ansible.builtin.set_fact:
     policy_qos_schedulers: "{{ policy_qos_schedulers | default([]) + [qos_scheduler] }}"
   loop: "{{ created_class_map_lists.results }}"
   vars:
@@ -86,7 +86,7 @@
   register: created_qos_map
 
 - name: Prepare rewrite rules for policy definition
-  set_fact:
+  ansible.builtin.set_fact:
     policy_rewrite_rules: "{{ policy_rewrite_rules | default([]) + rewrite_rules }}"
   loop: "{{ created_class_map_lists.results }}"
   when: item.item.queue > 0

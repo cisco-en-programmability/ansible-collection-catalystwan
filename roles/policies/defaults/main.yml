@@ -5,7 +5,7 @@
 
 policies: {}
 default_policy:
-  name: "Ansible Managed centralized policy"
+  name: "Ansible Managed policy"
   hub_and_spoke: []
   mesh: []
   acl_policy: []
