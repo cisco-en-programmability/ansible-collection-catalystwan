@@ -5,6 +5,7 @@ from catalystwan.models.policy import (
     AclPolicy,
     AdvancedInspectionProfilePolicy,
     AdvancedMalwareProtectionPolicy,
+    AppRoutePolicy,
     CflowdPolicy,
     ControlPolicy,
     DeviceAccessIPv6Policy,
@@ -31,6 +32,7 @@ policy_definition_type_mapping: Mapping[str, type] = {
     "access_control_policy_ipv6": AclIPv6Policy,
     "aip": AdvancedInspectionProfilePolicy,
     "amp": AdvancedMalwareProtectionPolicy,
+    "app_route": AppRoutePolicy,
     "cflowd": CflowdPolicy,
     "control": ControlPolicy,
     "device_access": DeviceAccessPolicy,
@@ -64,6 +66,7 @@ policy_definition_definition = {
                 "default": "feature",
             },
             "definition": {"type": "dict"},
+            "sequences": {"type": "list"},
         },
     }
 }

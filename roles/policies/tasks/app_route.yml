@@ -1,0 +1,73 @@
+# Copyright 2025 Cisco Systems, Inc. and its affiliates
+# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+---
+- name: "Create SLA class list for application route policy {{ policy_item['name'] }}"
+  cisco.catalystwan.policy:
+    name: "{{ policy_item['name'] }}_sla"
+    list:
+      type: "sla"
+      entries:
+        - loss: "{{ policy_item['action']['sla_class']['loss'] }}"
+          latency: "{{ policy_item['action']['sla_class']['latency'] }}"
+          jitter: "{{ policy_item['action']['sla_class']['jitter'] }}"
+    manager_credentials:
+      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
+      username: "{{ (vmanage_instances | first).admin_username }}"
+      password: "{{ (vmanage_instances | first).admin_password }}"
+  when: "'sla_class' in policy_item['action']"
+  register: result_sla_class
+
+- name: "Create application route policy {{ policy_item['name'] }}"
+  cisco.catalystwan.policy:
+    name: "{{ policy_item['name'] }}"
+    definition:
+      type: "app_route"
+      sequences: "{{ _sequences | from_yaml }}"
+    manager_credentials:
+      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
+      username: "{{ (vmanage_instances | first).admin_username }}"
+      password: "{{ (vmanage_instances | first).admin_password }}"
+  register: result_policy
+  vars:
+    _sequences: |
+      - sequenceId: 1
+        actions:
+      {% if "counter" in policy_item['action'] %}
+          - type: count
+            parameter: "{{ policy_item['action']['counter'] }}"
+      {% endif %}
+      {% if "log" in policy_item['action'] %}
+          - type: log
+            parameter: "{{ policy_item['action']['log'] }}"
+      {% endif %}
+      {% if "log" in policy_item['action'] %}
+          - type: slaClass
+            parameter: "{{ policy_item['action']['sla_class'] }}"
+      {% endif %}
+        match:
+          entries:
+      {% if "source_port" in policy_item['match'] %}
+            - field: sourcePort
+              value: "{{ policy_item['match']['source_port'] }}"
+      {% endif %}
+      {% if "destination_port" in policy_item['match'] %}
+            - field: destinationPort
+              value: "{{ policy_item['match']['destination_port'] }}"
+      {% endif %}
+      {% if "source_ip" in policy_item['match'] %}
+            - field: sourceIp
+              value: "{{ policy_item['match']['source_ip'] }}"
+      {% endif %}
+      {% if "destination_ip" in policy_item['match'] %}
+            - field: destinationIp
+              value: "{{ policy_item['match']['destination_ip'] }}"
+      {% endif %}
+
+- name: Save policy id
+  ansible.builtin.set_fact:
+    created_centralized_policies: "{{ created_centralized_policies + [_created_policy] }}"
+  vars:
+    _created_policy:
+      type: appRoute
+      definitionId: "{{ result_policy['id'] }}"

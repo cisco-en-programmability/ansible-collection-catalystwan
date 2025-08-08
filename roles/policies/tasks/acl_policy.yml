@@ -1,0 +1,51 @@
+# Copyright 2025 Cisco Systems, Inc. and its affiliates
+# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+---
+- name: "Create acl policy {{ policy_item['name'] }}"
+  cisco.catalystwan.policy:
+    name: "{{ policy_item['name'] }}"
+    definition:
+      type: "access_control_list"
+      sequences: "{{ _sequences | from_yaml }}"
+    manager_credentials:
+      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
+      username: "{{ (vmanage_instances | first).admin_username }}"
+      password: "{{ (vmanage_instances | first).admin_password }}"
+  register: result_policy
+  vars:
+    _sequences: |
+      - sequenceId: 1
+      {% if "next_hop" in policy_item['action'] %}
+        actions:
+          - type: set
+            parameter:
+              - field: nextHop
+                value: "{{ policy_item['action']['next_hop'] }}"
+      {% endif %}
+        match:
+          entries:
+      {% if "source_port" in policy_item['match'] %}
+            - field: sourcePort
+              value: "{{ policy_item['match']['source_port'] }}"
+      {% endif %}
+      {% if "destination_port" in policy_item['match'] %}
+            - field: destinationPort
+              value: "{{ policy_item['match']['destination_port'] }}"
+      {% endif %}
+      {% if "source_ip" in policy_item['match'] %}
+            - field: sourceIp
+              value: "{{ policy_item['match']['source_ip'] }}"
+      {% endif %}
+      {% if "destination_ip" in policy_item['match'] %}
+            - field: destinationIp
+              value: "{{ policy_item['match']['destination_ip'] }}"
+      {% endif %}
+
+- name: Save policy id
+  ansible.builtin.set_fact:
+    created_localized_policies: "{{ created_localized_policies + [_created_policy] }}"
+  vars:
+    _created_policy:
+      type: acl
+      definitionId: "{{ result_policy['id'] }}"
