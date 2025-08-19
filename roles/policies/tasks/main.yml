@@ -1,0 +1,75 @@
+# Copyright 2025 Cisco Systems, Inc. and its affiliates
+# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+---
+
+- name: Create hub and spoke policy
+  ansible.builtin.include_tasks: hub_and_spoke.yml
+  loop: "{{ combined_policies['hub_and_spoke'] }}"
+  loop_control:
+    loop_var: policy_item
+    label: "{{ policy_item['name'] }}"
+
+- name: Create mesh policy
+  ansible.builtin.include_tasks: mesh.yml
+  loop: "{{ combined_policies['mesh'] }}"
+  loop_control:
+    loop_var: policy_item
+    label: "{{ policy_item['name'] }}"
+
+- name: Create application route policy
+  ansible.builtin.include_tasks: app_route.yml
+  loop: "{{ combined_policies['app_route'] }}"
+  loop_control:
+    loop_var: policy_item
+    label: "{{ policy_item['name'] }}"
+
+- name: Create centralized policy
+  cisco.catalystwan.policy:
+    name: "ansible-managed-policy"
+    centralized:
+      definition:
+        assembly: "{{ created_centralized_policies }}"
+    manager_credentials:
+      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
+      username: "{{ (vmanage_instances | first).admin_username }}"
+      password: "{{ (vmanage_instances | first).admin_password }}"
+  when: created_centralized_policies
+
+- name: Create acl policy
+  ansible.builtin.include_tasks: acl_policy.yml
+  loop: "{{ combined_policies['acl_policy'] }}"
+  loop_control:
+    loop_var: policy_item
+    label: "{{ policy_item['name'] }}"
+
+- name: Create localized policy
+  cisco.catalystwan.policy:
+    name: "ansible-managed-policy"
+    localized:
+      definition:
+        assembly: "{{ created_localized_policies }}"
+    manager_credentials:
+      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
+      username: "{{ (vmanage_instances | first).admin_username }}"
+      password: "{{ (vmanage_instances | first).admin_password }}"
+  when: created_localized_policies
+
+- name: Create geolocation block policy
+  ansible.builtin.include_tasks: geolocation_block.yml
+  loop: "{{ combined_policies['geolocation_block'] }}"
+  loop_control:
+    loop_var: policy_item
+    label: "{{ policy_item['name'] }}"
+
+- name: Create security policy
+  cisco.catalystwan.policy:
+    name: "ansible-managed-policy"
+    security:
+      definition:
+        assembly: "{{ created_security_policies }}"
+    manager_credentials:
+      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
+      username: "{{ (vmanage_instances | first).admin_username }}"
+      password: "{{ (vmanage_instances | first).admin_password }}"
+  when: created_security_policies

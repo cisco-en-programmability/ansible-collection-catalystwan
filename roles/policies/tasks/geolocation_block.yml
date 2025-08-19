@@ -1,0 +1,72 @@
+# Copyright 2025 Cisco Systems, Inc. and its affiliates
+# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+---
+- name: "Create source zone for geolocation block policy {{ policy_item['name'] }}"
+  cisco.catalystwan.policy:
+    name: "{{ policy_item['name'] }}_src"
+    list:
+      type: "zone"
+      entries:
+        - vpn: "{{ policy_item['source_vpn'] }}"
+    manager_credentials:
+      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
+      username: "{{ (vmanage_instances | first).admin_username }}"
+      password: "{{ (vmanage_instances | first).admin_password }}"
+  register: result_source_zone
+
+- name: "Create destination zone for geolocation block policy {{ policy_item['name'] }}"
+  cisco.catalystwan.policy:
+    name: "{{ policy_item['name'] }}_dst"
+    list:
+      type: "zone"
+      entries:
+        - vpn: "{{ policy_item['destination_vpn'] }}"
+    manager_credentials:
+      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
+      username: "{{ (vmanage_instances | first).admin_username }}"
+      password: "{{ (vmanage_instances | first).admin_password }}"
+  register: result_destination_zone
+
+
+- name: "Create security policy {{ policy_item['name'] }}"
+  cisco.catalystwan.policy:
+    name: "{{ policy_item['name'] }}"
+    definition:
+      type: "zone_based_firewall"
+      definition:
+        entries:
+          - sourceZone: "{{ result_source_zone['id'] }}"
+            destinationZone: "{{ result_destination_zone['id'] }}"
+        sequences: "{{ _sequences | from_yaml }}"
+    manager_credentials:
+      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
+      username: "{{ (vmanage_instances | first).admin_username }}"
+      password: "{{ (vmanage_instances | first).admin_password }}"
+  register: result_policy
+  vars:
+    _sequences: |
+      - sequenceId: 1
+        sequenceName: sequence 1
+        match:
+          entries:
+      {% for geolocation in policy_item['geolocations'] %}
+            - field: sourceGeoLocation
+              value: "{{ geolocation }}"
+      {% endfor %}
+      - sequenceId: 2
+        sequenceName: sequence 2
+        match:
+          entries:
+      {% for geolocation in policy_item['geolocations'] %}
+            - field: destinationGeoLocation
+              value: "{{ geolocation }}"
+      {% endfor %}
+
+- name: Save policy id
+  ansible.builtin.set_fact:
+    created_security_policies: "{{ created_security_policies + [_created_policy] }}"
+  vars:
+    _created_policy:
+      type: zoneBasedFW
+      definitionId: "{{ result_policy['id'] }}"

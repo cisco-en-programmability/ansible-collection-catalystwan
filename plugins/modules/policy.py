@@ -110,10 +110,12 @@ from catalystwan.api.task_status_api import Task
 from catalystwan.models.policy import (
     AnyPolicyDefinition,
     AnyPolicyList,
+    AnySecurityPolicyInfo,
     CentralizedPolicy,
     CentralizedPolicyInfo,
     LocalizedPolicy,
     LocalizedPolicyInfo,
+    SecurityPolicy,
 )
 from catalystwan.models.policy.centralized import CentralizedPolicyEditPayload
 from catalystwan.session import ManagerHTTPError
@@ -123,6 +125,7 @@ from ..module_utils.policy_templates.centralized import policy_centralized_defin
 from ..module_utils.policy_templates.definition import policy_definition_definition, policy_definition_type_mapping
 from ..module_utils.policy_templates.list import policy_list_definition, policy_list_type_mapping
 from ..module_utils.policy_templates.localized import policy_localized_definition
+from ..module_utils.policy_templates.security import policy_security_definition
 from ..module_utils.result import ModuleResult
 from ..module_utils.vmanage_module import AnsibleCatalystwanModule
 
@@ -157,6 +160,7 @@ def run_module():
         **policy_definition_definition,
         **policy_centralized_definition,
         **policy_localized_definition,
+        **policy_security_definition,
     )
 
     result = ModuleResult()
@@ -169,6 +173,7 @@ def run_module():
                 "localized",
                 "list",
                 "definition",
+                "security",
             ),
         ],
         mutually_exclusive=[
@@ -177,6 +182,7 @@ def run_module():
                 "localized",
                 "list",
                 "definition",
+                "security",
             ),
         ],
     )
@@ -184,16 +190,36 @@ def run_module():
     object_name: str = module.params.get("name")
     object_description: str = module.params.get("description")
 
-    if module.params.get("centralized"):
-        object_pretty_name = "Centralized Policy"
-        object_type = CentralizedPolicy
-        object_endpoint = module.session.api.policy.centralized
-        all_centralized_policy: DataSequence[CentralizedPolicyInfo] = module.get_response_safely(object_endpoint.get)
-        filtered_definitions: Optional[DataSequence[CentralizedPolicyInfo]] = all_centralized_policy.filter(
-            policy_name=object_name
-        )
+    if module.params.get("centralized") or module.params.get("localized") or module.params.get("security"):
+        if module.params.get("centralized"):
+            object_pretty_name = "Centralized Policy"
+            object_type = CentralizedPolicy
+            object_edit_type = CentralizedPolicyEditPayload
+            object_endpoint = module.session.api.policy.centralized
+            policy_definition = module.params.get("centralized")
+        elif module.params.get("localized"):
+            object_pretty_name = "Localized Policy"
+            object_type = LocalizedPolicy
+            object_edit_type = object_type
+            object_endpoint = module.session.api.policy.localized
+            policy_definition = module.params.get("localized")
+        elif module.params.get("security"):
+            object_pretty_name = "Security Policy"
+            object_type = SecurityPolicy
+            object_edit_type = object_type
+            object_endpoint = module.session.api.policy.security
+            policy_definition = module.params.get("security")
+
+        all_policies: DataSequence[
+            CentralizedPolicyInfo | LocalizedPolicyInfo | AnySecurityPolicyInfo
+        ] = module.get_response_safely(object_endpoint.get)
+        if module.params.get("security"):
+            all_policies = all_policies.security
+        filtered_definitions: Optional[
+            DataSequence[CentralizedPolicyInfo | LocalizedPolicyInfo | AnySecurityPolicyInfo]
+        ] = all_policies.filter(policy_name=object_name)
         if filtered_definitions:
-            existing_object: DataSequence[CentralizedPolicy] = [
+            existing_object: DataSequence[CentralizedPolicy | LocalizedPolicy | SecurityPolicy] = [
                 module.get_response_safely(object_endpoint.get, id=filtered_definitions[0].policy_id)
             ]
             existing_object_id = filtered_definitions[0].policy_id
@@ -204,49 +230,17 @@ def run_module():
             object_to_create = object_type(
                 policy_name=object_name,
                 policy_description=object_description,
-                policy_type=module.params.get("centralized").get("type"),
-                policy_definition=module.params.get("centralized").get("definition"),
+                policy_type=policy_definition.get("type"),
+                policy_definition=policy_definition.get("definition"),
                 is_policy_activated=module.params.get("state") == "active",
             )
         elif module.params.get("state") in ("active", "present"):
-            object_to_create = CentralizedPolicyEditPayload(
+            object_to_create = object_edit_type(
                 policy_name=object_name,
                 policy_description=object_description,
-                policy_type=module.params.get("centralized").get("type"),
-                policy_definition=module.params.get("centralized").get("definition"),
+                policy_type=policy_definition.get("type"),
+                policy_definition=policy_definition.get("definition"),
                 is_policy_activated=module.params.get("state") == "active",
-                policy_id=existing_object_id,
-            )
-
-    elif module.params.get("localized"):
-        object_pretty_name = "Localized Policy"
-        object_type = LocalizedPolicy
-        object_endpoint = module.session.api.policy.localized
-        all_localized_policy: DataSequence[LocalizedPolicyInfo] = module.get_response_safely(object_endpoint.get)
-        filtered_definitions: Optional[DataSequence[LocalizedPolicyInfo]] = all_localized_policy.filter(
-            policy_name=object_name
-        )
-        if filtered_definitions:
-            existing_object: DataSequence[LocalizedPolicy] = [
-                module.get_response_safely(object_endpoint.get, id=filtered_definitions[0].policy_id)
-            ]
-            existing_object_id = filtered_definitions[0].policy_id
-        else:
-            existing_object = []
-
-        if module.params.get("state") in ("active", "present") and not existing_object:
-            object_to_create = object_type(
-                policy_name=object_name,
-                policy_description=object_description,
-                policy_type=module.params.get("localized").get("type"),
-                policy_definition=module.params.get("localized").get("definition"),
-            )
-        elif module.params.get("state") in ("active", "present"):
-            object_to_create = LocalizedPolicy(
-                policy_name=object_name,
-                policy_description=object_description,
-                policy_type=module.params.get("localized").get("type"),
-                policy_definition=module.params.get("localized").get("definition"),
                 policy_id=existing_object_id,
             )
 
@@ -259,6 +253,7 @@ def run_module():
                 name=object_name,
                 description=object_description,
                 definition=module.params.get("definition").get("definition"),
+                sequences=module.params.get("definition").get("sequences"),
             )
         all_policy_definitions: DataSequence[AnyPolicyDefinition] = module.get_response_safely(
             object_endpoint.get, type=object_type
@@ -315,8 +310,8 @@ def run_module():
                             )
                         device_action.wait_for_completed()
                     object_endpoint.edit(policy=object_to_create)
-                elif module.params.get("localized"):
-                    object_endpoint.edit(policy=object_to_create)
+                elif module.params.get("localized") or module.params.get("security"):
+                    object_endpoint.edit(id=existing_object_id, policy=object_to_create)
                 elif module.params.get("definition"):
                     object_endpoint.edit(
                         id=existing_object_id,
@@ -340,7 +335,7 @@ def run_module():
         # object doesn't exist in Manager and needs to be created
         else:
             try:
-                if module.params.get("centralized") or module.params.get("localized"):
+                if module.params.get("centralized") or module.params.get("localized") or module.params.get("security"):
                     created_uuid: UUID = module.get_response_safely(object_endpoint.create, policy=object_to_create)
                 elif module.params.get("definition"):
                     created_uuid: UUID = module.get_response_safely(

@@ -1,0 +1,19 @@
+# Copyright 2025 Cisco Systems, Inc. and its affiliates
+# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+---
+
+policies: {}
+default_policy:
+  name: "Ansible Managed policy"
+  hub_and_spoke: []
+  mesh: []
+  acl_policy: []
+  app_route: []
+  geolocation_block: []
+
+combined_policies: "{{ default_policy | combine(policies, recursive=True) }}"
+
+created_centralized_policies: []
+created_localized_policies: []
+created_security_policies: []

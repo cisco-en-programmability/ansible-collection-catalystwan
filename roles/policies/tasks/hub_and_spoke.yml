@@ -1,0 +1,80 @@
+# Copyright 2025 Cisco Systems, Inc. and its affiliates
+# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+---
+- name: "Create vpn list for hub and spoke policy {{ policy_item['name'] }}"
+  cisco.catalystwan.policy:
+    name: "{{ policy_item['name'] }}_vpn"
+    list:
+      type: "vpn"
+      entries: "{{ _entries | from_yaml }}"
+    manager_credentials:
+      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
+      username: "{{ (vmanage_instances | first).admin_username }}"
+      password: "{{ (vmanage_instances | first).admin_password }}"
+  register: result_vpn_list
+  vars:
+    _entries: |
+      {% for id in policy_item['vpns'] %}
+      - vpn: {{ id }}
+      {% endfor %}
+
+- name: "Create hub list for hub and spoke policy {{ policy_item['name'] }}"
+  cisco.catalystwan.policy:
+    name: "{{ policy_item['name'] }}_hub"
+    list:
+      type: "site"
+      entries: "{{ _entries | from_yaml }}"
+    manager_credentials:
+      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
+      username: "{{ (vmanage_instances | first).admin_username }}"
+      password: "{{ (vmanage_instances | first).admin_password }}"
+  register: result_hub_list
+  vars:
+    _entries: |
+      {% for id in policy_item['hubs'] %}
+      - site_id: "{{ id }}"
+      {% endfor %}
+
+- name: "Create spoke list for hub and spoke policy {{ policy_item['name'] }}"
+  cisco.catalystwan.policy:
+    name: "{{ policy_item['name'] }}_spoke"
+    list:
+      type: "site"
+      entries: "{{ _entries | from_yaml }}"
+    manager_credentials:
+      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
+      username: "{{ (vmanage_instances | first).admin_username }}"
+      password: "{{ (vmanage_instances | first).admin_password }}"
+  register: result_spoke_list
+  vars:
+    _entries: |
+      {% for id in policy_item['spokes'] %}
+      - site_id: "{{ id }}"
+      {% endfor %}
+
+- name: "Create hub and spoke policy {{ policy_item['name'] }}"
+  cisco.catalystwan.policy:
+    name: "{{ policy_item['name'] }}"
+    definition:
+      type: "hub_and_spoke"
+      definition:
+        vpnList: "{{ result_vpn_list['id'] }}"
+        subDefinitions:
+          - spokes:
+              - siteList: "{{ result_spoke_list['id'] }}"
+                hubs:
+                  - siteList: "{{ result_spoke_list['id'] }}"
+    manager_credentials:
+      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
+      username: "{{ (vmanage_instances | first).admin_username }}"
+      password: "{{ (vmanage_instances | first).admin_password }}"
+  register: result_policy
+
+- name: Save policy id
+  ansible.builtin.set_fact:
+    created_centralized_policies: "{{ created_centralized_policies + [_created_policy] }}"
+  vars:
+    _created_policy:
+      type: hubAndSpoke
+      definitionId: "{{ result_policy['id'] }}"

@@ -126,8 +126,6 @@ templates_configuration:
   type: list
 """
 
-from typing import Literal
-
 from catalystwan.api.template_api import CLITemplate
 from catalystwan.api.templates.device_template.device_template import DeviceTemplate
 from catalystwan.models.templates import DeviceTemplateInformation
