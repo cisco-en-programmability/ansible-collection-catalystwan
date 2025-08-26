@@ -1,0 +1,36 @@
+# Copyright 2024 Cisco Systems, Inc. and its affiliates
+# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+---
+
+- name: Verify required variables for selected role
+  ansible.builtin.include_tasks: variables_assertion.yml
+
+- name: Get list of tenants
+  cisco.catalystwan.tenants_info:
+    manager_authentication:
+      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
+      username: "{{ (vmanage_instances | first).admin_username }}"
+      password: "{{ (vmanage_instances | first).admin_password }}"
+  retries: 20
+  delay: 10
+  register: result_tenants
+
+- name: Create tenants
+  cisco.catalystwan.tenants:
+    name: "{{ tenant_item.name }}"
+    org_name: "{{ tenant_item.org_name }}"
+    description: "{{ tenant_item.description }}"
+    subdomain: "{{ tenant_item.subdomain }}"
+    wan_edge_forecast: "{{ tenant_item.wan_edge_forecast }}"
+    manager_authentication:
+      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
+      username: "{{ (vmanage_instances | first).admin_username }}"
+      password: "{{ (vmanage_instances | first).admin_password }}"
+  loop: "{{ tenants }}"
+  loop_control:
+    loop_var: tenant_item
+    label: "{{ tenant_item.name }}"
+  when: tenant_item.name not in result_tenants.tenants_info | map(attribute='name')
+  retries: 6
+  delay: 5
