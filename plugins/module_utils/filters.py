@@ -7,6 +7,7 @@ from catalystwan.endpoints.configuration_device_inventory import DeviceDetailsRe
 from catalystwan.endpoints.monitoring.device_details import DeviceData
 from catalystwan.session import ManagerHTTPError
 from catalystwan.typed_list import DataSequence
+from catalystwan.utils.session_type import SessionType
 
 from ..module_utils.vmanage_module import AnsibleCatalystwanModule
 
@@ -41,7 +42,10 @@ def get_target_device(
 
     module.logger.info(f"Device Category: {device_category} \nAll devices response: {devices}")
     if module.params.get("device_ip"):
-        target_device = devices.filter(device_ip=module.params["device_ip"]).single_or_default()
+        if module.session.session_type == SessionType.PROVIDER:
+            target_device = devices.filter(local_system_ip=module.params["device_ip"]).single_or_default()
+        else:
+            target_device = devices.filter(device_ip=module.params["device_ip"]).single_or_default()
     if module.params.get("hostname"):
         target_device = devices.filter(host_name=module.params["hostname"]).single_or_default()
     if module.params.get("uuid"):
