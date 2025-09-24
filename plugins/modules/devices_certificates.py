@@ -212,7 +212,7 @@ def run_module():
             result.changed = False
             module.exit_json(**result.model_dump(mode="json"))
 
-        payload = TargetDevice(deviceIP=module.params.get("device_ip"))
+        payload = TargetDevice(deviceIP=target_device_details.device_ip)
         module.send_request_safely(
             result=result,
             action_name="Generate CSR for vManage",
