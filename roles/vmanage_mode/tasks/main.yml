@@ -29,6 +29,7 @@
       url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
       username: "{{ (vmanage_instances | first).admin_username }}"
       password: "{{ (vmanage_instances | first).admin_password }}"
+      subdomain: "{{ instance_item.tenant_subdomain | default('') or omit }}"
   loop: "{{ edge_instances }}"
   loop_control:
     loop_var: instance_item
