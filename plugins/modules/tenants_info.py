@@ -88,10 +88,8 @@ tenancy_domain:
   type: str
 """
 
-from typing import Literal
-
-from catalystwan.models.tenant import Tenant
 from catalystwan.endpoints.cluster_management import TenancyMode
+from catalystwan.models.tenant import Tenant
 from catalystwan.typed_list import DataSequence
 
 from ..module_utils.result import ModuleResult
@@ -108,13 +106,9 @@ def run_module():
 
     filters = module.params.get("filters")
 
-    all_tenants: DataSequence[Tenant] = module.get_response_safely(
-        module.session.api.tenant_management.get
-    )
+    all_tenants: DataSequence[Tenant] = module.get_response_safely(module.session.api.tenant_management.get)
 
-    tenancy_mode: TenancyMode = module.get_response_safely(
-        module.session.endpoints.cluster_management.get_tenancy_mode
-    )
+    tenancy_mode: TenancyMode = module.get_response_safely(module.session.endpoints.cluster_management.get_tenancy_mode)
     result.tenancy_mode = tenancy_mode.mode
     result.tenancy_domain = tenancy_mode.domain
 

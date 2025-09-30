@@ -36,7 +36,7 @@ repos:
         fail_fast: true
 
   - repo: https://github.com/ansible-community/ansible-lint.git
-    rev: v24.2.0  # latest release tag from https://github.com/ansible-community/ansible-lint/releases/
+    rev: v25.8.1
     hooks:
       - id: ansible-lint
         files: \.(yaml|yml)$

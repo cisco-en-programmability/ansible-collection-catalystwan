@@ -92,14 +92,10 @@ from typing import Literal, Optional, get_args
 
 from catalystwan.api.task_status_api import Task
 from catalystwan.models.tenant import Tenant
-from catalystwan.typed_list import DataSequence
-
-
-from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed  # type: ignore
-
-from catalystwan.typed_list import DataSequence
 from catalystwan.session import ManagerRequestException
+from catalystwan.typed_list import DataSequence
 from catalystwan.vmanage_auth import UnauthorizedAccessError
+from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed  # type: ignore
 
 from ..module_utils.result import ModuleResult
 from ..module_utils.vmanage_module import AnsibleCatalystwanModule
@@ -109,7 +105,7 @@ State = Literal["present", "absent"]
 INTERVAL_SECONDS = 30
 TIMEOUT_SECONDS = 7200
 
-### TODO wait for tenant task to complete
+
 @retry(
     wait=wait_fixed(INTERVAL_SECONDS),
     stop=stop_after_attempt(int(TIMEOUT_SECONDS / INTERVAL_SECONDS)),
@@ -124,6 +120,7 @@ def wait_for_task_data(module: AnsibleCatalystwanModule, result: ModuleResult, t
         result.response = task_data.json()
         module.fail_json(**result.model_dump(mode="json"))
     module.logger.info(f"Task data after task completed: {task_data.dict()}")
+
 
 def run_module():
     module_args = dict(
@@ -140,7 +137,6 @@ def run_module():
         wait_timeout_seconds=dict(
             type="int", default=7200
         ),  # 3600 is because vManage reports: 'configuration-dbStatus it may take up to 40 mins or longer'
-
     )
     result = ModuleResult()
 
@@ -163,18 +159,14 @@ def run_module():
 
     tenant_name = module.params.get("name")
 
-    all_tenants: DataSequence[Tenant] = module.get_response_safely(
-        module.session.api.tenant_management.get
-    )
+    all_tenants: DataSequence[Tenant] = module.get_response_safely(module.session.api.tenant_management.get)
     filtered_tenants: Optional[DataSequence[Tenant]] = all_tenants.filter(name=tenant_name)
 
     if module.params.get("state") == "present":
         # Code for checking if tenant exists already
         if filtered_tenants:
             module.logger.debug(f"Detected existing tenant:\n{filtered_tenants}\n")
-            result.msg = (
-                f"Tenant with name {tenant_name} already present on vManage, skipping create tenant operation."
-            )
+            result.msg = f"Tenant with name {tenant_name} already present on vManage, skipping create tenant operation."
         else:
             create_task = module.session.api.tenant_management.create(
                 tenants=[
@@ -195,11 +187,7 @@ def run_module():
 
     if module.params.get("state") == "absent":
         if filtered_tenants:
-            delete_task = module.session.api.tenant_management.delete(
-                tenant_id_list=[
-                    filtered_tenants[0].id
-                ]
-            )
+            delete_task = module.session.api.tenant_management.delete(tenant_id_list=[filtered_tenants[0].id])
 
             wait_for_task_data(module=module, result=result, task=delete_task)
 
@@ -207,10 +195,7 @@ def run_module():
             result.msg += f"Created tenant {tenant_name}."
         else:
             module.logger.debug(f"Tenant '{tenant_name}' not presend on vManage.")
-            result.msg = (
-                f"Tenant '{tenant_name}' not presend on vManage. "
-                "skipping delete tenant operation."
-            )
+            result.msg = f"Tenant '{tenant_name}' not presend on vManage. skipping delete tenant operation."
 
     module.exit_json(**result.model_dump(mode="json"))
 

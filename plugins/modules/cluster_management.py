@@ -136,8 +136,7 @@ EXAMPLES = r"""
 import time
 from typing import List, Optional
 
-from catalystwan.endpoints.cluster_management import ConnectedDevice, VManageSetup
-from catalystwan.endpoints.cluster_management import TenancyMode
+from catalystwan.endpoints.cluster_management import ConnectedDevice, TenancyMode, VManageSetup
 from catalystwan.exceptions import ManagerRequestException
 
 from ..module_utils.result import ModuleResult
@@ -206,42 +205,29 @@ def run_module():
             ),
         ),
         tenancy=dict(
-            type='dict',
+            type="dict",
             options=dict(
-                mode=dict(type='str', choices=['single', 'multi']),
-                clusterid=dict(type='str'),
-                domain=dict(type='str'),
+                mode=dict(type="str", choices=["single", "multi"]),
+                clusterid=dict(type="str"),
+                domain=dict(type="str"),
             ),
             required=False,
         ),
     )
 
-    required_together = [
-        (
-            "system_ip",
-            "cluster_ip",
-            "username",
-            "password",
-            "persona"
-        )
-    ]
+    required_together = [("system_ip", "cluster_ip", "username", "password", "persona")]
 
-    mutually_exclusive = [
-        (
-            "tenancy",
-            (
-                "system_ip",
-                "cluster_ip",
-                "username",
-                "password",
-                "persona"
-            )
-        )
-    ]
+    mutually_exclusive = [("tenancy", ("system_ip", "cluster_ip", "username", "password", "persona"))]
 
     required_one_of = mutually_exclusive
 
-    module = AnsibleCatalystwanModule(argument_spec=module_args, session_reconnect_retries=180, required_together=required_together, mutually_exclusive=mutually_exclusive, required_one_of= required_one_of)
+    module = AnsibleCatalystwanModule(
+        argument_spec=module_args,
+        session_reconnect_retries=180,
+        required_together=required_together,
+        mutually_exclusive=mutually_exclusive,
+        required_one_of=required_one_of,
+    )
     module.session.request_timeout = 60
     result = ModuleResult()
 
@@ -291,20 +277,19 @@ def run_module():
         else:
             result.msg = "No changes to vManage configuration applied."
 
-
     if module.params.get("tenancy"):
         tenancy_mode: TenancyMode = module.get_response_safely(
             module.session.endpoints.cluster_management.get_tenancy_mode
         )
 
-        if tenancy_mode.mode == "MultiTenant" and module.params.get("tenancy").get("mode")  != "multi":
-            module.fail_json(msg=f"Switching from MultiTenancy to SingleTenancy is forbidden")
+        if tenancy_mode.mode == "MultiTenant" and module.params.get("tenancy").get("mode") != "multi":
+            module.fail_json(msg="Switching from MultiTenancy to SingleTenancy is forbidden")
 
         elif tenancy_mode.mode == "SingleTenant" and module.params.get("tenancy").get("mode") != "single":
             new_tennacy = TenancyMode(
-                mode = "MultiTenant",
-                domain = module.params.get("tenancy").get("domain"),
-                clusterid = module.params.get("tenancy").get("clusterid"),
+                mode="MultiTenant",
+                domain=module.params.get("tenancy").get("domain"),
+                clusterid=module.params.get("tenancy").get("clusterid"),
             )
 
             result.changed = True
@@ -313,7 +298,7 @@ def run_module():
                 action_name="Cluster Management: Tenancy Mode",
                 send_func=module.session.endpoints.cluster_management.set_tenancy_mode,
                 payload=new_tennacy,
-                response_key=tenancy_mode
+                response_key=tenancy_mode,
             )
 
             if result.changed:
