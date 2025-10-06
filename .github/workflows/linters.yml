@@ -43,7 +43,7 @@ jobs:
         uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
 
       - name: Run ansible-lint
-        uses: ansible/ansible-lint@95382d398ea1744bf6bfa47b030f14c38b3f6957 # v24.7.0
+        uses: ansible/ansible-lint@v25.8.1
 
       - name: Install detect-secrets
         run: pip install detect-secrets==1.4.0

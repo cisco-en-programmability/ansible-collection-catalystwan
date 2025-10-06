@@ -111,7 +111,7 @@
           username: "{{ (vmanage_instances | first).admin_username }}"
           password: "{{ (vmanage_instances | first).admin_password }}"
 
-    - name: "Get details of software installed on control components - filter vBond"
+    - name: "Get details of software installed on control components - filter vBond"  # noqa: name[unique]
       cisco.catalystwan.software_upgrade_info:
         device_type: "controller"
         filters:
@@ -142,7 +142,7 @@
           username: "{{ (vmanage_instances | first).admin_username }}"
           password: "{{ (vmanage_instances | first).admin_password }}"
 
-    - name: "Get details of software installed on control components - filter vBond"
+    - name: "Get details of software installed on control components - filter vBond"  # noqa: name[unique]
       cisco.catalystwan.software_upgrade_info:
         device_type: "controller"
         filters:
@@ -178,7 +178,7 @@
           username: "{{ (vmanage_instances | first).admin_username }}"
           password: "{{ (vmanage_instances | first).admin_password }}"
 
-    - name: "Get details of software installed on control components - filter vBond"
+    - name: "Get details of software installed on control components - filter vBond"  # noqa: name[unique]
       cisco.catalystwan.software_upgrade_info:
         device_type: "controller"
         filters:
