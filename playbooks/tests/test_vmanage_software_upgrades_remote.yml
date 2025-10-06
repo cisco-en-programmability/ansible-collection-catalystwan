@@ -222,7 +222,7 @@
           username: "{{ (vmanage_instances | first).admin_username }}"
           password: "{{ (vmanage_instances | first).admin_password }}"
 
-    - name: "Get details of software info - filter vManage"
+    - name: "Get details of software info - filter vManage"  # noqa: name[unique]
       cisco.catalystwan.software_upgrade_info:
         device_type: "vmanage"
         filters:
@@ -252,7 +252,7 @@
           username: "{{ (vmanage_instances | first).admin_username }}"
           password: "{{ (vmanage_instances | first).admin_password }}"
 
-    - name: "Get details of software info - filter vManage"
+    - name: "Get details of software info - filter vManage"  # noqa: name[unique]
       cisco.catalystwan.software_upgrade_info:
         device_type: "vmanage"
         filters:
