@@ -61,6 +61,7 @@ class AnsibleCatalystwanModule:
                 username=dict(type="str", required=True, fallback=(env_fallback, ["VMANAGE_USERNAME"])),
                 password=dict(type="str", required=True, fallback=(env_fallback, ["VMANAGE_PASSWORD"]), no_log=True),
                 port=dict(type="str", required=False, fallback=(env_fallback, ["VMANAGE_PORT"])),
+                subdomain=dict(type="str", required=False, fallback=(env_fallback, ["VMANAGE_SUBDOMAIN"])),
             ),
         ),
         catalystwan_log_dir=dict(type="str", required=False, fallback=(env_fallback, ["CATALYSTWAN_LOG_DIR"])),
@@ -136,6 +137,7 @@ class AnsibleCatalystwanModule:
                         username=self.module.params["manager_credentials"]["username"],
                         password=self.module.params["manager_credentials"]["password"],
                         port=self.module.params["manager_credentials"]["port"],
+                        subdomain=self.module.params["manager_credentials"]["subdomain"],
                         logger=self._vmanage_logger,
                     )
                     break

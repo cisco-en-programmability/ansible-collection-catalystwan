@@ -1,0 +1,79 @@
+# Copyright 2024 Cisco Systems, Inc. and its affiliates
+# GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
+
+---
+
+# serial viptela file will work only for dev/engineering images
+- name: Upload WAN Edge List
+  cisco.catalystwan.devices_wan_edges:
+    wan_edge_list: "{{ wan_edge_list_path }}"
+    state: present
+    manager_authentication:
+      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
+      username: "{{ (vmanage_instances | first).admin_username }}"
+      password: "{{ (vmanage_instances | first).admin_password }}"
+      subdomain: "{{ tenant_subdomain if provider_mode else omit }}"
+  when: wan_edge_list_path is defined
+  retries: 12
+  delay: 5
+
+- name: Sync devices with Smart Account only if user didn't provide WAN Edge list path
+  cisco.catalystwan.devices_wan_edges:
+    state: present
+    sync_devices_from_smart_account: true
+    username: "{{ pnp_username }}"
+    password: "{{ pnp_password }}"
+    manager_authentication:
+      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
+      username: "{{ (vmanage_instances | first).admin_username }}"
+      password: "{{ (vmanage_instances | first).admin_password }}"
+      subdomain: "{{ tenant_subdomain if provider_mode else omit }}"
+  when: wan_edge_list_path is not defined
+  retries: 12
+  delay: 5
+
+- name: Get list of Edge devices
+  cisco.catalystwan.devices_info:
+    device_category: vedges
+    manager_authentication:
+      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
+      username: "{{ (vmanage_instances | first).admin_username }}"
+      password: "{{ (vmanage_instances | first).admin_password }}"
+      subdomain: "{{ tenant_subdomain if provider_mode else omit }}"
+  register: all_edge_devices
+  retries: 12
+  delay: 5
+
+- name: Generate bootstrap configuration for all devices
+  cisco.catalystwan.devices_wan_edges:
+    generate_bootstrap_configuration: true
+    uuid: "{{ (all_edge_devices['devices'] | selectattr('cert_install_status', '!=', 'Installed')) | map(attribute='uuid') }}"
+    manager_authentication:
+      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
+      username: "{{ (vmanage_instances | first).admin_username }}"
+      password: "{{ (vmanage_instances | first).admin_password }}"
+      subdomain: "{{ tenant_subdomain if provider_mode else omit }}"
+  register: all_bootstrap_cfg
+  retries: 12
+  delay: 5
+
+- name: Generate entries for generated_data_edge_instances.edge_instances
+  ansible.builtin.set_fact:
+    generated_data_edge_instances:
+      edge_instances: "{{ generated_data_edge_instances.edge_instances | default([]) + [new_entry] }}"
+  vars:
+    generated_bootstrap: "{{ all_bootstrap_cfg.bootstrap_configuration | json_query('[?uuid==`'~ instance.uuid ~'`]') }}"
+    new_entry:
+      hostname: "{{ tenant_org if provider_mode else organization_name }}-cedge-{{ index + 1 }}"
+      otp: "{{ generated_bootstrap[0].otp if generated_bootstrap else omit }}"
+      uuid: "{{ instance.uuid }}"
+      vbond: "{{ generated_bootstrap[0].vbond if generated_bootstrap else instance.vbond }}"
+      system_ip: "192.168.{{ 100 + tenant_id * 20 + index + 1 }}.1"
+      site_id: "{{ 1000 + tenant_id * 20 + index + 1 }}"
+      tenant_org_name: "{{ tenant_org | default(organization_name) }}"
+      tenant_subdomain: "{{ tenant_subdomain | default('') }}"
+  loop: "{{ all_edge_devices.devices }}"
+  loop_control:
+    index_var: index
+    loop_var: instance
+    label: "{{ instance.uuid }}"

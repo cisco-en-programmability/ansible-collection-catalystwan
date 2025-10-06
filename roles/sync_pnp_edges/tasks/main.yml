@@ -15,80 +15,24 @@
       Press any key to continue, press `Ctrl + C` and `Shift + A` to abort
   register: user_response
 
+- name: Sync edges in single tenant environment
+  ansible.builtin.include_tasks: sync_pnp_edges.yml
+  when: not tenants
 
-# serial viptela file will work only for dev/engineering images
-- name: Upload WAN Edge List
-  cisco.catalystwan.devices_wan_edges:
-    wan_edge_list: "{{ wan_edge_list_path }}"
-    state: present
-    manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
-  when: wan_edge_list_path is defined
-  retries: 12
-  delay: 5
-
-- name: Sync devices with Smart Account only if user didn't provide WAN Edge list path
-  cisco.catalystwan.devices_wan_edges:
-    state: present
-    sync_devices_from_smart_account: true
-    username: "{{ pnp_username }}"
-    password: "{{ pnp_password }}"
-    manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
-  when: wan_edge_list_path is not defined
-  retries: 12
-  delay: 5
-
-- name: Get list of Edge devices
-  cisco.catalystwan.devices_info:
-    device_category: vedges
-    manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
-  register: all_edge_devices
-  retries: 12
-  delay: 5
-
-- name: Generate bootstrap configuration for all devices
-  cisco.catalystwan.devices_wan_edges:
-    generate_bootstrap_configuration: true
-    uuid: "{{ (all_edge_devices['devices'] | selectattr('cert_install_status', '!=', 'Installed')) | map(attribute='uuid') }}"
-    manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
-      username: "{{ (vmanage_instances | first).admin_username }}"
-      password: "{{ (vmanage_instances | first).admin_password }}"
-  register: all_bootstrap_cfg
-  retries: 12
-  delay: 5
-
-- name: Initialize empty dictionary for generated_data_edge_instances
-  ansible.builtin.set_fact:
-    generated_data_edge_instances:
-      edge_instances: []
-
-- name: Generate entries for generated_data_edge_instances.edge_instances
-  ansible.builtin.set_fact:
-    generated_data_edge_instances:
-      edge_instances: "{{ generated_data_edge_instances.edge_instances + [new_entry] }}"
-  vars:
-    generated_bootstrap: "{{ all_bootstrap_cfg.bootstrap_configuration | json_query('[?uuid==`'~ instance.uuid ~'`]') }}"
-    new_entry:
-      hostname: "{{ organization_name }}-cedge-{{ index + 1 }}"
-      otp: "{{ generated_bootstrap[0].otp if generated_bootstrap else omit }}"
-      uuid: "{{ instance.uuid }}"
-      vbond: "{{ generated_bootstrap[0].vbond if generated_bootstrap else instance.vbond }}"
-      system_ip: "192.168.10{{ index + 1 }}.1"
-      site_id: "{{ 1000 + index + 1 }}"
-  loop: "{{ all_edge_devices.devices }}"
+- name: Sync edges in multitenant tenant environment
+  ansible.builtin.include_tasks:
+    file: sync_pnp_edges.yml
+    apply:
+      vars:
+        provider_mode: true
+        tenant_subdomain: "{{ tenant_item.subdomain }}"
+        tenant_org: "{{ tenant_item.org_name }}"
+        wan_edge_list_path: "{{ tenant_item.wan_edge_list_path or omit }}"
+  loop: "{{ tenants }}"
   loop_control:
-    index_var: index
-    loop_var: instance
-    label: "{{ instance.uuid }}"
+    loop_var: tenant_item
+    label: "{{ tenant_item.name }}"
+    index_var: "tenant_id"
 
 - name: "Generate file to store edge deployment configuration, path: {{ deployment_edges_config }}"
   ansible.builtin.blockinfile:
