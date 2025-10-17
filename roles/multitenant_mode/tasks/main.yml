@@ -17,13 +17,3 @@
       username: "{{ (vmanage_instances | first).admin_username }}"
       password: "{{ (vmanage_instances | first).admin_password }}"
   register: updated_tenancy_mode
-
-- name: Wait for Manager to restart
-  ansible.builtin.pause:
-    seconds: 60
-  when: updated_tenancy_mode.changed  # noqa: no-handler
-
-- name: Wait for Manager to be ready
-  ansible.builtin.include_role:
-    name: cisco.catalystwan.api_ready
-  when: updated_tenancy_mode.changed  # noqa: no-handler

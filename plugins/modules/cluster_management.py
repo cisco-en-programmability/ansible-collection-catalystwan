@@ -292,7 +292,6 @@ def run_module():
                 clusterid=module.params.get("tenancy").get("clusterid"),
             )
 
-            result.changed = True
             module.send_request_safely(
                 result,
                 action_name="Cluster Management: Tenancy Mode",
@@ -302,7 +301,14 @@ def run_module():
             )
 
             if result.changed:
-                result.msg = "Successfully updated requested vManage configuration. vManage will be restarted"
+                wait_until_configured_seconds = module.params.get("wait_until_configured_seconds")
+                if wait_until_configured_seconds:
+                    # wait for manager to restart
+                    time.sleep(60)
+                    module.session.wait_server_ready(timeout=(wait_until_configured_seconds))
+                    result.msg = "Successfully updated requested vManage configuration. vManage was restarted"
+                else:
+                    result.msg = "Successfully updated requested vManage configuration. vManage will be restarted"
             else:
                 result.msg = "No changes to vManage configuration applied."
 

@@ -8,7 +8,7 @@
 DOCUMENTATION = r"""
 ---
 module: tenants_info
-short_description: Get information about temamts.
+short_description: Get information about tenants
 version_added: "0.3.5"
 description:
   - This module allows you to get tenants Info from vManage.
