@@ -79,6 +79,7 @@
       url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
       username: "{{ (vmanage_instances | first).admin_username }}"
       password: "{{ (vmanage_instances | first).admin_password }}"
+  when: not tenants
 
 - name: "Health check: OMP sessions - verifies if all have state up"
   cisco.catalystwan.health_checks:
@@ -87,3 +88,4 @@
       url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
       username: "{{ (vmanage_instances | first).admin_username }}"
       password: "{{ (vmanage_instances | first).admin_password }}"
+  when: not tenants

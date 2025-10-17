@@ -146,7 +146,7 @@
   cisco.catalystwan.devices_info:
     device_category: controllers
     filters:
-      device_ip: "{{ device_item.system_ip }}"
+      local_system_ip: "{{ device_item.system_ip }}"
     manager_authentication:
       url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
       username: "{{ (vmanage_instances | first).admin_username }}"
@@ -164,7 +164,7 @@
   cisco.catalystwan.devices_info:
     device_category: controllers
     filters:
-      device_ip: "{{ device_item.system_ip }}"
+      local_system_ip: "{{ device_item.system_ip }}"
     manager_authentication:
       url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
       username: "{{ (vmanage_instances | first).admin_username }}"
