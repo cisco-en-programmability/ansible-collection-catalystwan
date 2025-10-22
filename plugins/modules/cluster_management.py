@@ -52,6 +52,26 @@ options:
       - A dict containing the services of cluster device,
         such as Cisco Software-Defined Application Visibility and Control.
     type: dict
+  tenancy:
+    description:
+      - Dictionary to configure tenancy settings.
+    type: dict
+    required: false
+    suboptions:
+      mode:
+        description:
+          - Tenancy mode for the cluster.
+        choices: ['single', 'multi']
+        type: str
+      clusterid:
+        description:
+          - Unique identifier for the cluster in tenancy context.
+        type: str
+      domain:
+        description:
+          - Domain name associated with the tenancy.
+        type: str
+
 author:
   - Przemyslaw Susko (sprzemys@cisco.com)
 extends_documentation_fragment:
@@ -105,12 +125,18 @@ EXAMPLES = r"""
     services:
       sd-avc:
         server: false
+
+- name: Create a cluster with tenancy configuration
+  cluster_management:
+    tenancy:
+      mode: multi
+      domain: "domain"
 """
 
 import time
 from typing import List, Optional
 
-from catalystwan.endpoints.cluster_management import ConnectedDevice, VManageSetup
+from catalystwan.endpoints.cluster_management import ConnectedDevice, TenancyMode, VManageSetup
 from catalystwan.exceptions import ManagerRequestException
 
 from ..module_utils.result import ModuleResult
@@ -160,12 +186,12 @@ def run_module():
     module_args = dict(
         wait_until_configured_seconds=dict(type="int", default=0),
         vmanage_id=dict(type=str),
-        system_ip=dict(type=str, required=True),
-        cluster_ip=dict(type=str, required=True),
-        username=dict(type=str, required=True),
-        password=dict(type=str, no_log=True, required=True),
+        system_ip=dict(type=str),
+        cluster_ip=dict(type=str),
+        username=dict(type=str),
+        password=dict(type=str, no_log=True),
         gen_csr=dict(type=bool, aliases=["genCSR"]),
-        persona=dict(type=str, choices=["COMPUTE_AND_DATA", "COMPUTE", "DATA"], required=True),
+        persona=dict(type=str, choices=["COMPUTE_AND_DATA", "COMPUTE", "DATA"]),
         services=dict(
             type="dict",
             options=dict(
@@ -178,56 +204,113 @@ def run_module():
                 ),
             ),
         ),
+        tenancy=dict(
+            type="dict",
+            options=dict(
+                mode=dict(type="str", choices=["single", "multi"]),
+                clusterid=dict(type="str"),
+                domain=dict(type="str"),
+            ),
+            required=False,
+        ),
     )
 
-    module = AnsibleCatalystwanModule(argument_spec=module_args, session_reconnect_retries=180)
+    required_together = [("system_ip", "cluster_ip", "username", "password", "persona")]
+
+    mutually_exclusive = [("tenancy", ("system_ip", "cluster_ip", "username", "password", "persona"))]
+
+    required_one_of = mutually_exclusive
+
+    module = AnsibleCatalystwanModule(
+        argument_spec=module_args,
+        session_reconnect_retries=180,
+        required_together=required_together,
+        mutually_exclusive=mutually_exclusive,
+        required_one_of=required_one_of,
+    )
     module.session.request_timeout = 60
     result = ModuleResult()
 
-    vmanage_id = module.params.get("vmanage_id")
-    system_ip = module.params.get("system_ip")
-    cluster_ip = module.params.get("cluster_ip")
+    if module.params.get("vmanage_id"):
+        vmanage_id = module.params.get("vmanage_id")
+        system_ip = module.params.get("system_ip")
+        cluster_ip = module.params.get("cluster_ip")
 
-    if is_device_connected_to_cluster(module, system_ip, cluster_ip):
-        result.changed = False
-        result.msg = f"Device {cluster_ip} already configured"
-        module.exit_json(**result.model_dump(mode="json"))
+        if is_device_connected_to_cluster(module, system_ip, cluster_ip):
+            result.changed = False
+            result.msg = f"Device {cluster_ip} already configured"
+            module.exit_json(**result.model_dump(mode="json"))
 
-    payload = VManageSetup(
-        vmanage_id=vmanage_id,
-        device_ip=cluster_ip,
-        username=module.params.get("username"),
-        password=module.params.get("password"),
-        persona=module.params.get("persona"),
-        services=module.params.get("services"),
-    )
-
-    if vmanage_id:
-        module.send_request_safely(
-            result,
-            action_name="Cluster Management: Edit vManage",
-            send_func=module.session.endpoints.cluster_management.edit_vmanage,
-            payload=payload,
-            response_key="edit_vmanage",
-        )
-    else:
-        module.send_request_safely(
-            result,
-            action_name="Cluster Management: Add vManage",
-            send_func=module.session.endpoints.cluster_management.add_vmanage,
-            payload=payload,
-            response_key="add_vmanage",
+        payload = VManageSetup(
+            vmanage_id=vmanage_id,
+            device_ip=cluster_ip,
+            username=module.params.get("username"),
+            password=module.params.get("password"),
+            persona=module.params.get("persona"),
+            services=module.params.get("services"),
         )
 
-    if result.changed:
-        wait_until_configured_seconds = module.params.get("wait_until_configured_seconds")
-        if wait_until_configured_seconds:
-            error_msg = wait_for_connected_device(module, system_ip, cluster_ip, wait_until_configured_seconds)
-            if error_msg:
-                module.fail_json(msg=f"Error during vManage configuration: {error_msg}")
-        result.msg = "Successfully updated requested vManage configuration."
-    else:
-        result.msg = "No changes to vManage configuration applied."
+        if vmanage_id:
+            module.send_request_safely(
+                result,
+                action_name="Cluster Management: Edit vManage",
+                send_func=module.session.endpoints.cluster_management.edit_vmanage,
+                payload=payload,
+                response_key="edit_vmanage",
+            )
+        else:
+            module.send_request_safely(
+                result,
+                action_name="Cluster Management: Add vManage",
+                send_func=module.session.endpoints.cluster_management.add_vmanage,
+                payload=payload,
+                response_key="add_vmanage",
+            )
+
+        if result.changed:
+            wait_until_configured_seconds = module.params.get("wait_until_configured_seconds")
+            if wait_until_configured_seconds:
+                error_msg = wait_for_connected_device(module, system_ip, cluster_ip, wait_until_configured_seconds)
+                if error_msg:
+                    module.fail_json(msg=f"Error during vManage configuration: {error_msg}")
+            result.msg = "Successfully updated requested vManage configuration."
+        else:
+            result.msg = "No changes to vManage configuration applied."
+
+    if module.params.get("tenancy"):
+        tenancy_mode: TenancyMode = module.get_response_safely(
+            module.session.endpoints.cluster_management.get_tenancy_mode
+        )
+
+        if tenancy_mode.mode == "MultiTenant" and module.params.get("tenancy").get("mode") != "multi":
+            module.fail_json(msg="Switching from MultiTenancy to SingleTenancy is forbidden")
+
+        elif tenancy_mode.mode == "SingleTenant" and module.params.get("tenancy").get("mode") != "single":
+            new_tennacy = TenancyMode(
+                mode="MultiTenant",
+                domain=module.params.get("tenancy").get("domain"),
+                clusterid=module.params.get("tenancy").get("clusterid"),
+            )
+
+            module.send_request_safely(
+                result,
+                action_name="Cluster Management: Tenancy Mode",
+                send_func=module.session.endpoints.cluster_management.set_tenancy_mode,
+                payload=new_tennacy,
+                response_key=tenancy_mode,
+            )
+
+            if result.changed:
+                wait_until_configured_seconds = module.params.get("wait_until_configured_seconds")
+                if wait_until_configured_seconds:
+                    # wait for manager to restart
+                    time.sleep(60)
+                    module.session.wait_server_ready(timeout=(wait_until_configured_seconds))
+                    result.msg = "Successfully updated requested vManage configuration. vManage was restarted"
+                else:
+                    result.msg = "Successfully updated requested vManage configuration. vManage will be restarted"
+            else:
+                result.msg = "No changes to vManage configuration applied."
 
     module.exit_json(**result.model_dump(mode="json"))
 
