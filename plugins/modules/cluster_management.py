@@ -219,7 +219,7 @@ def run_module():
 
     mutually_exclusive = [("tenancy", ("system_ip", "cluster_ip", "username", "password", "persona"))]
 
-    required_one_of = mutually_exclusive
+    required_one_of = [("tenancy", "system_ip", "cluster_ip", "username", "password", "persona")]
 
     module = AnsibleCatalystwanModule(
         argument_spec=module_args,
@@ -231,7 +231,7 @@ def run_module():
     module.session.request_timeout = 60
     result = ModuleResult()
 
-    if module.params.get("vmanage_id"):
+    if module.params.get("cluster_ip"):
         vmanage_id = module.params.get("vmanage_id")
         system_ip = module.params.get("system_ip")
         cluster_ip = module.params.get("cluster_ip")
