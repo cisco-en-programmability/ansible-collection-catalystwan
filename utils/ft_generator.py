@@ -1,6 +1,29 @@
 # Copyright 2024 Cisco Systems, Inc. and its affiliates
 # GNU General Public License v3.0+ (see LICENSE or https://www.gnu.org/licenses/gpl-3.0.txt)
 
+"""
+Ansible Documentation and Argument Specification Generator.
+This script automates the creation of Ansible documentation fragments and module
+argument specifications based on Pydantic models defined in the Catalystwan SDK.
+It iterates through available feature template models, generates the corresponding
+Ansible documentation in YAML format, and creates Python files for module
+arguments.
+Process:
+1.  Loads Pydantic models from `catalystwan.api.templates.models.supported`.
+2.  For each model, it generates a documentation fragment (`.py` file) and
+    places it in `plugins/doc_fragments/`.
+3.  It also generates a module argument specification (`.py` file) and places
+    it in `plugins/module_utils/feature_templates/`.
+4.  Finally, it creates a documentation fragment for device models.
+Important Note:
+    Device Specific Variables do not have descriptions, and this requires manual
+    effort to fix in the generated documentation. For example, the
+    `cisco.catalystwan.feature_template_cisco_system` requires updating a few
+    fields. Look for '- null' fields in the generated documentation fragments.
+    This will be solved once Device Specific Variables are properly defined in
+    the SDK.
+"""
+
 from __future__ import annotations
 
 from enum import Enum
@@ -20,6 +43,14 @@ PROJECT_ROOT_DIR = PurePath(Path.cwd())
 
 
 def safe_issubclass(type_, class_):
+    """
+    Safely checks if a type is a subclass of a given class.
+    Args:
+        type_: The type to check.
+        class_: The class to check against.
+    Returns:
+        bool: True if `type_` is a subclass of `class_`, False otherwise.
+    """
     try:
         return issubclass(type_, class_)
     except TypeError:
@@ -27,6 +58,13 @@ def safe_issubclass(type_, class_):
 
 
 def is_pydantic_model(type_):
+    """
+    Checks if a type is a Pydantic model.
+    Args:
+        type_: The type to check.
+    Returns:
+        bool: True if `type_` is a Pydantic model, False otherwise.
+    """
     try:
         return issubclass(type_, BaseModel)
     except TypeError:
@@ -34,6 +72,15 @@ def is_pydantic_model(type_):
 
 
 def field_to_ansible_option(field: FieldInfo, field_name: str, model_name: str):
+    """
+    Converts a Pydantic field to an Ansible option dictionary.
+    Args:
+        field (FieldInfo): The Pydantic field information.
+        field_name (str): The name of the field.
+        model_name (str): The name of the Pydantic model.
+    Returns:
+        dict: A dictionary representing the Ansible option.
+    """
     option = {
         "description": [field.description],
         "required": field.is_required(),
@@ -176,6 +223,14 @@ def field_to_ansible_option(field: FieldInfo, field_name: str, model_name: str):
 
 
 def model_to_ansible_options(model: Type[BaseModel], model_name: str):
+    """
+    Converts a Pydantic model to a dictionary of Ansible options.
+    Args:
+        model (Type[BaseModel]): The Pydantic model to convert.
+        model_name (str): The name of the model.
+    Returns:
+        dict: A dictionary of Ansible options.
+    """
     options = {}
     for field_name, field in model.model_fields.items():
         if field_name in [
@@ -190,6 +245,14 @@ def model_to_ansible_options(model: Type[BaseModel], model_name: str):
 
 
 def generate_ansible_docs(model: Type[BaseModel], model_name: str):
+    """
+    Generates an Ansible documentation dictionary for a Pydantic model.
+    Args:
+        model (Type[BaseModel]): The Pydantic model.
+        model_name (str): The name of the model.
+    Returns:
+        dict: An Ansible documentation dictionary.
+    """
     if not hasattr(model, "_docs_description"):
         raise ValueError(f"Missing '_docs_description' documentation field for model {model_name}!")
     ansible_docs = {
@@ -204,12 +267,17 @@ def generate_ansible_docs(model: Type[BaseModel], model_name: str):
     return ansible_docs
 
 
-# Function to parse YAML data and return the argument spec
 def generate_arg_spec(yaml_data):
+    """
+    Parses YAML data and returns an Ansible argument specification.
+    Args:
+        yaml_data (str): A string containing YAML data.
+    Returns:
+        dict: An Ansible argument specification dictionary.
+    """
     # Load the YAML data
     data = yaml.safe_load(yaml_data)
 
-    # Function to recursively parse the options
     def parse_options(options):
         arg_spec = {}
         for opt_name, opt_info in options.items():
@@ -294,14 +362,3 @@ for model_name, model_module in available_models.items():
     with open(file_name, "w") as f:
         f.write(output)
     print(f"File '{file_name}' has been written successfully.")
-
-
-print(
-    """
-    When used, note that Device Specific Variables doesn't have description and it required manual effort to fix
-    these in documentation. Example: cisco.catalystwan.feature_template_cisco_system requires updating few fields.
-    Look for '- null' fields.
-    That will be solved once we will have Device Specific Variables in SDK properly defined.
-
-    """
-)
