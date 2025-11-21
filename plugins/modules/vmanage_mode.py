@@ -131,11 +131,13 @@ def run_module():
                 result.msg += (
                     f"Template: {template_name} exists on : {device.hostname}. Trying to attach it to the device.\n"
                 )
-            module.session.api.templates.attach(template_name, device)
 
-            result.changed = True
-            result.attached_templates.update({template_name: device.hostname})
-            result.msg += f"Successfully attached template: {template_name} to device: {device.hostname}\n"
+            if module.session.api.templates.attach(template_name, device):
+                result.changed = True
+                result.attached_templates.update({template_name: device.hostname})
+                result.msg += f"Successfully attached template: {template_name} to device: {device.hostname}\n"
+            else:
+                module.fail_json(msg=f"Could not attach template: {template_name} to device: {device.hostname}\n")
 
         except ManagerHTTPError as ex:
             module.fail_json(
