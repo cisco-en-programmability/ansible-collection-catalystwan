@@ -85,6 +85,7 @@ from catalystwan.endpoints.configuration_device_inventory import DeviceDetailsRe
 from catalystwan.typed_list import DataSequence
 from catalystwan.utils.creation_tools import asdict
 from pydantic import Field
+from catalystwan.utils.session_type import SessionType
 
 from ..module_utils.filters import get_devices_details
 from ..module_utils.result import ModuleResult
@@ -315,6 +316,8 @@ def bfd_sessions_health(
     result.response[f"{HealthCheckTypes.BFD.value}"] = {}
 
     for dev in devices:
+        if module.session.session_type == SessionType.PROVIDER_AS_TENANT and dev.device_type != "vedge":
+            continue
         # if devbice not reachable report problem but move with other devices to have all reported
         if dev.reachability != "reachable":
             bfd_sessions_health.append(False)
@@ -368,6 +371,8 @@ def omp_sessions_health(
     result.response[f"{HealthCheckTypes.OMP.value}"] = {}
 
     for dev in devices:
+        if module.session.session_type == SessionType.PROVIDER_AS_TENANT and dev.device_type != "vedge":
+            continue
         # if device not reachable report problem but move with other devices to have all reported
         if dev.reachability != "reachable":
             omp_sessions_health.append(False)
