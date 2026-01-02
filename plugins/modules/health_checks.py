@@ -84,8 +84,8 @@ from catalystwan.dataclasses import Personality
 from catalystwan.endpoints.configuration_device_inventory import DeviceDetailsResponse
 from catalystwan.typed_list import DataSequence
 from catalystwan.utils.creation_tools import asdict
-from pydantic import Field
 from catalystwan.utils.session_type import SessionType
+from pydantic import Field
 
 from ..module_utils.filters import get_devices_details
 from ..module_utils.result import ModuleResult
