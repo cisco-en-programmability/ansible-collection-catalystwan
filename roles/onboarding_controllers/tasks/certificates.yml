@@ -29,6 +29,6 @@
   cisco.catalystwan.devices_certificates:
     install_signed_certificate: "{{ signed_cert['certificate'] }}"
     manager_authentication:
-      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
+      url: "{{ mgmt_url }}"
       username: "{{ (vmanage_instances | first).admin_username }}"
       password: "{{ (vmanage_instances | first).admin_password }}"

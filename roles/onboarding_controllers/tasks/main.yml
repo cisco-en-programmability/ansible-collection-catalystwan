@@ -35,6 +35,7 @@
   vars:
     csr_content: "{{ (csr_item['response']['generate_csr'] | first)['deviceCSR'] }}"
     csr_system_ip: "{{ csr_item.device_item.system_ip }}"
+    mgmt_url: "{{ csr_item.device_item.mgmt_public_ip }}"
 
 - name: Add vSmart devices
   cisco.catalystwan.devices_controllers:
@@ -87,6 +88,7 @@
   vars:
     csr_content: "{{ (csr_item['response']['generate_csr'] | first)['deviceCSR'] }}"
     csr_system_ip: "{{ csr_item.device_item.device_item.system_ip }}"
+    mgmt_url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
 
 - name: Add vBond devices
   cisco.catalystwan.devices_controllers:
@@ -141,6 +143,7 @@
   vars:
     csr_content: "{{ (csr_item['response']['generate_csr'] | first)['deviceCSR'] }}"
     csr_system_ip: "{{ csr_item.device_item.device_item.system_ip }}"
+    mgmt_url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
 
 - name: Wait until all controller devices are discoverable via system ip
   cisco.catalystwan.devices_info:
