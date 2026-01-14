@@ -60,8 +60,8 @@
       - target_remote_server_edge | list | length > 0
       - (target_remote_server_edge | list | first).remote_server_port == 22
   vars:
-    target_remote_server: "{{ remote_servers_info.remote_servers | selectattr('remote_server_name', 'equalto', remote_server_name) }}"
-    target_remote_server_edge: "{{ remote_servers_info.remote_servers | selectattr('remote_server_name', 'equalto', remote_server_name~'-edge') }}"
+    target_remote_server: "{{ remote_servers_info.remote_servers | selectattr('remote_server_name', 'equalto', remote_server_name) | list }}"
+    target_remote_server_edge: "{{ remote_servers_info.remote_servers | selectattr('remote_server_name', 'equalto', remote_server_name~'-edge') | list }}"
 
 
 # --- Remote Server images upload --- #

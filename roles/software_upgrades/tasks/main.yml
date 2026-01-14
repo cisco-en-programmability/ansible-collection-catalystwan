@@ -320,18 +320,19 @@
 - name: Verify that IPv4 dual stack addresses are reachable
   ansible.builtin.command:
     cmd: "ping -c 4 {{ item }}"
-  loop: "{{ (deployed_edge_instances | map(attribute='mgmt_public_ip') | list)
-           + (deployed_edge_instances | map(attribute='transport_public_ip') | list) }}"
+  loop: "{{ ((deployed_edge_instances | default([]) | map(attribute='mgmt_public_ip') | list)
+           + (deployed_edge_instances | default([]) | map(attribute='transport_public_ip') | list))
+           | select('truthy') | list }}"
   changed_when: false
 
 - name: Verify that IPv6 dual stack addresses are reachable
   ansible.builtin.command:
     cmd: "ping6 -c 4 {{ _edge_instance[_ipv6_attribute] }}"
-  loop: "{{ deployed_edge_instances | product(['mgmt_public_ipv6', 'transport_public_ipv6']) }}"
+  loop: "{{ deployed_edge_instances | default([]) | product(['mgmt_public_ipv6', 'transport_public_ipv6']) }}"
   loop_control:
     label: "{{ _edge_instance['hostname'] }} - {{ _ipv6_attribute }}"
   vars:
     _edge_instance: "{{ item.0 }}"
     _ipv6_attribute: "{{ item.1 }}"
-  when: _ipv6_attribute in _edge_instance
+  when: _ipv6_attribute in _edge_instance and _edge_instance[_ipv6_attribute]
   changed_when: false
