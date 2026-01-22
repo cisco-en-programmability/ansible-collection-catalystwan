@@ -51,15 +51,17 @@
       password: "{{ (vmanage_instances | first).admin_password }}"
   register: remote_servers_info
 
-- name: "Debug all_remote_servers - expect two, and verify port is == 22"
+- name: "Verify remote servers configuration - expect two, and port is 22"
   ansible.builtin.assert:
     that:
       - remote_servers_info.remote_servers | length == 2
-      - ( remote_servers_info.remote_servers | first ).remote_server_name == remote_server_name
-      - ( remote_servers_info.remote_servers | first ).remote_server_port == 22
-      - ( remote_servers_info.remote_servers | last ).remote_server_name == remote_server_name~'-edge'
-      - ( remote_servers_info.remote_servers | last ).remote_server_port == 22
-    fail_msg: "Requested Remote Server not found in configured Remote Servers list"
+      - target_remote_server | list | length > 0
+      - (target_remote_server | list | first).remote_server_port == 22
+      - target_remote_server_edge | list | length > 0
+      - (target_remote_server_edge | list | first).remote_server_port == 22
+  vars:
+    target_remote_server: "{{ remote_servers_info.remote_servers | selectattr('remote_server_name', 'equalto', remote_server_name) | list }}"
+    target_remote_server_edge: "{{ remote_servers_info.remote_servers | selectattr('remote_server_name', 'equalto', remote_server_name~'-edge') | list }}"
 
 
 # --- Remote Server images upload --- #
