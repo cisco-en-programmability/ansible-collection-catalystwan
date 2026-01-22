@@ -72,7 +72,7 @@
 #       username: "{{ (vmanage_instances | first).admin_username }}"
 #       password: "{{ (vmanage_instances | first).admin_password }}"
 
-- name: "Health check: BFD sessions - verifies if all have state up"
+- name: "Health check: BFD sessions single tenant - verifies if all have state up"
   cisco.catalystwan.health_checks:
     check_type: bfd
     manager_authentication:
@@ -81,7 +81,21 @@
       password: "{{ (vmanage_instances | first).admin_password }}"
   when: not tenants
 
-- name: "Health check: OMP sessions - verifies if all have state up"
+- name: "Health check: BFD sessions multi tenant - verifies if all have state up"
+  cisco.catalystwan.health_checks:
+    check_type: bfd
+    manager_authentication:
+      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
+      username: "{{ (vmanage_instances | first).admin_username }}"
+      password: "{{ (vmanage_instances | first).admin_password }}"
+      subdomain: "{{ tenant_item.subdomain }}"
+  loop: "{{ tenants }}"
+  loop_control:
+    loop_var: tenant_item
+    label: "{{ tenant_item.name }}"
+    index_var: "tenant_id"
+
+- name: "Health check: OMP sessions single tenant - verifies if all have state up"
   cisco.catalystwan.health_checks:
     check_type: omp
     manager_authentication:
@@ -89,3 +103,17 @@
       username: "{{ (vmanage_instances | first).admin_username }}"
       password: "{{ (vmanage_instances | first).admin_password }}"
   when: not tenants
+
+- name: "Health check: OMP sessions in multi tenant - verifies if all have state up"
+  cisco.catalystwan.health_checks:
+    check_type: omp
+    manager_authentication:
+      url: "{{ (vmanage_instances | first).mgmt_public_ip }}"
+      username: "{{ (vmanage_instances | first).admin_username }}"
+      password: "{{ (vmanage_instances | first).admin_password }}"
+      subdomain: "{{ tenant_item.subdomain }}"
+  loop: "{{ tenants }}"
+  loop_control:
+    loop_var: tenant_item
+    label: "{{ tenant_item.name }}"
+    index_var: "tenant_id"
