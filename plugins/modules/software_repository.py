@@ -57,9 +57,8 @@ options:
         aliases: [ 'port' ]
       remote_server_vpn:
         description:
-          - VPN ID used by the remote server.
+          - VPN ID used by the remote server, from 0 through 65527.
         type: int
-        choices: range(0, 65528)
         aliases: [ 'vpn' ]
       remote_server_user:
         description:
@@ -70,7 +69,6 @@ options:
         description:
           - Password to authenticate to the remote server.
         type: str
-        no_log: true
         aliases: [ 'password' ]
       image_location_prefix:
         description:
@@ -111,7 +109,7 @@ options:
         aliases: [ 'filename' ]
 
 author:
-  - Arkadiusz Cichon (acichon@cisco.com)
+  - Arkadiusz Cichon (@acichon)
 extends_documentation_fragment:
   - cisco.catalystwan.manager_authentication
 """
@@ -255,7 +253,7 @@ def run_module():
                 remote_server_url=dict(type="str", aliases=["url"]),
                 remote_server_protocol=dict(
                     type="str",
-                    choices=[choice for choice in RemoteServerProtocol],
+                    choices=list(RemoteServerProtocol),
                     default=RemoteServerProtocol.FTP.value,
                     aliases=["protocol"],
                 ),
@@ -313,6 +311,8 @@ def run_module():
     upload_software_from_remote_server = False
     delete_software_from_software_repository = False
     software_payload = None
+    existing_remote_server_id = None
+    remove_software_id = None
 
     # ---------------------------------#
     # STEP 1 - verify module arguments #

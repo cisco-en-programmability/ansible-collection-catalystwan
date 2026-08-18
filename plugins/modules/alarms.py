@@ -22,7 +22,7 @@ options:
       - If not provided, the module will retrieve alarms from the beginning of time.
     type: int
     required: False
-    default: None
+    default: null
   mark_all_as_viewed:
     description:
       - Whether to mark all the alarms as viewed.
@@ -41,9 +41,9 @@ options:
       - If not provided, alarms will not be logged to a file.
     type: str
     required: False
-    default: None
+    default: null
 author:
-  - Arkadiusz Cichon (acichon@cisco.com)
+  - Arkadiusz Cichon (@acichon)
 
 extends_documentation_fragment:
   - cisco.catalystwan.manager_authentication
@@ -75,7 +75,6 @@ changed:
     - In this case, always false since this module is for information retrieval only.
   returned: always
   type: bool
-  default: False
 """
 
 EXAMPLES = r"""
@@ -148,9 +147,9 @@ def run_module():
 
     alarms_dict = [asdict(alarm) for alarm in alarms]
     for alarm in alarms_dict:
-        if type(alarm["severity"]) is Severity:
+        if isinstance(alarm["severity"], Severity):
             alarm["severity"] = alarm["severity"].value
-    result.alarms = [alarm for alarm in alarms_dict]
+    result.alarms = list(alarms_dict)
 
     result.changed = False
     result.number_of_alarms = len(alarms_dict)

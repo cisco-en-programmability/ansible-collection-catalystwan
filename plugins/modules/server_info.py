@@ -21,7 +21,7 @@ options:
     choices: ["server_info", "server_ready", "about_info"]
     default: "server_info"
 author:
-  - Arkadiusz Cichon (acichon@cisco.com)
+  - Arkadiusz Cichon (@acichon)
 
 notes:
   - The module does not make any changes on the server, it only retrieves information.

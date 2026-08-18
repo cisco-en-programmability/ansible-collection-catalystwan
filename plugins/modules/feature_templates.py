@@ -6,7 +6,7 @@
 
 DOCUMENTATION = r"""
 ---
-module: vmanage_feature_template
+module: feature_templates
 short_description: Manage feature templates for Cisco vManage SD-WAN
 version_added: "0.2.0"
 description:
@@ -63,9 +63,19 @@ extends_documentation_fragment:
   - cisco.catalystwan.device_models_feature_template
   - cisco.catalystwan.manager_authentication
 author:
-  - Arkadiusz Cichon (acichon@cisco.com)
+  - Arkadiusz Cichon (@acichon)
 """
 
+EXAMPLES = r"""
+- name: Create a Cisco system feature template
+  cisco.catalystwan.feature_templates:
+    state: present
+    template_name: branch-system
+    template_description: Branch system template
+    device_models:
+      - C8000V
+    cisco_system: {}
+"""
 
 from typing import Dict, Final, Literal, Optional, get_args
 

@@ -7,7 +7,7 @@
 
 DOCUMENTATION = r"""
 ---
-module: Device_templates_info
+module: device_templates_info
 short_description: Get information about Device Templates on vManage.
 version_added: "0.2.0"
 description:
@@ -118,7 +118,7 @@ options:
       - Directory to store the backup. It's created if missing. Defaults to a 'backup' folder in the current directory.
     type: path
 author:
-  - Arkadiusz Cichon (acichon@cisco.com)
+  - Arkadiusz Cichon (@acichon)
 extends_documentation_fragment:
   - cisco.catalystwan.manager_authentication
 notes:
@@ -220,13 +220,13 @@ def run_module():
         if filtered_templates:
             module.logger.info(f"All Device Templates filtered with filters: {filters}:\n{filtered_templates}")
             result.msg = "Succesfully got all requested Device Templates Info from vManage"
-            result.templates_info = [template for template in filtered_templates]
+            result.templates_info = list(filtered_templates)
         else:
             module.logger.warning(msg=f"Device templates filtered with `{filters}` not present.")
             result.msg = f"Device templates filtered with `{filters}` not present on vManage."
     else:
         result.msg = "Succesfully got all Device Templates Info from vManage"
-        result.templates_info = [template for template in all_templates]
+        result.templates_info = list(all_templates)
 
     if module.params.get("backup"):
         backup_dir_path: Path = Path(module.params.get("backup_dir_path"))

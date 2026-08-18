@@ -36,14 +36,13 @@ options:
           - Password for authentication with vManage.
         required: true
         type: str
-        no_log: true
       port:
         description:
           - Port number to use for connecting to vManage.
         required: false
         type: str
 author:
-  - Arkadiusz Cichon (acichon@cisco.com)
+  - Arkadiusz Cichon (@acichon)
 """
 
 EXAMPLES = r"""

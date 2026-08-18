@@ -72,7 +72,7 @@ options:
       - UUID of the device.
     type: str
 author:
-  - Arkadiusz Cichon (acichon@cisco.com)
+  - Arkadiusz Cichon (@acichon)
 
 notes:
   - Actions are mutually exclusive and only one action can be performed at a time.

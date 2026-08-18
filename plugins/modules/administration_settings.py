@@ -69,7 +69,6 @@ options:
         description: Password for Smart Account.
         type: str
         required: true
-        no_log: true
       username:
         description: Username for Smart Account.
         type: str
@@ -99,7 +98,7 @@ options:
         description: Control PPS, should be in range 300-65535.
         type: str
 author:
-  - Arkadiusz Cichon (acichon@cisco.com)
+  - Arkadiusz Cichon (@acichon)
 
 extends_documentation_fragment:
   - cisco.catalystwan.manager_authentication

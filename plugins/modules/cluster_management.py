@@ -37,7 +37,6 @@ options:
     description:
       - Password for the device being managed.
     type: str
-    no_log: True
   gen_csr:
     description:
       - Whether to generate a CSR (Certificate Signing Request) for the device.
@@ -73,7 +72,7 @@ options:
         type: str
 
 author:
-  - Przemyslaw Susko (sprzemys@cisco.com)
+  - Przemyslaw Susko (@sprzemys)
 extends_documentation_fragment:
   - cisco.catalystwan.manager_authentication
 """

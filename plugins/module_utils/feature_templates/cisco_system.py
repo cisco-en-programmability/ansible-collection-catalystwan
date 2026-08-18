@@ -27,7 +27,7 @@ cisco_system_definition = {
             "epfr": {"default": None, "required": False, "type": "str"},
             "hostname": {
                 "default": None,
-                "options": {"name": {"default": "system_host_name", "required": True, "type": "str"}},
+                "options": {"name": {"default": "system_host_name", "required": False, "type": "str"}},
                 "required": False,
                 "type": "raw",
             },
@@ -78,11 +78,11 @@ cisco_system_definition = {
             "region_id": {"default": None, "required": False, "type": "int"},
             "role": {"default": None, "required": False, "type": "str"},
             "secondary_region": {"default": None, "required": False, "type": "int"},
-            "site_id": {"default": "system_site_id", "required": False, "type": "int"},
+            "site_id": {"default": None, "required": False, "type": "int"},
             "site_type": {"default": None, "elements": "str", "required": False, "type": "list"},
             "system_ip": {
                 "default": None,
-                "options": {"name": {"default": "system_system_ip", "required": True, "type": "str"}},
+                "options": {"name": {"default": "system_system_ip", "required": False, "type": "str"}},
                 "required": False,
                 "type": "raw",
             },

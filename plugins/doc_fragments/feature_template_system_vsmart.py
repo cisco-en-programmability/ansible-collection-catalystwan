@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 # Copyright 2024 Cisco Systems, Inc. and its affiliates
@@ -448,7 +447,7 @@ options:
                 suboptions:
                     name:
                         default: system_host_name
-                        required: true
+                        required: false
                         type: str
                         description: Device Specific Variables name
             dual_stack_ipv6:
@@ -459,7 +458,7 @@ options:
                 suboptions:
                     name:
                         default: system_ipv6-strict-control
-                        required: true
+                        required: false
                         type: str
                         description: Device Specific Variables name
             description:
@@ -507,7 +506,7 @@ options:
                 suboptions:
                     name:
                         default: system_system_ip
-                        required: true
+                        required: false
                         type: str
                         description: Device Specific Variables name
             site_id:
@@ -518,7 +517,7 @@ options:
                 suboptions:
                     name:
                         default: system_site_id
-                        required: true
+                        required: false
                         type: str
                         description: Device Specific Variables name
             overlay_id:

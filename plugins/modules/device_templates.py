@@ -7,7 +7,7 @@
 
 DOCUMENTATION = r"""
 ---
-module: Device_templates
+module: device_templates
 short_description: Manage Device Templates on vManage.
 version_added: "0.2.0"
 description:
@@ -72,7 +72,7 @@ options:
         for these parameters.
     type: raw
 author:
-  - Arkadiusz Cichon (acichon@cisco.com)
+  - Arkadiusz Cichon (@acichon)
 extends_documentation_fragment:
   - cisco.catalystwan.device_models_device_template
   - cisco.catalystwan.manager_authentication

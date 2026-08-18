@@ -12,6 +12,8 @@ short_description: Get information about CLI Templates on vManage.
 version_added: "0.3.5"
 description:
   - This module allows you to get CLI Templates Info from vManage.
+author:
+  - Arkadiusz Cichon (@acichon)
 options:
   filters:
     description:
@@ -155,9 +157,9 @@ def run_module():
     )
 
     if module.params.get("filters"):
-        result.templates_info = [template for template in all_templates.filter(**filters)]
+        result.templates_info = list(all_templates.filter(**filters))
     else:
-        result.templates_info = [template for template in all_templates]
+        result.templates_info = list(all_templates)
 
     if module.params.get("gather_configuration"):
         result.templates_configuration = []

@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 # Copyright 2024 Cisco Systems, Inc. and its affiliates

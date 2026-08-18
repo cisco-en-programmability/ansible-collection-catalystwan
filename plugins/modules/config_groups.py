@@ -11,7 +11,7 @@ short_description: Description
 version_added: "0.3.1"
 description: Module for configuration of config groups.
 author:
-  - Przemyslaw Susko (sprzemys@cisco.com)
+  - Przemyslaw Susko (@sprzemys)
 extends_documentation_fragment:
   - cisco.catalystwan.manager_authentication
 """

@@ -29,7 +29,7 @@ options:
     description:
       - Dictionary of filter key-value pairs to apply on the device details.
     type: dict
-    default: None
+    default: null
   backup:
     description:
       - This argument triggers the module to back up the filtered device's current running-config.
@@ -42,7 +42,7 @@ options:
       - Directory to store the backup. It's created if missing. Defaults to a 'backup' folder in the current directory.
     type: path
 author:
-  - Arkadiusz Cichon (acichon@cisco.com)
+  - Arkadiusz Cichon (@acichon)
 
 notes:
   - The C(filters) option allows for specifying filtering criteria such as device model, status, etc.

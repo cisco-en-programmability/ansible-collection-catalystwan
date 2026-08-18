@@ -23,9 +23,9 @@ options:
     description:
       - Optional filters used to refine the results.
     type: dict
-    default: None
+    default: null
 author:
-  - Arkadiusz Cichon (acichon@cisco.com)
+  - Arkadiusz Cichon (@acichon)
 extends_documentation_fragment:
   - cisco.catalystwan.manager_authentication
 """

@@ -28,7 +28,7 @@ options:
     elements: str
     required: true
 author:
-  - Arkadiusz Cichon (acichon@cisco.com)
+  - Arkadiusz Cichon (@acichon)
 extends_documentation_fragment:
   - cisco.catalystwan.manager_authentication
 notes:

@@ -6,7 +6,7 @@
 
 DOCUMENTATION = r"""
 ---
-module: XXX
+module: wait_for_api_server
 
 short_description: XXX
 

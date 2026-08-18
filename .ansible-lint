@@ -14,6 +14,8 @@ exclude_paths:
   - .dev_dir/example_dev_vars.yml
   - .dev_dir/*
   - playbooks/tests/configuration_file_dev_vars.yml
+  # External SDK imports are explicitly baselined for ansible-test 2.21.
+  - tests/sanity/ignore-2.21.txt
   - .ansible
 # parseable: true
 # quiet: true

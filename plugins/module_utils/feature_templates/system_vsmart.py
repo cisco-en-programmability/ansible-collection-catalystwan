@@ -20,13 +20,13 @@ system_vsmart_definition = {
             "dns_cache_timeout": {"default": None, "required": False, "type": "int"},
             "dual_stack_ipv6": {
                 "default": None,
-                "options": {"name": {"default": "system_ipv6-strict-control", "required": True, "type": "str"}},
+                "options": {"name": {"default": "system_ipv6-strict-control", "required": False, "type": "str"}},
                 "required": False,
                 "type": "raw",
             },
             "host_name": {
                 "default": None,
-                "options": {"name": {"default": "system_host_name", "required": True, "type": "str"}},
+                "options": {"name": {"default": "system_host_name", "required": False, "type": "str"}},
                 "required": False,
                 "type": "raw",
             },
@@ -52,13 +52,13 @@ system_vsmart_definition = {
             "region_list_id": {"default": None, "required": False, "type": "int"},
             "site_id": {
                 "default": None,
-                "options": {"name": {"default": "system_site_id", "required": True, "type": "str"}},
+                "options": {"name": {"default": "system_site_id", "required": False, "type": "str"}},
                 "required": False,
                 "type": "raw",
             },
             "system_ip": {
                 "default": None,
-                "options": {"name": {"default": "system_system_ip", "required": True, "type": "str"}},
+                "options": {"name": {"default": "system_system_ip", "required": False, "type": "str"}},
                 "required": False,
                 "type": "raw",
             },

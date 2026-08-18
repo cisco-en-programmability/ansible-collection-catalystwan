@@ -30,7 +30,7 @@ options:
       - The description of the Tenant.
     required: false
     type: str
-    default: None
+    default: null
   org_name:
     description:
       - The organization name of the Tenant.
@@ -51,7 +51,7 @@ options:
       - The timeout in seconds for creating Tenant. Default is 7200.
     type: int
 author:
-  - Piotr Piwowarski (pipiwowa@cisco.com)
+  - Piotr Piwowarski (@pipiwowa)
 extends_documentation_fragment:
   - cisco.catalystwan.manager_authentication
 notes:

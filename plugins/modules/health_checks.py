@@ -24,7 +24,7 @@ options:
       - A dictionary of filters used to select devices for module action.
     type: dict
 author:
-  - Arkadiusz Cichon (acichon@cisco.com)
+  - Arkadiusz Cichon (@acichon)
 extends_documentation_fragment:
   - cisco.catalystwan.manager_authentication
 """
@@ -416,7 +416,7 @@ def run_module():
     module_args = dict(
         check_type=dict(
             type=str,
-            choices=[check_type for check_type in HealthCheckTypes],
+            choices=list(HealthCheckTypes),
             required=True,
         ),
         filters=dict(type="dict", default=None),

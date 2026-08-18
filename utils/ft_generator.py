@@ -49,7 +49,7 @@ def field_to_ansible_option(field: FieldInfo, field_name: str, model_name: str):
             option["default"] = field.default
         elif safe_issubclass(type(field.default), list):
             option["default"] = field.default
-        elif type(field.default) is DeviceVariable:
+        elif isinstance(field.default, DeviceVariable):
             option["default"] = field.default.name
 
     field_type = get_origin(field.annotation) or field.annotation
@@ -113,11 +113,11 @@ def field_to_ansible_option(field: FieldInfo, field_name: str, model_name: str):
             elif get_origin(user_class) == Literal:
                 option["type"] = "list"
                 option["elements"] = "str"
-                option["choices"] = [item for item in get_args(user_class)]
+                option["choices"] = list(get_args(user_class))
             elif origin_type == Literal:
                 option["type"] = "list"
                 option["elements"] = "str"
-                option["choices"] = [item for item in get_args(elements_type)]
+                option["choices"] = list(get_args(elements_type))
             elif user_class == int:
                 option["type"] = "list"
                 option["elements"] = "int"
@@ -161,11 +161,11 @@ def field_to_ansible_option(field: FieldInfo, field_name: str, model_name: str):
     elif field_type == Union and Literal in subargs_base_types:
         elements_type = next((arg for arg in args if arg is not None), None)
         option["type"] = "str"
-        option["choices"] = [item for item in get_args(elements_type)]
+        option["choices"] = list(get_args(elements_type))
 
     elif field_type == Literal:
         option["type"] = "str"
-        option["choices"] = [item for item in args]
+        option["choices"] = list(args)
 
     else:
         option["type"] = "str"

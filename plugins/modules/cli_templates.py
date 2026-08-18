@@ -30,7 +30,7 @@ options:
       - The description of the CLI template.
     required: false
     type: str
-    default: None
+    default: null
   config_file:
     description:
       - The path to the configuration file that contains the CLI template content.
@@ -48,7 +48,7 @@ options:
       - The timeout in seconds for attaching the template. Default is 300.
     type: int
 author:
-  - Arkadiusz Cichon (acichon@cisco.com)
+  - Arkadiusz Cichon (@acichon)
 extends_documentation_fragment:
   - cisco.catalystwan.device_models_device_template
   - cisco.catalystwan.manager_authentication

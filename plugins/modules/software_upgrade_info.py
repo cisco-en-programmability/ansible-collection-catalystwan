@@ -28,9 +28,9 @@ options:
     description:
       - Optional filters to apply on the list of installed devices.
     type: dict
-    default: None
+    default: null
 author:
-  - Arkadiusz Cichon (acichon@cisco.com)
+  - Arkadiusz Cichon (@acichon)
 extends_documentation_fragment:
   - cisco.catalystwan.manager_authentication
 """

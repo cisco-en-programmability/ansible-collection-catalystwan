@@ -93,7 +93,7 @@ options:
         default: null
         type: str
 author:
-  - Arkadiusz Cichon (acichon@cisco.com)
+  - Arkadiusz Cichon (@acichon)
 extends_documentation_fragment:
   - cisco.catalystwan.manager_authentication
 notes:
@@ -180,13 +180,13 @@ def run_module():
         if filtered_templates:
             module.logger.info(f"All Feature Templates filtered with filters: {filters}:\n{filtered_templates}")
             result.msg = "Succesfully got all requested Feature Templates Info from vManage"
-            result.templates_info = [template for template in filtered_templates]
+            result.templates_info = list(filtered_templates)
         else:
             module.logger.warning(msg=f"Feature templates filtered with `{filters}` not present.")
             result.msg = f"Feature templates filtered with `{filters}` not present on vManage."
     else:
         result.msg = "Succesfully got all Feature Templates Info from vManage"
-        result.templates_info = [template for template in all_templates]
+        result.templates_info = list(all_templates)
 
     module.exit_json(**result.model_dump(mode="json"))
 
