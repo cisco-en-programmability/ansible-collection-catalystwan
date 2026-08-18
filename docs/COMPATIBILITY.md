@@ -25,8 +25,11 @@ ansible-playbook playbooks/tests/test_manager_release_compatibility.yml \
 ```
 
 `manager_credentials.yml` must define `manager_authentication` with `url`,
-`username`, and `password`. The playbook reads the installed release and checks
-API readiness without changing Manager state.
+`username`, `password`, and the HTTPS API `port` when it is not 443. The
+playbook reads the installed release and checks API readiness without changing
+Manager state. If the shell also uses `VMANAGE_PORT` for SSH, pass the HTTPS
+port explicitly in `manager_authentication` so the SDK does not inherit the SSH
+port.
 
 ## SDK compatibility note
 

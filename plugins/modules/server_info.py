@@ -40,7 +40,7 @@ response:
   description: The detailed server information based on the selected category.
   returned: success
   type: dict
-  sample: {"version": "20.3.1", "buildNumber": "12345", "ready": true}
+  sample: {"platform_version": "26.1.0", "is_server_ready": true}
 msg:
   description: Failure message if the information could not be retrieved.
   returned: failure
