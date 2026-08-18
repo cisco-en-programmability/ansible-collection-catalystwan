@@ -68,8 +68,8 @@ from ..module_utils.vmanage_module import AnsibleCatalystwanModule
 
 
 class ExtendedModuleResult(ModuleResult):
-    remote_servers: Optional[List] = Field(default=[])
-    software_images: Optional[List] = Field(default=[])
+    remote_servers: Optional[List] = Field(default_factory=list)
+    software_images: Optional[List] = Field(default_factory=list)
 
 
 def run_module():

@@ -113,8 +113,8 @@ class BackupPathModel(BaseModel):
 
 
 class ExtendedModuleResult(ModuleResult):
-    devices: Optional[List] = Field(default=[])
-    backup_paths: Optional[List[BackupPathModel]] = Field(default=[])
+    devices: Optional[List] = Field(default_factory=list)
+    backup_paths: Optional[List[BackupPathModel]] = Field(default_factory=list)
 
 
 def run_module():

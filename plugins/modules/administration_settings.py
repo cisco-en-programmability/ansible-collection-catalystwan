@@ -208,13 +208,32 @@ from typing import get_args
 from catalystwan.endpoints.configuration_settings import (
     Certificate,
     Device,
-    EnterpriseRootCA,
     OnOffMode,
     Organization,
     PnPConnectSync,
     SmartAccountCredentials,
     SoftwareInstallTimeout,
 )
+from pydantic import BaseModel, ConfigDict, Field
+
+try:
+    from catalystwan.endpoints.configuration_settings import EnterpriseRootCA
+
+    HAS_ENTERPRISE_ROOT_CA_ENDPOINT = True
+except ImportError:
+    HAS_ENTERPRISE_ROOT_CA_ENDPOINT = False
+
+    class EnterpriseRootCA(BaseModel):
+        """Payload used by SDK versions that no longer expose this endpoint model."""
+
+        model_config = ConfigDict(populate_by_name=True)
+        enterprise_root_ca: str = Field(serialization_alias="enterpriseRootCA", validation_alias="enterpriseRootCA")
+        control_connection_up: bool = Field(
+            default=False,
+            serialization_alias="controlConnectionUp",
+            validation_alias="controlConnectionUp",
+        )
+
 
 from ..module_utils.result import ModuleResult
 from ..module_utils.vmanage_module import AnsibleCatalystwanModule
@@ -342,6 +361,13 @@ def run_module():
         modify_certificates = True if certificates_data != certificates_payload else False
 
     if module.params.get("enterprise_root_ca"):
+        if not HAS_ENTERPRISE_ROOT_CA_ENDPOINT:
+            module.fail_json(
+                msg=(
+                    "The installed catalystwan SDK does not expose the Enterprise Root CA endpoint. "
+                    "Install catalystwan==0.41.5.dev2 to use this option."
+                )
+            )
         enterprise_ca_payload = EnterpriseRootCA(
             enterprise_root_ca=module.params_without_none_values.get("enterprise_root_ca")
         )

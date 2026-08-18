@@ -1,47 +1,47 @@
 files: '.py'
 exclude: '.git'
-default_stages: [commit]
+default_stages: [pre-commit]
 
 repos:
-  - repo: https://github.com/timothycrosley/isort
-    rev: 5.12.0
+  - repo: https://github.com/PyCQA/isort
+    rev: 8.0.1
     hooks:
       - id: isort
         args: ["-l", "120", "--profile", "black"]
 
   - repo: https://github.com/hadialqattan/pycln
-    rev: v2.5.0
+    rev: v2.6.0
     hooks:
       - id: pycln
         args: ["--all"]
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v4.4.0
+    rev: v6.0.0
     hooks:
       - id: check-yaml
       - id: end-of-file-fixer
       - id: trailing-whitespace
 
   - repo: https://github.com/psf/black
-    rev: 23.3.0
+    rev: 26.5.1
     hooks:
       - id: black
         args: ["-l", "120"]
 
   - repo: https://github.com/pycqa/flake8
-    rev: 6.1.0
+    rev: 7.3.0
     hooks:
       - id: flake8
         args: ["--max-line-length", "120"]
         fail_fast: true
 
   - repo: https://github.com/ansible-community/ansible-lint.git
-    rev: v25.8.1
+    rev: v26.8.0
     hooks:
       - id: ansible-lint
         files: \.(yaml|yml)$
 
   - repo: https://github.com/Yelp/detect-secrets
-    rev: v1.4.0
+    rev: v1.5.0
     hooks:
       - id: detect-secrets

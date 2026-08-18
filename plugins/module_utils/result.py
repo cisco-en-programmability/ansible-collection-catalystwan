@@ -11,7 +11,7 @@ ALLOW: Final[str] = "allow"
 class ModuleResult(BaseModel):
     model_config = ConfigDict(extra=ALLOW)
 
-    response: Optional[Dict] = Field(default={})  # for responses from Manager after running action
-    state: Optional[Dict] = Field(default={})  # for current state when no changes applied
+    response: Optional[Dict] = Field(default_factory=dict)  # for responses from Manager after running action
+    state: Optional[Dict] = Field(default_factory=dict)  # for current state when no changes applied
     changed: bool = Field(default=False)
     msg: Optional[str] = Field(default="")

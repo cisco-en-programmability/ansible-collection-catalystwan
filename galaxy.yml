@@ -1,6 +1,6 @@
 namespace: cisco
 name: catalystwan
-version: 0.3.3
+version: 0.3.4
 readme: README.md
 authors:
   - Arkadiusz Cichon <acichon@cisco.com>
@@ -22,4 +22,11 @@ tags:
   - networking
 
 dependencies: {}
-build_ignore: []
+build_ignore:
+  - .git
+  - .github
+  - .pytest_cache
+  - .venv
+  - "**/__pycache__"
+  - "**/*.pyc"
+  - "*.tar.gz"

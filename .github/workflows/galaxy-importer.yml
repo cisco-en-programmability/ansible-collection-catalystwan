@@ -21,12 +21,12 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set up Python
-        uses: actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f # v5.1.1
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
-          python-version: '3.10'
+          python-version: '3.13'
 
       - name: Get collection namespace and name from galaxy.yml
         id: collection-name
@@ -47,7 +47,7 @@ jobs:
 
       - name: Install Ansible and importer
         run: |
-          pip install ansible==9.4.0
+          pip install ansible==14.3.1
           pip install ansible-importer
           pip install galaxy-importer
 

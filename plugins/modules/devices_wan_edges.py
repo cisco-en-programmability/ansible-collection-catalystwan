@@ -142,7 +142,7 @@ class State(str, Enum):
 
 
 class ExtendedModuleResult(ModuleResult):
-    bootstrap_configuration: Optional[List] = Field(default=[])
+    bootstrap_configuration: Optional[List] = Field(default_factory=list)
 
 
 def generate_bootstrap_configuration(module: AnsibleCatalystwanModule, result: ExtendedModuleResult):

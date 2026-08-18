@@ -96,7 +96,7 @@ from ..module_utils.vmanage_module import AnsibleCatalystwanModule
 
 
 class ExtendedModuleResult(ModuleResult):
-    installed_devices: Optional[List] = Field(default=[])
+    installed_devices: Optional[List] = Field(default_factory=list)
 
 
 def run_module():

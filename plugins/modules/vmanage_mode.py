@@ -83,7 +83,7 @@ State = Literal["present"]
 
 
 class ExtendedModuleResult(ModuleResult):
-    attached_templates: Optional[Dict] = Field(default={})
+    attached_templates: Optional[Dict] = Field(default_factory=dict)
 
 
 def run_module():

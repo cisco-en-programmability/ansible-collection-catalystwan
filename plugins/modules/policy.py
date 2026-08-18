@@ -111,11 +111,10 @@ from catalystwan.models.policy import (
     AnyPolicyDefinition,
     AnyPolicyList,
     CentralizedPolicy,
-    CentralizedPolicyInfo,
     LocalizedPolicy,
-    LocalizedPolicyInfo,
 )
-from catalystwan.models.policy.centralized import CentralizedPolicyEditPayload
+from catalystwan.models.policy.centralized import CentralizedPolicyEditPayload, CentralizedPolicyInfo
+from catalystwan.models.policy.localized import LocalizedPolicyInfo
 from catalystwan.session import ManagerHTTPError
 from catalystwan.typed_list import DataSequence
 

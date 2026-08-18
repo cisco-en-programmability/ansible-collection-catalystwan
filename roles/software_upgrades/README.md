@@ -25,6 +25,9 @@ The `software_upgrades` role performs the following tasks:
 
 - `cisco.catalystwan` collection installed.
 - Access details for the Cisco Manager instance must be provided.
+- Run `playbooks/tests/test_manager_release_compatibility.yml` against a new
+  Manager train before performing a software upgrade. The current compatibility
+  target is Cisco Catalyst SD-WAN Manager 26.1.
 
 ## Dependencies
 
@@ -78,7 +81,8 @@ Including an example of how to use your role (with variables passed in as parame
 
 ## Known Limitations
 
-- The role assumes that controllers are <20.13 version.
+- Upgrade endpoints are version-agnostic, but a live compatibility smoke test
+  is required for each newly published Manager train.
 - When directly uploading images from local machine to vManage, upload of a single image must complete within Server Session Timeout
 
 ## License

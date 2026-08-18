@@ -6,17 +6,16 @@ authors = ["acichon <acichon@cisco.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.10"
-ansible-core = "2.16.6"
-ansible = "9.4.0"
-catalystwan = "v0.35.5dev3"
-flake8 = "5.0.4"
-black = "24.3.0"
-pre-commit = "3.7"
-pydantic = "2.7"
-requests = "2.32.2"
-urllib3 = "2.2.2"
-ansible-lint = { version = "6.22.2", markers = "platform_system != 'Windows'" }
+python = ">=3.12,<3.15"
+ansible = "14.3.1"
+catalystwan = "0.41.5.dev2"
+flake8 = "7.3.0"
+black = "26.5.1"
+pre-commit = "4.6.2"
+pydantic = ">=2.7,<3.0"
+requests = ">=2.32.5,<3.0"
+urllib3 = ">=2.6,<3.0"
+ansible-lint = { version = "26.8.0", markers = "platform_system != 'Windows'" }
 
 [tool.poetry.group.dev.dependencies]
 

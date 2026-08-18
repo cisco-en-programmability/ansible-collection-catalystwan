@@ -32,7 +32,8 @@ service_profiles:
   returned: on success
   type: str
 settable_variables:
-  description: A list of settable variables for created feature profiles grouped by profile type, i.e.:
+  description: >-
+    A list of settable variables for created feature profiles grouped by profile type.
     settable_variables:
       service:
         interface_names:
@@ -70,16 +71,16 @@ EXAMPLES = r"""
               - wan_interface_ethernet_parcel_1:
                 template: ethernet
                 config:
-                    data:
-                      interfaceName:
-                        optionType: default
+                  data:
+                    interfaceName:
+                      optionType: default
     service_profiles:
       - name: Service
         description: Description
         parcels:
-        - template: vpn
-          sub_parcels:
-            - template: ethernet
+          - template: vpn
+            sub_parcels:
+              - template: ethernet
 """
 
 import os

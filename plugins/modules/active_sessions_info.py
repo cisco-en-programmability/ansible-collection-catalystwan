@@ -96,7 +96,7 @@ from ..module_utils.vmanage_module import AnsibleCatalystwanModule
 
 
 class ExtendedModuleResult(ModuleResult):
-    active_sessions: Optional[List] = Field(default=[])
+    active_sessions: Optional[List] = Field(default_factory=list)
 
 
 def run_module():

@@ -121,7 +121,7 @@ from ..module_utils.vmanage_module import AnsibleCatalystwanModule
 
 
 class ExtendedModuleResult(ModuleResult):
-    users: Optional[List] = Field(default=[])
+    users: Optional[List] = Field(default_factory=list)
 
 
 def run_module():

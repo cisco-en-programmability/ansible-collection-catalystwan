@@ -4,7 +4,7 @@
 ---
 
 # This playbook uses example role for remote upgrades.
-# It assumes that controllers are <20.13 version and Edge are <17.13 version.
+# Run the Manager release compatibility smoke test before destructive upgrade testing.
 # It configures Remote Server, uploads images, then perform installation, activation and default version set.
 # Doesn't include cEdge software upgrades - known bug with cEdge with Remote Images
 # Vars provided in this playbook are dev_vars

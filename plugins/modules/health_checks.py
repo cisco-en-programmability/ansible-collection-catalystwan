@@ -93,7 +93,7 @@ from ..module_utils.vmanage_module import AnsibleCatalystwanModule
 
 
 class ExtendedModuleResult(ModuleResult):
-    health_summary: Optional[List] = Field(default=[])
+    health_summary: Optional[List] = Field(default_factory=list)
 
 
 class HealthCheckTypes(str, Enum):

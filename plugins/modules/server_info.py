@@ -98,7 +98,10 @@ def run_module():
     elif module.params["information_category"] == InformationCategory.ABOUT_INFO:
         response = module.get_response_safely(module.session.endpoints.client.about)
 
-    result.response = response.dict()
+    try:
+        result.response = response.model_dump(mode="json")
+    except AttributeError:  # catalystwan models created with Pydantic v1
+        result.response = response.dict()
 
     module.exit_json(**result.model_dump(mode="json"))
 

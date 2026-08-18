@@ -133,10 +133,18 @@ from typing import Literal, Optional, get_args
 from catalystwan.api.template_api import DeviceTemplate, GeneralTemplate
 from catalystwan.dataclasses import Device
 from catalystwan.exceptions import TemplateNotFoundError
-from catalystwan.models.common import DeviceModel
-from catalystwan.models.templates import DeviceTemplateInformation
 from catalystwan.session import ManagerHTTPError
 from catalystwan.typed_list import DataSequence
+
+try:
+    from catalystwan.dataclasses import DeviceTemplateInfo
+except ImportError:
+    from catalystwan.models.templates import DeviceTemplateInformation as DeviceTemplateInfo
+
+try:
+    from catalystwan.utils.device_model import DeviceModel
+except ImportError:
+    from catalystwan.models.common import DeviceModel
 
 from ..module_utils.result import ModuleResult
 from ..module_utils.vmanage_module import AnsibleCatalystwanModule
@@ -205,10 +213,10 @@ def run_module():
 
     template_name = module.params.get("template_name")
 
-    all_templates: DataSequence[DeviceTemplateInformation] = module.get_response_safely(
+    all_templates: DataSequence[DeviceTemplateInfo] = module.get_response_safely(
         module.session.api.templates.get, template=DeviceTemplate
     )
-    target_template: Optional[DeviceTemplateInformation] = all_templates.filter(name=template_name)
+    target_template: Optional[DeviceTemplateInfo] = all_templates.filter(name=template_name)
 
     if module.params.get("state") == "present":
         # Code for checking if template name exists already

@@ -114,8 +114,8 @@ from ..module_utils.vmanage_module import AnsibleCatalystwanModule
 
 
 class ExtendedModuleResult(ModuleResult):
-    alarms: Optional[List] = Field(default=[])
-    number_of_alarms: Optional[List] = Field(default=[])
+    alarms: Optional[List] = Field(default_factory=list)
+    number_of_alarms: int = 0
 
 
 def run_module():
