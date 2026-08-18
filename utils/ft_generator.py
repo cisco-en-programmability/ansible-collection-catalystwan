@@ -296,12 +296,10 @@ for model_name, model_module in available_models.items():
     print(f"File '{file_name}' has been written successfully.")
 
 
-print(
-    """
+print("""
     When used, note that Device Specific Variables doesn't have description and it required manual effort to fix
     these in documentation. Example: cisco.catalystwan.feature_template_cisco_system requires updating few fields.
     Look for '- null' fields.
     That will be solved once we will have Device Specific Variables in SDK properly defined.
 
-    """
-)
+    """)
