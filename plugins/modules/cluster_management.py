@@ -37,7 +37,6 @@ options:
     description:
       - Password for the device being managed.
     type: str
-    no_log: True
   gen_csr:
     description:
       - Whether to generate a CSR (Certificate Signing Request) for the device.
@@ -73,7 +72,7 @@ options:
         type: str
 
 author:
-  - Przemyslaw Susko (sprzemys@cisco.com)
+  - Przemyslaw Susko (@sprzemys)
 extends_documentation_fragment:
   - cisco.catalystwan.manager_authentication
 """
@@ -88,8 +87,11 @@ response:
   description: Detailed response from the vManage API if applicable.
   returned: when API call is made
   type: dict
-  sample: {"edit_vmanage": "successMessage": "Edit Node operation performed. The operation may take some time and
-    may cause application-server to restart in between"}
+  sample:
+    edit_vmanage:
+      successMessage: >-
+        Edit Node operation performed. The operation may take some time and may
+        cause application-server to restart in between.
 changed:
   description: Whether or not the state was changed.
   returned: always
@@ -134,10 +136,34 @@ EXAMPLES = r"""
 """
 
 import time
-from typing import List, Optional
+from typing import Dict, List, Optional
 
-from catalystwan.endpoints.cluster_management import ConnectedDevice, TenancyMode, VManageSetup
+from catalystwan.endpoints.cluster_management import TenancyMode
 from catalystwan.exceptions import ManagerRequestException
+from pydantic import BaseModel, ConfigDict, Field
+
+try:
+    from catalystwan.endpoints.cluster_management import ConnectedDevice, VManageSetup
+
+    HAS_CLUSTER_MANAGEMENT_ENDPOINTS = True
+except ImportError:
+    HAS_CLUSTER_MANAGEMENT_ENDPOINTS = False
+
+    class ConnectedDevice(BaseModel):
+        model_config = ConfigDict(populate_by_name=True)
+        uuid: str
+        device_id: str = Field(serialization_alias="deviceId", validation_alias="deviceId")
+
+    class VManageSetup(BaseModel):
+        model_config = ConfigDict(populate_by_name=True)
+        vmanage_id: Optional[str] = Field(default=None, serialization_alias="vmanageID", validation_alias="vmanageID")
+        device_ip: str = Field(serialization_alias="deviceIP", validation_alias="deviceIP")
+        username: str
+        password: str
+        gen_csr: Optional[bool] = Field(default=None, serialization_alias="genCSR", validation_alias="genCSR")
+        persona: str
+        services: Optional[Dict[str, Dict[str, bool]]] = None
+
 
 from ..module_utils.result import ModuleResult
 from ..module_utils.vmanage_module import AnsibleCatalystwanModule
@@ -228,6 +254,13 @@ def run_module():
         mutually_exclusive=mutually_exclusive,
         required_one_of=required_one_of,
     )
+    if not HAS_CLUSTER_MANAGEMENT_ENDPOINTS:
+        module.fail_json(
+            msg=(
+                "The installed catalystwan SDK no longer exposes the cluster-management write endpoints. "
+                "Install catalystwan==0.41.5.dev2 to use this module."
+            )
+        )
     module.session.request_timeout = 60
     result = ModuleResult()
 

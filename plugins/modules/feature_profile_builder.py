@@ -10,8 +10,25 @@ module: feature_profile_builder
 short_description: Description
 version_added: "0.3.1"
 description: Module for building feature profile data based on parcel templates.
+options:
+  templates_path:
+    description: Path containing the parcel template files.
+    type: str
+    required: true
+  system_profiles:
+    description: System feature-profile definitions to render.
+    type: list
+    elements: dict
+  transport_profiles:
+    description: Transport feature-profile definitions to render.
+    type: list
+    elements: dict
+  service_profiles:
+    description: Service feature-profile definitions to render.
+    type: list
+    elements: dict
 author:
-  - Przemyslaw Susko (sprzemys@cisco.com)
+  - Przemyslaw Susko (@sprzemys)
 """
 
 RETURN = r"""
@@ -32,7 +49,8 @@ service_profiles:
   returned: on success
   type: str
 settable_variables:
-  description: A list of settable variables for created feature profiles grouped by profile type, i.e.:
+  description: >-
+    A list of settable variables for created feature profiles grouped by profile type.
     settable_variables:
       service:
         interface_names:
@@ -70,16 +88,16 @@ EXAMPLES = r"""
               - wan_interface_ethernet_parcel_1:
                 template: ethernet
                 config:
-                    data:
-                      interfaceName:
-                        optionType: default
+                  data:
+                    interfaceName:
+                      optionType: default
     service_profiles:
       - name: Service
         description: Description
         parcels:
-        - template: vpn
-          sub_parcels:
-            - template: ethernet
+          - template: vpn
+            sub_parcels:
+              - template: ethernet
 """
 
 import os
@@ -221,9 +239,9 @@ def generate_profiles(module: AnsibleModule, cache: TemplateCache, profile_type:
 def run_module():
     module_args = dict(
         templates_path=dict(type="str", required=True),
-        system_profiles=dict(type="list"),
-        transport_profiles=dict(type="list"),
-        service_profiles=dict(type="list"),
+        system_profiles=dict(type="list", elements="dict"),
+        transport_profiles=dict(type="list", elements="dict"),
+        service_profiles=dict(type="list", elements="dict"),
     )
 
     result = dict(changed=True, data={})

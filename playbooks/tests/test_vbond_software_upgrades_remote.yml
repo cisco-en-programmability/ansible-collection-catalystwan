@@ -4,7 +4,7 @@
 ---
 
 # Helper playbooks to test modules and flows while developing them
-# It assumes that controllers are <20.13 version and Edge are <17.13 version
+# Run the Manager release compatibility smoke test before destructive upgrade testing.
 # This playbook should be reused for CI/CD integration. For this, only vars should be adjusted.
 
 

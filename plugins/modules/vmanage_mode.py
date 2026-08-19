@@ -28,7 +28,7 @@ options:
     elements: str
     required: true
 author:
-  - Arkadiusz Cichon (acichon@cisco.com)
+  - Arkadiusz Cichon (@acichon)
 extends_documentation_fragment:
   - cisco.catalystwan.manager_authentication
 notes:
@@ -83,7 +83,7 @@ State = Literal["present"]
 
 
 class ExtendedModuleResult(ModuleResult):
-    attached_templates: Optional[Dict] = Field(default={})
+    attached_templates: Optional[Dict] = Field(default_factory=dict)
 
 
 def run_module():

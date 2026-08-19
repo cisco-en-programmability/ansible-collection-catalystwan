@@ -6,7 +6,7 @@
 
 DOCUMENTATION = r"""
 ---
-module: vmanage_feature_template
+module: feature_templates
 short_description: Manage feature templates for Cisco vManage SD-WAN
 version_added: "0.2.0"
 description:
@@ -63,20 +63,38 @@ extends_documentation_fragment:
   - cisco.catalystwan.device_models_feature_template
   - cisco.catalystwan.manager_authentication
 author:
-  - Arkadiusz Cichon (acichon@cisco.com)
+  - Arkadiusz Cichon (@acichon)
 """
 
+EXAMPLES = r"""
+- name: Create a Cisco system feature template
+  cisco.catalystwan.feature_templates:
+    state: present
+    template_name: branch-system
+    template_description: Branch system template
+    device_models:
+      - C8000V
+    cisco_system: {}
+"""
 
 from typing import Dict, Final, Literal, Optional, get_args
 
 from catalystwan.api.template_api import FeatureTemplate
 from catalystwan.api.templates.device_variable import DeviceVariable
 from catalystwan.api.templates.models.supported import available_models
-from catalystwan.models.common import DeviceModel
-from catalystwan.models.templates import FeatureTemplateInformation
 from catalystwan.session import ManagerHTTPError
 from catalystwan.typed_list import DataSequence
 from pydantic import BaseModel, ConfigDict, Field
+
+try:
+    from catalystwan.dataclasses import FeatureTemplateInfo
+except ImportError:
+    from catalystwan.models.templates import FeatureTemplateInformation as FeatureTemplateInfo
+
+try:
+    from catalystwan.utils.device_model import DeviceModel
+except ImportError:
+    from catalystwan.models.common import DeviceModel
 
 from ..module_utils.feature_templates.aaa import aaa_definition
 from ..module_utils.feature_templates.cisco_aaa import cisco_aaa_definition
@@ -107,7 +125,7 @@ class Values(BaseModel):
 
 
 class ExtendedModuleResult(ModuleResult):
-    templates_info: Optional[Dict] = Field(default={})
+    templates_info: Optional[Dict] = Field(default_factory=dict)
 
 
 State = Literal["present", "modified", "absent"]
@@ -181,10 +199,10 @@ def run_module():
     device_specific_variables: Dict = module.params.get("device_specific_variables")
     module.logger.info(f"Module input: \n{module.params}\n")
 
-    all_templates: DataSequence[FeatureTemplateInformation] = module.get_response_safely(
+    all_templates: DataSequence[FeatureTemplateInfo] = module.get_response_safely(
         module.session.api.templates.get, template=FeatureTemplate
     )
-    target_template: Optional[FeatureTemplateInformation] = all_templates.filter(name=template_name)
+    target_template: Optional[FeatureTemplateInfo] = all_templates.filter(name=template_name)
 
     if module.params.get("state") == "present":
         # Code for checking if template name exists already

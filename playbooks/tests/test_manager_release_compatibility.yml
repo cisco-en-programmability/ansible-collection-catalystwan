@@ -1,0 +1,31 @@
+---
+- name: Verify compatibility with the target Cisco Catalyst SD-WAN Manager release
+  hosts: localhost
+  gather_facts: false
+  vars:
+    target_manager_release: "26.1"
+  tasks:
+    - name: Read Manager server information
+      cisco.catalystwan.server_info:
+        information_category: server_info
+        manager_authentication: "{{ manager_authentication }}"
+      register: manager_server_info
+
+    - name: Verify the Manager release meets the compatibility target
+      ansible.builtin.assert:
+        that:
+          - manager_server_info.response.platform_version is version(target_manager_release, '>=')
+        fail_msg: >-
+          Expected Cisco Catalyst SD-WAN Manager {{ target_manager_release }} or newer,
+          got {{ manager_server_info.response.platform_version | default('unknown') }}.
+
+    - name: Verify the Manager API is ready
+      cisco.catalystwan.server_info:
+        information_category: server_ready
+        manager_authentication: "{{ manager_authentication }}"
+      register: manager_ready
+
+    - name: Assert that the Manager API reports ready
+      ansible.builtin.assert:
+        that:
+          - manager_ready.response.is_server_ready | bool

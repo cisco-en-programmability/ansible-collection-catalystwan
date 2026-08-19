@@ -76,7 +76,7 @@ options:
     type: list
     elements: str
 author:
-  - Arkadiusz Cichon (acichon@cisco.com)
+  - Arkadiusz Cichon (@acichon)
 
 notes:
   - This module does not guarantee idempotency - certain operations like installation will always change device state.
@@ -205,6 +205,10 @@ class SoftwareState(str, Enum):
     DEFAULT = "default"  # in vManage -> DEFAULT
 
 
+def _all_devices_are_managers(devices: DataSequence[DeviceDetailsResponse]) -> bool:
+    return all(device.personality == "vmanage" for device in devices)
+
+
 @retry(
     wait=wait_fixed(INTERVAL_SECONDS),
     stop=stop_after_attempt(int(TIMEOUT_SECONDS / INTERVAL_SECONDS)),
@@ -316,7 +320,7 @@ def run_module():
             if (
                 module.params.get("wait_for_completed")
                 and module.params.get("reboot")  # noqa: W503
-                and all([True for device in devices if device.personality == "vmanage"])  # noqa: W503
+                and _all_devices_are_managers(devices)  # noqa: W503
             ):
                 try:
                     module.session.restart_imminent(restart_timeout_override=module.params.get("wait_timeout_seconds"))
@@ -381,9 +385,7 @@ def run_module():
                 version_to_activate=module.params.get("image_version"),
             )
 
-            if module.params.get("wait_for_completed") and all(
-                [True for device in devices if device.personality == "vmanage"]
-            ):
+            if module.params.get("wait_for_completed") and _all_devices_are_managers(devices):
                 try:
                     module.session.restart_imminent(restart_timeout_override=module.params.get("wait_timeout_seconds"))
                     wait_for_task_data(module=module, result=result, task=activate_task)

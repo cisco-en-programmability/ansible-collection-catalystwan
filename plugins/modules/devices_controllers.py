@@ -28,7 +28,6 @@ options:
     description:
       - Password for the device being managed.
     type: str
-    no_log: True
   personality:
     description:
       - Personality of the device. Choices are 'vSmart', 'vBond', or 'vManage'.
@@ -61,7 +60,7 @@ options:
       - Hostname of the device.
     type: str
 author:
-  - Arkadiusz Cichon (acichon@cisco.com)
+  - Arkadiusz Cichon (@acichon)
 notes:
   - "Only vSmart, vBond, and vManage device personalities are currently supported."
   - "The 'state' option 'invalidated' will delete the device configuration in vManage."

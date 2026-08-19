@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 # Copyright 2024 Cisco Systems, Inc. and its affiliates
@@ -33,7 +32,6 @@ options:
           - Password for authentication with vManage.
         required: true
         type: str
-        no_log: true
       port:
         description:
           - Port number to use for connecting to vManage.

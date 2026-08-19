@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 # Copyright 2024 Cisco Systems, Inc. and its affiliates
@@ -454,7 +453,7 @@ options:
                 suboptions:
                     name:
                         default: system_host_name
-                        required: true
+                        required: false
                         type: str
                         description: Device Specific Variables name
             location:
@@ -530,7 +529,7 @@ options:
                 suboptions:
                     name:
                         default: system_system_ip
-                        required: true
+                        required: false
                         type: str
                         description: Device Specific Variables name
             overlay_id:
@@ -543,7 +542,7 @@ options:
                 description:
                 - The site ID of the device.
                 required: false
-                default: system_site_id
+                default: null
                 type: int
             site_type:
                 description:

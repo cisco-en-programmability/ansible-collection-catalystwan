@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 
 # Copyright 2024 Cisco Systems, Inc. and its affiliates
@@ -117,7 +116,6 @@ options:
                         required: false
                         default: null
                         type: dict
-                        elements: dict
                         suboptions:
                             interface_name:
                                 description:

@@ -7,7 +7,7 @@
 
 DOCUMENTATION = r"""
 ---
-module: Device_templates_info
+module: device_templates_info
 short_description: Get information about Device Templates on vManage.
 version_added: "0.2.0"
 description:
@@ -118,7 +118,7 @@ options:
       - Directory to store the backup. It's created if missing. Defaults to a 'backup' folder in the current directory.
     type: path
 author:
-  - Arkadiusz Cichon (acichon@cisco.com)
+  - Arkadiusz Cichon (@acichon)
 extends_documentation_fragment:
   - cisco.catalystwan.manager_authentication
 notes:
@@ -174,10 +174,14 @@ from pathlib import Path, PurePath
 from typing import Dict, List, Optional
 
 from catalystwan.api.template_api import DeviceTemplate
-from catalystwan.models.templates import DeviceTemplateInformation
 from catalystwan.session import ManagerHTTPError
 from catalystwan.typed_list import DataSequence
 from pydantic import BaseModel, Field
+
+try:
+    from catalystwan.dataclasses import DeviceTemplateInfo
+except ImportError:
+    from catalystwan.models.templates import DeviceTemplateInformation as DeviceTemplateInfo
 
 from ..module_utils.result import ModuleResult
 from ..module_utils.vmanage_module import AnsibleCatalystwanModule
@@ -190,8 +194,8 @@ class BackupPathModel(BaseModel):
 
 
 class ExtendedModuleResult(ModuleResult):
-    templates_info: Optional[Dict] = Field(default={})
-    backup_paths: Optional[List[BackupPathModel]] = Field(default=[])
+    templates_info: Optional[Dict] = Field(default_factory=dict)
+    backup_paths: Optional[List[BackupPathModel]] = Field(default_factory=list)
 
 
 def run_module():
@@ -205,9 +209,9 @@ def run_module():
     module = AnsibleCatalystwanModule(argument_spec=module_args)
 
     filters = module.params.get("filters")
-    filtered_templates = DataSequence(DeviceTemplateInformation)
+    filtered_templates = DataSequence(DeviceTemplateInfo)
 
-    all_templates: DataSequence[DeviceTemplateInformation] = module.get_response_safely(
+    all_templates: DataSequence[DeviceTemplateInfo] = module.get_response_safely(
         module.session.api.templates.get, template=DeviceTemplate
     )
 
@@ -216,13 +220,13 @@ def run_module():
         if filtered_templates:
             module.logger.info(f"All Device Templates filtered with filters: {filters}:\n{filtered_templates}")
             result.msg = "Succesfully got all requested Device Templates Info from vManage"
-            result.templates_info = [template for template in filtered_templates]
+            result.templates_info = list(filtered_templates)
         else:
             module.logger.warning(msg=f"Device templates filtered with `{filters}` not present.")
             result.msg = f"Device templates filtered with `{filters}` not present on vManage."
     else:
         result.msg = "Succesfully got all Device Templates Info from vManage"
-        result.templates_info = [template for template in all_templates]
+        result.templates_info = list(all_templates)
 
     if module.params.get("backup"):
         backup_dir_path: Path = Path(module.params.get("backup_dir_path"))

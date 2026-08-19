@@ -1,0 +1,38 @@
+name: Ansible sanity
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  schedule:
+    - cron: "23 9 * * 1"
+  workflow_dispatch:
+
+permissions: read-all
+
+jobs:
+  sanity:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.13", "3.14"]
+
+    steps:
+      - name: Check out the collection
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: ansible_collections/cisco/catalystwan
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "${{ matrix.python-version }}"
+
+      - name: Install ansible-test
+        run: python -m pip install "ansible==14.3.1"
+
+      - name: Run collection sanity tests
+        working-directory: ansible_collections/cisco/catalystwan
+        run: ansible-test sanity --python "${{ matrix.python-version }}" --color yes

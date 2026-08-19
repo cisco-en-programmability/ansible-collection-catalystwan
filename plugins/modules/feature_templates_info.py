@@ -93,7 +93,7 @@ options:
         default: null
         type: str
 author:
-  - Arkadiusz Cichon (acichon@cisco.com)
+  - Arkadiusz Cichon (@acichon)
 extends_documentation_fragment:
   - cisco.catalystwan.manager_authentication
 notes:
@@ -145,16 +145,20 @@ changed:
 from typing import Dict, Optional
 
 from catalystwan.api.template_api import FeatureTemplate
-from catalystwan.models.templates import FeatureTemplateInformation
 from catalystwan.typed_list import DataSequence
 from pydantic import Field
+
+try:
+    from catalystwan.dataclasses import FeatureTemplateInfo
+except ImportError:
+    from catalystwan.models.templates import FeatureTemplateInformation as FeatureTemplateInfo
 
 from ..module_utils.result import ModuleResult
 from ..module_utils.vmanage_module import AnsibleCatalystwanModule
 
 
 class ExtendedModuleResult(ModuleResult):
-    templates_info: Optional[Dict] = Field(default={})
+    templates_info: Optional[Dict] = Field(default_factory=dict)
 
 
 def run_module():
@@ -167,7 +171,7 @@ def run_module():
 
     filters = module.params.get("filters")
 
-    all_templates: DataSequence[FeatureTemplateInformation] = module.get_response_safely(
+    all_templates: DataSequence[FeatureTemplateInfo] = module.get_response_safely(
         module.session.api.templates.get, template=FeatureTemplate
     )
 
@@ -176,13 +180,13 @@ def run_module():
         if filtered_templates:
             module.logger.info(f"All Feature Templates filtered with filters: {filters}:\n{filtered_templates}")
             result.msg = "Succesfully got all requested Feature Templates Info from vManage"
-            result.templates_info = [template for template in filtered_templates]
+            result.templates_info = list(filtered_templates)
         else:
             module.logger.warning(msg=f"Feature templates filtered with `{filters}` not present.")
             result.msg = f"Feature templates filtered with `{filters}` not present on vManage."
     else:
         result.msg = "Succesfully got all Feature Templates Info from vManage"
-        result.templates_info = [template for template in all_templates]
+        result.templates_info = list(all_templates)
 
     module.exit_json(**result.model_dump(mode="json"))
 

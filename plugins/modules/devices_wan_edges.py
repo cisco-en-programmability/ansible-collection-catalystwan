@@ -34,7 +34,6 @@ options:
     description:
       - Password for the smart account.
     type: str
-    no_log: True
   wan_edge_list:
     description:
       - Filepath to the WAN Edge list for uploading.
@@ -51,7 +50,7 @@ options:
     type: bool
     default: False
 author:
-  - Arkadiusz Cichon (acichon@cisco.com)
+  - Arkadiusz Cichon (@acichon)
 
 notes:
   - If 'state' is 'present', either 'sync_devices_from_smart_account' or 'wan_edge_list' must be defined.
@@ -142,7 +141,7 @@ class State(str, Enum):
 
 
 class ExtendedModuleResult(ModuleResult):
-    bootstrap_configuration: Optional[List] = Field(default=[])
+    bootstrap_configuration: Optional[List] = Field(default_factory=list)
 
 
 def generate_bootstrap_configuration(module: AnsibleCatalystwanModule, result: ExtendedModuleResult):

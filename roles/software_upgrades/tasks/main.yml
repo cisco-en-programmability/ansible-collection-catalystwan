@@ -4,7 +4,6 @@
 ---
 
 # This role provides full workflow for upgrading devices with Remote Server.
-# It assumes that controllers are <20.13 version
 # Currently doesn't include upgrades of cEdges from Remote Server. Known bug on vManage.
 
 - name: "Verify required variables for selected role"

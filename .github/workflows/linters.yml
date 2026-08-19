@@ -5,7 +5,7 @@ on:
 
   push:
     branches:
-      - master
+      - main
 
 permissions: read-all
 
@@ -14,27 +14,27 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ['3.10']
+        python-version: ['3.14']
     defaults:
       run:
         shell: sh
 
     steps:
       - name: Check out the repository
-        uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Set up Python
-        uses: actions/setup-python@39cd14951b08e74b54015e9e001cdefcf80e669f # v5.1.1
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
         with:
-          python-version: '3.10'
+          python-version: '3.14'
 
       - uses: isort/isort-action@master
         with:
           requirementsFiles: "requirements.txt"
-          isortVersion: '5.12.0'
+          isortVersion: '8.0.1'
 
       - name: Install pycln
-        run: pip install pycln==2.4.0
+        run: pip install pycln==2.6.0
 
       - name: Run pycln
         run: pycln --all .
@@ -43,10 +43,10 @@ jobs:
         uses: pre-commit/action@2c7b3805fd2a0fd8c1884dcaebf91fc102a13ecd # v3.0.1
 
       - name: Run ansible-lint
-        uses: ansible/ansible-lint@v25.8.1
+        uses: ansible/ansible-lint@665d9e07a1943254d2910faffc106adaf7ea7294 # v26.8.0
 
       - name: Install detect-secrets
-        run: pip install detect-secrets==1.4.0
+        run: pip install detect-secrets==1.5.0
 
       - name: Run detect-secrets
         run: detect-secrets scan

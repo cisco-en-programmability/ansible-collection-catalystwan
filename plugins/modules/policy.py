@@ -36,24 +36,24 @@ options:
     description:
       - Centralized policy definition
       - The centralized, localized, definition and list options are mutually exclusive.
-    type: dictionary
+    type: dict
   localized:
     description:
       - Localized policy definition
       - The centralized, localized, definition and list options are mutually exclusive.
-    type: dictionary
+    type: dict
   definition:
     description:
       - Policy definition object
       - The centralized, localized, definition and list options are mutually exclusive.
-    type: dictionary
+    type: dict
   list:
     description:
       - Policy list object
       - The centralized, localized, definition and list options are mutually exclusive.
-    type: dictionary
+    type: dict
 author:
-  - Piotr Piwowarski (pipiwowa@cisco.com)
+  - Piotr Piwowarski (@pipiwowa)
 
 extends_documentation_fragment:
   - cisco.catalystwan.manager_authentication
@@ -111,11 +111,10 @@ from catalystwan.models.policy import (
     AnyPolicyDefinition,
     AnyPolicyList,
     CentralizedPolicy,
-    CentralizedPolicyInfo,
     LocalizedPolicy,
-    LocalizedPolicyInfo,
 )
-from catalystwan.models.policy.centralized import CentralizedPolicyEditPayload
+from catalystwan.models.policy.centralized import CentralizedPolicyEditPayload, CentralizedPolicyInfo
+from catalystwan.models.policy.localized import LocalizedPolicyInfo
 from catalystwan.session import ManagerHTTPError
 from catalystwan.typed_list import DataSequence
 
@@ -183,6 +182,8 @@ def run_module():
 
     object_name: str = module.params.get("name")
     object_description: str = module.params.get("description")
+    existing_object_id = None
+    object_to_create = None
 
     if module.params.get("centralized"):
         object_pretty_name = "Centralized Policy"

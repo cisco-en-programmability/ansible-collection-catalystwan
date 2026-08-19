@@ -12,6 +12,8 @@ short_description: Get information about CLI Templates on vManage.
 version_added: "0.3.5"
 description:
   - This module allows you to get CLI Templates Info from vManage.
+author:
+  - Arkadiusz Cichon (@acichon)
 options:
   filters:
     description:
@@ -128,8 +130,12 @@ templates_configuration:
 
 from catalystwan.api.template_api import CLITemplate
 from catalystwan.api.templates.device_template.device_template import DeviceTemplate
-from catalystwan.models.templates import DeviceTemplateInformation
 from catalystwan.typed_list import DataSequence
+
+try:
+    from catalystwan.dataclasses import DeviceTemplateInfo
+except ImportError:
+    from catalystwan.models.templates import DeviceTemplateInformation as DeviceTemplateInfo
 
 from ..module_utils.result import ModuleResult
 from ..module_utils.vmanage_module import AnsibleCatalystwanModule
@@ -146,14 +152,14 @@ def run_module():
 
     filters = module.params.get("filters")
 
-    all_templates: DataSequence[DeviceTemplateInformation] = module.get_response_safely(
+    all_templates: DataSequence[DeviceTemplateInfo] = module.get_response_safely(
         module.session.api.templates.get, template=CLITemplate
     )
 
     if module.params.get("filters"):
-        result.templates_info = [template for template in all_templates.filter(**filters)]
+        result.templates_info = list(all_templates.filter(**filters))
     else:
-        result.templates_info = [template for template in all_templates]
+        result.templates_info = list(all_templates)
 
     if module.params.get("gather_configuration"):
         result.templates_configuration = []

@@ -1,0 +1,5 @@
+* text=auto
+*.j2 text eol=lf
+*.py text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf

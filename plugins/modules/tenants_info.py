@@ -12,6 +12,8 @@ short_description: Get information about tenants
 version_added: "0.3.5"
 description:
   - This module allows you to get tenants Info from vManage.
+author:
+  - Piotr Piwowarski (@pipiwowa)
 options:
   filters:
     description:
@@ -113,9 +115,9 @@ def run_module():
     result.tenancy_domain = tenancy_mode.domain
 
     if module.params.get("filters"):
-        result.tenants_info = [tenant for tenant in all_tenants.filter(**filters)]
+        result.tenants_info = list(all_tenants.filter(**filters))
     else:
-        result.tenants_info = [tenant for tenant in all_tenants]
+        result.tenants_info = list(all_tenants)
 
     if result.tenants_info:
         module.logger.info(f"All tenants filtered with filters: {filters}:\n{result.tenants_info}")

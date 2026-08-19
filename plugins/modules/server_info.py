@@ -21,7 +21,7 @@ options:
     choices: ["server_info", "server_ready", "about_info"]
     default: "server_info"
 author:
-  - Arkadiusz Cichon (acichon@cisco.com)
+  - Arkadiusz Cichon (@acichon)
 
 notes:
   - The module does not make any changes on the server, it only retrieves information.
@@ -40,7 +40,7 @@ response:
   description: The detailed server information based on the selected category.
   returned: success
   type: dict
-  sample: {"version": "20.3.1", "buildNumber": "12345", "ready": true}
+  sample: {"platform_version": "26.1.0", "is_server_ready": true}
 msg:
   description: Failure message if the information could not be retrieved.
   returned: failure
@@ -98,7 +98,10 @@ def run_module():
     elif module.params["information_category"] == InformationCategory.ABOUT_INFO:
         response = module.get_response_safely(module.session.endpoints.client.about)
 
-    result.response = response.dict()
+    try:
+        result.response = response.model_dump(mode="json")
+    except AttributeError:  # catalystwan models created with Pydantic v1
+        result.response = response.dict()
 
     module.exit_json(**result.model_dump(mode="json"))
 

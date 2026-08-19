@@ -1,0 +1,51 @@
+name: Compatibility
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions: read-all
+
+jobs:
+  sdk-and-ansible:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.13", "3.14"]
+        catalystwan-version: ["0.41.5.dev2", "0.41.6"]
+
+    steps:
+      - name: Check out the repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "${{ matrix.python-version }}"
+
+      - name: Install the current automation stack
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install \
+            "ansible==14.3.1" \
+            "catalystwan==${{ matrix.catalystwan-version }}" \
+            "pytest==9.1.1"
+
+      - name: Run SDK compatibility tests
+        run: python -m pytest -q tests/unit
+
+      - name: Build and install the collection
+        run: |
+          ansible-galaxy collection build . --force
+          ansible-galaxy collection install cisco-catalystwan-*.tar.gz --force
+
+      - name: Validate module documentation imports
+        run: |
+          for module in plugins/modules/*.py; do
+            module_name="${module##*/}"
+            ansible-doc --type module "cisco.catalystwan.${module_name%.py}" >/dev/null
+          done

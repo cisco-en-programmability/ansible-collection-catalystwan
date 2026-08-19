@@ -36,14 +36,13 @@ options:
           - Password for authentication with vManage.
         required: true
         type: str
-        no_log: true
       port:
         description:
           - Port number to use for connecting to vManage.
         required: false
         type: str
 author:
-  - Arkadiusz Cichon (acichon@cisco.com)
+  - Arkadiusz Cichon (@acichon)
 """
 
 EXAMPLES = r"""
@@ -96,7 +95,7 @@ from ..module_utils.vmanage_module import AnsibleCatalystwanModule
 
 
 class ExtendedModuleResult(ModuleResult):
-    active_sessions: Optional[List] = Field(default=[])
+    active_sessions: Optional[List] = Field(default_factory=list)
 
 
 def run_module():

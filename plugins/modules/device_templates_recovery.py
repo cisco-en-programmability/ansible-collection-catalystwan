@@ -122,7 +122,7 @@ options:
         default: null
         type: str
 author:
-  - Arkadiusz Cichon (acichon@cisco.com)
+  - Arkadiusz Cichon (@acichon)
 extends_documentation_fragment:
   - cisco.catalystwan.manager_authentication
 notes:
@@ -138,7 +138,14 @@ RETURN = r"""
 from pathlib import Path, PurePath
 
 from catalystwan.session import ManagerHTTPError
-from catalystwan.workflows import backup_restore_device_templates
+
+try:
+    from catalystwan.workflows import backup_restore_device_templates
+
+    HAS_TEMPLATE_RECOVERY_WORKFLOW = True
+except ImportError:
+    backup_restore_device_templates = None
+    HAS_TEMPLATE_RECOVERY_WORKFLOW = False
 
 from ..module_utils.result import ModuleResult
 from ..module_utils.vmanage_module import AnsibleCatalystwanModule
@@ -157,6 +164,13 @@ def run_module():
     result = ModuleResult()
 
     module = AnsibleCatalystwanModule(argument_spec=module_args)
+    if not HAS_TEMPLATE_RECOVERY_WORKFLOW:
+        module.fail_json(
+            msg=(
+                "The installed catalystwan SDK no longer includes the device-template recovery workflow. "
+                "Install catalystwan==0.41.5.dev2 to use this module."
+            )
+        )
 
     filters = module.params.get("filters")
     backup_dir_path: Path = Path(module.params.get("backup_dir_path"))

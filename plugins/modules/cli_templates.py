@@ -30,7 +30,7 @@ options:
       - The description of the CLI template.
     required: false
     type: str
-    default: None
+    default: null
   config_file:
     description:
       - The path to the configuration file that contains the CLI template content.
@@ -48,7 +48,7 @@ options:
       - The timeout in seconds for attaching the template. Default is 300.
     type: int
 author:
-  - Arkadiusz Cichon (acichon@cisco.com)
+  - Arkadiusz Cichon (@acichon)
 extends_documentation_fragment:
   - cisco.catalystwan.device_models_device_template
   - cisco.catalystwan.manager_authentication
@@ -94,14 +94,32 @@ template_id:
 from typing import List, Literal, Optional, get_args
 
 from catalystwan.api.template_api import CLITemplate
-from catalystwan.api.templates.device_template.device_template import DeviceTemplateConfigAttached
 from catalystwan.dataclasses import Device
-from catalystwan.models.common import DeviceModel
-from catalystwan.models.templates import DeviceTemplateInformation
 from catalystwan.session import ManagerHTTPError
 from catalystwan.typed_list import DataSequence
 from ciscoconfparse import CiscoConfParse  # type: ignore
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
+
+try:
+    from catalystwan.api.templates.device_template.device_template import DeviceTemplateConfigAttached
+except ImportError:
+
+    class DeviceTemplateConfigAttached(BaseModel):
+        """Response model removed from the stable 0.40+ SDK line."""
+
+        model_config = ConfigDict(populate_by_name=True)
+        uuid: Optional[str] = None
+
+
+try:
+    from catalystwan.dataclasses import DeviceTemplateInfo
+except ImportError:
+    from catalystwan.models.templates import DeviceTemplateInformation as DeviceTemplateInfo
+
+try:
+    from catalystwan.utils.device_model import DeviceModel
+except ImportError:
+    from catalystwan.models.common import DeviceModel
 
 from ..module_utils.result import ModuleResult
 from ..module_utils.vmanage_module import AnsibleCatalystwanModule
@@ -154,10 +172,10 @@ def run_module():
 
     template_name = module.params.get("template_name")
 
-    all_templates: DataSequence[DeviceTemplateInformation] = module.get_response_safely(
+    all_templates: DataSequence[DeviceTemplateInfo] = module.get_response_safely(
         module.session.api.templates.get, template=CLITemplate
     )
-    target_template: Optional[DeviceTemplateInformation] = all_templates.filter(name=template_name)
+    target_template: Optional[DeviceTemplateInfo] = all_templates.filter(name=template_name)
 
     if module.params.get("state") == "present":
         # Code for checking if template name exists already

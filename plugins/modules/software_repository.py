@@ -57,9 +57,8 @@ options:
         aliases: [ 'port' ]
       remote_server_vpn:
         description:
-          - VPN ID used by the remote server.
+          - VPN ID used by the remote server, from 0 through 65527.
         type: int
-        choices: range(0, 65528)
         aliases: [ 'vpn' ]
       remote_server_user:
         description:
@@ -70,7 +69,6 @@ options:
         description:
           - Password to authenticate to the remote server.
         type: str
-        no_log: true
         aliases: [ 'password' ]
       image_location_prefix:
         description:
@@ -111,7 +109,7 @@ options:
         aliases: [ 'filename' ]
 
 author:
-  - Arkadiusz Cichon (acichon@cisco.com)
+  - Arkadiusz Cichon (@acichon)
 extends_documentation_fragment:
   - cisco.catalystwan.manager_authentication
 """
@@ -255,7 +253,7 @@ def run_module():
                 remote_server_url=dict(type="str", aliases=["url"]),
                 remote_server_protocol=dict(
                     type="str",
-                    choices=[choice for choice in RemoteServerProtocol],
+                    choices=list(RemoteServerProtocol),
                     default=RemoteServerProtocol.FTP.value,
                     aliases=["protocol"],
                 ),
@@ -279,7 +277,7 @@ def run_module():
                 ),
                 ("state", State.ABSENT.value, ("remote_server_id",), False),
             ],
-            mutually_exclusive=[("remote_server_name", "id")],
+            mutually_exclusive=[("remote_server_name", "remote_server_id")],
         ),
         software=dict(
             type="dict",
@@ -313,6 +311,8 @@ def run_module():
     upload_software_from_remote_server = False
     delete_software_from_software_repository = False
     software_payload = None
+    existing_remote_server_id = None
+    remove_software_id = None
 
     # ---------------------------------#
     # STEP 1 - verify module arguments #
@@ -356,20 +356,21 @@ def run_module():
                 update_remote_server = True
 
         if module.params["remote_server"]["state"] == State.ABSENT.value:
-            remote_server_id = module.params["remote_server"]["id"]
-            existing_server: RemoteServerInfo = remote_servers.filter(remote_server_id=remote_server_id)
+            remote_server_id = module.params["remote_server"]["remote_server_id"]
+            existing_server: RemoteServerInfo = remote_servers.filter(
+                remote_server_id=remote_server_id
+            ).single_or_default()
             if existing_server:
                 remove_remote_server = True
             else:
-                result.response[
-                    "remove_remote_server"
-                ] = f"Server with UUID: {remote_server_id} not present in Remote Servers List"
+                result.response["remove_remote_server"] = (
+                    f"Server with UUID: {remote_server_id} not present in Remote Servers List"
+                )
 
     if module.params.get("software"):
         image_path = module.params["software"].get("image_path")
-        remote_server_id = module.params["software"].get("remote_server_id")
         remote_server_name = module.params["software"].get("remote_server_name")
-        remote_filename = module.params["software"].get("filename")
+        remote_filename = module.params["software"].get("remote_filename")
         software_id = module.params["software"].get("software_id")
         software_state = module.params["software"]["state"]
 
@@ -393,11 +394,7 @@ def run_module():
                     f"{version_in_available_files}, skipping upload."
                 )
 
-        elif (
-            software_state == State.PRESENT.value
-            and remote_filename  # noqa: W503
-            and (remote_server_id or remote_server_name)  # noqa: W503
-        ):
+        elif software_state == State.PRESENT.value and remote_filename and remote_server_name:
             remote_servers = module.get_response_safely(
                 module.session.endpoints.configuration_software_actions.get_list_of_remote_servers
             )

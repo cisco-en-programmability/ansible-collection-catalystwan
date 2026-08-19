@@ -11,7 +11,7 @@ short_description: Description
 version_added: "0.3.1"
 description: Module for configuration of config groups.
 author:
-  - Przemyslaw Susko (sprzemys@cisco.com)
+  - Przemyslaw Susko (@sprzemys)
 extends_documentation_fragment:
   - cisco.catalystwan.manager_authentication
 """
@@ -55,50 +55,64 @@ EXAMPLES = r"""
 import traceback
 
 from catalystwan.models.configuration.feature_profile.common import FeatureProfileCreationPayload
-from catalystwan.models.configuration.feature_profile.sdwan.service import (
-    InterfaceEthernetParcel as ServiceInterfaceEthernetParcel,
-)
-from catalystwan.models.configuration.feature_profile.sdwan.service import LanVpnParcel
-from catalystwan.models.configuration.feature_profile.sdwan.system import (
-    AAAParcel,
-    BannerParcel,
-    BasicParcel,
-    BFDParcel,
-    GlobalParcel,
-    LoggingParcel,
-    MRFParcel,
-    NtpParcel,
-    OMPParcel,
-)
-from catalystwan.models.configuration.feature_profile.sdwan.transport import (
-    InterfaceEthernetParcel as TransportInterfaceEthernetParcel,
-)
-from catalystwan.models.configuration.feature_profile.sdwan.transport import TransportVpnParcel
+
+try:
+    from catalystwan.models.configuration.feature_profile.sdwan.service import (
+        InterfaceEthernetParcel as ServiceInterfaceEthernetParcel,
+    )
+    from catalystwan.models.configuration.feature_profile.sdwan.service import (
+        LanVpnParcel,
+    )
+    from catalystwan.models.configuration.feature_profile.sdwan.system import (
+        AAAParcel,
+        BannerParcel,
+        BasicParcel,
+        BFDParcel,
+        GlobalParcel,
+        LoggingParcel,
+        MRFParcel,
+        NtpParcel,
+        OMPParcel,
+    )
+    from catalystwan.models.configuration.feature_profile.sdwan.transport import (
+        InterfaceEthernetParcel as TransportInterfaceEthernetParcel,
+    )
+    from catalystwan.models.configuration.feature_profile.sdwan.transport import (
+        TransportVpnParcel,
+    )
+
+    HAS_LEGACY_FEATURE_PROFILE_BUILDER = True
+except ImportError:
+    HAS_LEGACY_FEATURE_PROFILE_BUILDER = False
 
 from ..module_utils.result import ModuleResult
 from ..module_utils.vmanage_module import AnsibleCatalystwanModule
 
-system_parcel_type_mapping = {
-    "banner": BannerParcel,
-    "basic": BasicParcel,
-    "bfd": BFDParcel,
-    "omp": OMPParcel,
-    "logging": LoggingParcel,
-    "ntp": NtpParcel,
-    "global": GlobalParcel,
-    "aaa": AAAParcel,
-    "mrf": MRFParcel,
-}
+system_parcel_type_mapping = (
+    {
+        "banner": BannerParcel,
+        "basic": BasicParcel,
+        "bfd": BFDParcel,
+        "omp": OMPParcel,
+        "logging": LoggingParcel,
+        "ntp": NtpParcel,
+        "global": GlobalParcel,
+        "aaa": AAAParcel,
+        "mrf": MRFParcel,
+    }
+    if HAS_LEGACY_FEATURE_PROFILE_BUILDER
+    else {}
+)
 
-transport_parcel_type_mapping = {
-    "vpn": TransportVpnParcel,
-    "ethernet": TransportInterfaceEthernetParcel,
-}
+transport_parcel_type_mapping = (
+    {"vpn": TransportVpnParcel, "ethernet": TransportInterfaceEthernetParcel}
+    if HAS_LEGACY_FEATURE_PROFILE_BUILDER
+    else {}
+)
 
-service_parcel_type_mapping = {
-    "vpn": LanVpnParcel,
-    "ethernet": ServiceInterfaceEthernetParcel,
-}
+service_parcel_type_mapping = (
+    {"vpn": LanVpnParcel, "ethernet": ServiceInterfaceEthernetParcel} if HAS_LEGACY_FEATURE_PROFILE_BUILDER else {}
+)
 
 
 def create_parcel(module, parcel, profile_type):
@@ -177,6 +191,13 @@ def run_module():
     )
 
     module = AnsibleCatalystwanModule(argument_spec=module_args)
+    if not HAS_LEGACY_FEATURE_PROFILE_BUILDER:
+        module.fail_json(
+            msg=(
+                "The installed catalystwan SDK no longer exposes the legacy feature-profile builder. "
+                "Install catalystwan==0.41.5.dev2 to use this module."
+            )
+        )
     result = ModuleResult()
     profile_ids = []
 
