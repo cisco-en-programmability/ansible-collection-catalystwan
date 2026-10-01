@@ -1,5 +1,5 @@
 # Tested runtime stack. Python 3.12-3.14 is required by Ansible 14.
-ansible==14.3.1
+ansible==14.4.0
 
 # The 0.41.5 development line is the newest published SDK artifact that still
 # contains every high-level API used by this collection. Compatibility tests

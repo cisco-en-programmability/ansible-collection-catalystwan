@@ -47,7 +47,7 @@ jobs:
 
       - name: Install Ansible and importer
         run: |
-          pip install ansible==14.3.1
+          pip install ansible==14.4.0
           pip install ansible-importer
           pip install galaxy-importer
 

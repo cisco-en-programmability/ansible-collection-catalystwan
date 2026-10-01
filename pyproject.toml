@@ -7,7 +7,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = ">=3.12,<3.15"
-ansible = "14.3.1"
+ansible = "14.4.0"
 catalystwan = "0.41.5.dev2"
 flake8 = "7.3.0"
 black = "26.5.1"
