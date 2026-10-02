@@ -90,12 +90,13 @@ changed:
 
 from typing import Literal, Optional, get_args
 
+from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed  # type: ignore
+
 from catalystwan.api.task_status_api import Task
 from catalystwan.models.tenant import Tenant
 from catalystwan.session import ManagerRequestException
 from catalystwan.typed_list import DataSequence
 from catalystwan.vmanage_auth import UnauthorizedAccessError
-from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed  # type: ignore
 
 from ..module_utils.result import ModuleResult
 from ..module_utils.vmanage_module import AnsibleCatalystwanModule

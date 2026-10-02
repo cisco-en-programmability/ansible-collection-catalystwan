@@ -96,10 +96,11 @@ from datetime import datetime
 from pathlib import Path, PurePath
 from typing import List, Optional
 
+from pydantic import BaseModel, Field
+
 from catalystwan.dataclasses import Device
 from catalystwan.endpoints.configuration_device_inventory import DeviceDetailsResponse
 from catalystwan.typed_list import DataSequence
-from pydantic import BaseModel, Field
 
 from ..module_utils.filters import get_target_device
 from ..module_utils.result import ModuleResult

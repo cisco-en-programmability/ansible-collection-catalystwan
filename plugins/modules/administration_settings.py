@@ -204,6 +204,8 @@ response:
 
 from typing import get_args
 
+from pydantic import BaseModel, ConfigDict, Field
+
 from catalystwan.endpoints.configuration_settings import (
     Certificate,
     Device,
@@ -213,7 +215,6 @@ from catalystwan.endpoints.configuration_settings import (
     SmartAccountCredentials,
     SoftwareInstallTimeout,
 )
-from pydantic import BaseModel, ConfigDict, Field
 
 try:
     from catalystwan.endpoints.configuration_settings import EnterpriseRootCA

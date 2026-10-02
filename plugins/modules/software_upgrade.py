@@ -181,14 +181,15 @@ result:
 import traceback
 from enum import Enum
 
+from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed  # type: ignore
+from urllib3.exceptions import NewConnectionError, TimeoutError
+
 from catalystwan.api.task_status_api import Task
 from catalystwan.endpoints.configuration_device_inventory import DeviceDetailsResponse
 from catalystwan.exceptions import EmptyVersionPayloadError, ImageNotInRepositoryError
 from catalystwan.session import ManagerHTTPError, ManagerRequestException
 from catalystwan.typed_list import DataSequence
 from catalystwan.vmanage_auth import UnauthorizedAccessError
-from tenacity import retry, retry_if_exception_type, stop_after_attempt, wait_fixed  # type: ignore
-from urllib3.exceptions import NewConnectionError, TimeoutError
 
 from ..module_utils.filters import get_devices_details
 from ..module_utils.result import ModuleResult

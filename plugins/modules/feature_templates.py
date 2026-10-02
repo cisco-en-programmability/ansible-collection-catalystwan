@@ -79,12 +79,13 @@ EXAMPLES = r"""
 
 from typing import Dict, Final, Literal, Optional, get_args
 
+from pydantic import BaseModel, ConfigDict, Field
+
 from catalystwan.api.template_api import FeatureTemplate
 from catalystwan.api.templates.device_variable import DeviceVariable
 from catalystwan.api.templates.models.supported import available_models
 from catalystwan.session import ManagerHTTPError
 from catalystwan.typed_list import DataSequence
-from pydantic import BaseModel, ConfigDict, Field
 
 try:
     from catalystwan.dataclasses import FeatureTemplateInfo

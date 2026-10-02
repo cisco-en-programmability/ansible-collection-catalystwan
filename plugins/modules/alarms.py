@@ -103,10 +103,11 @@ import json
 import traceback
 from typing import List, Optional
 
+from pydantic import Field
+
 from catalystwan.session import ManagerHTTPError
 from catalystwan.utils.alarm_status import Severity
 from catalystwan.utils.creation_tools import asdict
-from pydantic import Field
 
 from ..module_utils.result import ModuleResult
 from ..module_utils.vmanage_module import AnsibleCatalystwanModule

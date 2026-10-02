@@ -59,9 +59,10 @@ EXAMPLES = r"""
 
 from typing import Any, List, Optional, Union
 
+from pydantic import Field
+
 from catalystwan.endpoints.configuration.software_actions import RemoteServerInfo, SoftwareImageDetails
 from catalystwan.typed_list import DataSequence
-from pydantic import Field
 
 from ..module_utils.result import ModuleResult
 from ..module_utils.vmanage_module import AnsibleCatalystwanModule

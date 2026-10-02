@@ -112,9 +112,10 @@ changed:
 import traceback
 from typing import List, Optional
 
+from pydantic import Field
+
 from catalystwan.endpoints.administration_user_and_group import User
 from catalystwan.session import ManagerHTTPError
-from pydantic import Field
 
 from ..module_utils.result import ModuleResult
 from ..module_utils.vmanage_module import AnsibleCatalystwanModule

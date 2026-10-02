@@ -9,12 +9,13 @@ from pprint import pformat
 from typing import Annotated, Literal, Type, Union, get_args, get_origin
 
 import yaml
-from catalystwan.api.templates.device_variable import DeviceVariable
-from catalystwan.api.templates.models.supported import available_models
-from catalystwan.models.common import DeviceModel
 from jinja2 import Environment, FileSystemLoader
 from pydantic import BaseModel
 from pydantic.fields import FieldInfo
+
+from catalystwan.api.templates.device_variable import DeviceVariable
+from catalystwan.api.templates.models.supported import available_models
+from catalystwan.models.common import DeviceModel
 
 PROJECT_ROOT_DIR = PurePath(Path.cwd())
 
