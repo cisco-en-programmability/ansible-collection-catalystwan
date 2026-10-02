@@ -64,7 +64,7 @@ Support for the following workflows in vManage client and as Ansible modules:
 Currently development of the tool was set with:
 
 - Python = 3.12-3.14
-- Ansible = 14.3.1 (ansible-core 2.21.3)
+- Ansible = 14.4.0 (ansible-core 2.21.4)
 - catalystwan = 0.41.5.dev2 for the complete high-level API used by the collection
 
 The compatibility CI also imports and validates module documentation with the
