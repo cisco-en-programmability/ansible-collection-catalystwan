@@ -173,11 +173,10 @@ import traceback
 from pathlib import Path, PurePath
 from typing import Dict, List, Optional
 
-from pydantic import BaseModel, Field
-
 from catalystwan.api.template_api import DeviceTemplate
 from catalystwan.session import ManagerHTTPError
 from catalystwan.typed_list import DataSequence
+from pydantic import BaseModel, Field
 
 try:
     from catalystwan.dataclasses import DeviceTemplateInfo

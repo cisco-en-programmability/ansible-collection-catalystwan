@@ -138,10 +138,9 @@ EXAMPLES = r"""
 import time
 from typing import Dict, List, Optional
 
-from pydantic import BaseModel, ConfigDict, Field
-
 from catalystwan.endpoints.cluster_management import TenancyMode
 from catalystwan.exceptions import ManagerRequestException
+from pydantic import BaseModel, ConfigDict, Field
 
 try:
     from catalystwan.endpoints.cluster_management import ConnectedDevice, VManageSetup

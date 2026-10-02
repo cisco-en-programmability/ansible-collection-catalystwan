@@ -144,10 +144,9 @@ changed:
 
 from typing import Dict, Optional
 
-from pydantic import Field
-
 from catalystwan.api.template_api import FeatureTemplate
 from catalystwan.typed_list import DataSequence
+from pydantic import Field
 
 try:
     from catalystwan.dataclasses import FeatureTemplateInfo

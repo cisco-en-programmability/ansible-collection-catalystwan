@@ -93,13 +93,12 @@ template_id:
 
 from typing import List, Literal, Optional, get_args
 
-from ciscoconfparse import CiscoConfParse  # type: ignore
-from pydantic import BaseModel, ConfigDict, Field
-
 from catalystwan.api.template_api import CLITemplate
 from catalystwan.dataclasses import Device
 from catalystwan.session import ManagerHTTPError
 from catalystwan.typed_list import DataSequence
+from ciscoconfparse import CiscoConfParse  # type: ignore
+from pydantic import BaseModel, ConfigDict, Field
 
 try:
     from catalystwan.api.templates.device_template.device_template import DeviceTemplateConfigAttached

@@ -71,11 +71,10 @@ changed:
 import traceback
 from typing import Dict, Literal, Optional, get_args
 
-from pydantic import Field
-
 from catalystwan.api.template_api import CLITemplate
 from catalystwan.session import ManagerHTTPError
 from catalystwan.utils.personality import Personality
+from pydantic import Field
 
 from ..module_utils.result import ModuleResult
 from ..module_utils.vmanage_module import AnsibleCatalystwanModule

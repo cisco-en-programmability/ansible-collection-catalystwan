@@ -123,13 +123,12 @@ import traceback
 from enum import Enum
 from typing import List, Optional
 
-from pydantic import Field
-
 from catalystwan.endpoints.configuration_device_inventory import (
     DeviceDetailsResponse,
     SerialFilePayload,
     SmartAccountSyncParams,
 )
+from pydantic import Field
 
 from ..module_utils.filters import get_target_device
 from ..module_utils.result import ModuleResult

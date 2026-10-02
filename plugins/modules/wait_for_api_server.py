@@ -62,13 +62,12 @@ message:
 import traceback
 from typing import Any, Dict, Optional
 
+from catalystwan.session import create_manager_session
+from catalystwan.vmanage_auth import UnauthorizedAccessError
 from pydantic import Field
 from requests.exceptions import ConnectionError
 from tenacity import retry, retry_if_exception_type, stop_after_delay, wait_fixed  # type: ignore
 from urllib3.exceptions import NewConnectionError, TimeoutError
-
-from catalystwan.session import create_manager_session
-from catalystwan.vmanage_auth import UnauthorizedAccessError
 
 from ..module_utils.result import ModuleResult
 from ..module_utils.vmanage_module import AnsibleCatalystwanModule

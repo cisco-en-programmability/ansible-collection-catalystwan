@@ -87,10 +87,9 @@ installed_devices:
 
 from typing import List, Optional
 
-from pydantic import Field
-
 from catalystwan.endpoints.configuration_device_actions import InstalledDeviceData
 from catalystwan.typed_list import DataSequence
+from pydantic import Field
 
 from ..module_utils.result import ModuleResult
 from ..module_utils.vmanage_module import AnsibleCatalystwanModule
