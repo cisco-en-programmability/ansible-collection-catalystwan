@@ -39,12 +39,12 @@ When you're finished with the changes, create a pull request, also known as a PR
 
 ## Development
 
-Initial note: we are using `catalystwan` version that is still under development so please adjust your poetry according to this information.
-Sorry for inconvenience but we will fix that soon.
+The full collection uses `catalystwan==0.41.5.dev2`; see the
+[SDK compatibility policy](COMPATIBILITY.md) before changing that version.
 
 Preferred way to setup environment for development:
 
-1. Use `poetry install` and `poetry shell`
+1. Use `poetry install` and `poetry env activate` to set up the SDK/test environment
 2. Install local collection with `ansible-galaxy collection install . --force`
 3. Adjust configuration of variables in ``.dev_dir/dev_vars.yml``
 4. Run playground playbook with `ansible-playbook .dev_dir/playground.yml` or any other playbook used for tests
@@ -52,13 +52,30 @@ Preferred way to setup environment for development:
 You can also refer to [Ansible modules dev guide](https://docs.ansible.com/ansible/latest/dev_guide/developing_modules_general.html#verifying-your-module-code) to look for more convenient way of
 testing your code.
 
-### Dependencies in requirements.txt
+### Separate SDK and lint environments
 
-All dependencies are updated via `poetry` tool. Dependencies defined for development are later used to generate `requirements.txt` file with command:
+The SDK requires `packaging<24`. Security-fixed `virtualenv` requires
+`packaging>=26.3`, so install pre-commit and the lint tools in a separate
+environment. Installing both requirement files into one environment is unsupported.
+For example, using Python 3.14:
 
 ```bash
-poetry export --without-hashes --format=requirements.txt > requirements.txt
+python3.14 -m venv .venv
+.venv/bin/python -m pip install -r requirements-dev.txt
+.venv/bin/python -m pytest -q tests/unit
+
+python3.14 -m venv .venv-lint
+.venv-lint/bin/python -m pip install -r requirements-lint.txt
+.venv-lint/bin/pre-commit run --all-files
 ```
+
+`requirements.txt` and Poetry define the SDK/runtime stack; `requirements-dev.txt`
+adds unit tests. `requirements-lint.txt` defines the isolated lint stack, which CI
+also uses. `requirements-security.txt` supplies the fixed dependency minimums for
+pip installs and the SDK compatibility matrix; keep these minimums in sync with
+`pyproject.toml` when updating dependencies. Collection installation through Galaxy
+does not install Python requirements: install `requirements.txt` in the runtime
+environment as described in the README.
 
 ---
 
