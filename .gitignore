@@ -12,6 +12,7 @@ run*
 .dev_dir/serialFile.viptela
 
 ansible.log
+tests/output/
 vmngclient.log
 playbooks/tests/configuration_file_dev_vars.yml
 playbooks/tests/ansible_catalystwan.log
