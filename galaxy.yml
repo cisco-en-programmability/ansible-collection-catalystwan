@@ -30,3 +30,6 @@ build_ignore:
   - "**/__pycache__"
   - "**/*.pyc"
   - "*.tar.gz"
+  - "*.log"
+  - "**/*.log"
+  - tests/output

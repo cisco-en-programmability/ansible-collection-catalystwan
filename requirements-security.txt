@@ -1,0 +1,4 @@
+# Minimum fixed versions shared by runtime, lint, and SDK compatibility CI.
+certifi>=2026.10.19
+urllib3>=2.8.0,<3.0
+setuptools>=84.1.0

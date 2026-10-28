@@ -1,0 +1,10 @@
+# Install in a separate environment: the SDK requires packaging<24, while
+# security-fixed virtualenv requires packaging>=26.3.
+-r requirements-security.txt
+ansible-lint==26.8.0
+black==26.10.1
+flake8==7.3.0
+pre-commit==4.6.2
+pycln==2.6.0
+filelock>=4.2.1
+virtualenv>=21.14.9

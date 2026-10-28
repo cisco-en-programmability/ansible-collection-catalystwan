@@ -30,7 +30,7 @@ jobs:
 
       - uses: isort/isort-action@master
         with:
-          requirementsFiles: "requirements.txt"
+          requirementsFiles: "requirements-lint.txt"
           isortVersion: '8.0.1'
 
       - name: Install pycln

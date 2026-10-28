@@ -7,17 +7,16 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = ">=3.12,<3.15"
-ansible = "14.3.1"
+ansible = "14.4.0"
 catalystwan = "0.41.5.dev2"
-flake8 = "7.3.0"
-black = "26.5.1"
-pre-commit = "4.6.2"
 pydantic = ">=2.7,<3.0"
 requests = ">=2.32.5,<3.0"
-urllib3 = ">=2.6,<3.0"
-ansible-lint = { version = "26.8.0", markers = "platform_system != 'Windows'" }
+certifi = ">=2026.10.19"
+urllib3 = ">=2.8.0,<3.0"
+setuptools = ">=84.1.0"
 
 [tool.poetry.group.dev.dependencies]
+pytest = "9.1.1"
 
 [tool.black]
 line-length = 120
@@ -25,3 +24,4 @@ line-length = 120
 [tool.isort]
 profile = "black"
 line_length = 120
+known_third_party = ["catalystwan"]

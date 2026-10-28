@@ -5,7 +5,7 @@
 | Layer | Tested target | Validation |
 | --- | --- | --- |
 | Python | 3.12, 3.13, 3.14 | CI matrix |
-| Ansible | 14.3.1 / ansible-core 2.21.3 | Unit, collection build, and `ansible-doc` checks |
+| Ansible | 14.4.0 / ansible-core 2.21.4 | Unit, collection build, and `ansible-doc` checks |
 | catalystwan SDK | 0.41.5.dev2 | Full module import and SDK contract checks |
 | catalystwan SDK | 0.41.6 | Full module import and documentation checks; removed SDK APIs fail with actionable messages |
 | Cisco Catalyst SD-WAN Manager | 26.1 | SDK version parsing plus opt-in live smoke playbook |
